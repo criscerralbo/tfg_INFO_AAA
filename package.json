@@ -1,0 +1,21 @@
+{
+    "name": "tfg",
+    "version": "1.0.0",
+    "description": "Aplicación TFG",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "@sendgrid/mail": "^8.1.4",
+        "bcrypt": "^5.1.1",
+        "body-parser": "^1.20.3",
+        "express": "^4.21.1",
+        "express-session": "^1.18.1",
+        "nodemailer": "^6.9.15",
+        "postmark": "^4.0.5",
+        "sqlite3": "^5.1.7"
+    },
+    "author": "Cristina Cerralbo",
+    "license": "ISC"
+}

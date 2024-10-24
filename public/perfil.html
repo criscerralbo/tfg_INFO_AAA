@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="/css/perfil.css"> <!-- Estilos independientes para la página del perfil -->
+</head>
+<body>
+    <!-- Header común con botón de volver -->
+    <header>
+        <h1>Perfil de Usuario</h1>
+        <div class="user-section">
+            <button id="inicio-button" class="inicio-button">Volver a Inicio</button>
+            <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="profile-container">
+        <form id="profileForm">
+            <h2>Editar Perfil</h2>
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" value="" required>
+
+            <label for="email">Correo</label>
+            <input type="email" id="email" name="email" value="" readonly>
+
+            <label for="password">Contraseña (Actual para cambiar)</label>
+            <input type="password" id="currentPassword" name="currentPassword" placeholder="Introduce la contraseña actual para cambiar">
+
+            <label for="newPassword">Nueva Contraseña (opcional)</label>
+            <input type="password" id="newPassword" name="newPassword" placeholder="Introduce una nueva contraseña si quieres cambiarla">
+
+            <button type="submit">Guardar Cambios</button>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
+    </footer>
+
+    <script>
+        // Cargar datos del perfil del usuario desde el servidor
+        window.addEventListener('DOMContentLoaded', (event) => {
+            console.log("Intentando cargar datos del perfil...");
+            
+            fetch('/usuarios/perfil')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el perfil del usuario');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.nombre && data.email) {
+                        document.getElementById('nombre').value = data.nombre;
+                        document.getElementById('email').value = data.email;
+                    }
+                })
+                .catch(err => {
+                    console.error('Error al cargar los datos del perfil:', err);
+                    alert('Hubo un problema al cargar los datos del perfil. Por favor, inténtalo de nuevo.');
+                });
+        });
+
+        // Función para cerrar sesión
+        document.getElementById('logout-button').addEventListener('click', function() {
+            console.log("Intentando cerrar sesión...");
+            fetch('/usuarios/logout')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al cerrar la sesión');
+                    }
+                    window.location.href = '/'; // Redirigir a la página de inicio de sesión (index.html)
+                })
+                .catch(err => {
+                    console.error('Error al cerrar sesión:', err);
+                    alert('Hubo un problema al intentar cerrar la sesión. Por favor, inténtalo de nuevo.');
+                });
+        });
+
+        // Función para volver a inicio (redirigir a /inicio)
+        document.getElementById('inicio-button').addEventListener('click', function() {
+            window.location.href = '/inicio'; // Redirigir a la página de inicio
+        });
+
+        // Enviar el formulario para actualizar datos del usuario
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const nombre = document.getElementById('nombre').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            if (!nombre.trim()) {
+                alert('El nombre no puede estar vacío');
+                return;
+            }
+
+            console.log("Enviando datos para actualizar perfil...");
+            try {
+                const response = await fetch('/usuarios/actualizarPerfil', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre, currentPassword, newPassword })
+                });
+
+                if (response.ok) {
+                    const result = await response.text();
+                    alert(result);
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Error al actualizar el perfil: ${errorMessage}`);
+                }
+            } catch (error) {
+                console.error("Error al actualizar el perfil:", error);
+                alert('Hubo un problema al actualizar el perfil. Por favor, inténtalo de nuevo.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Gamificación en Odontología</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Estilos generales -->
+</head>
+<body>
+
+    <!-- Header con título y usuario -->
+    <header>
+        <h1>Tu Aplicación de Gamificación</h1>
+        <div class="user-section">
+            <span id="user-greeting">Bienvenido</span> <!-- Aquí se cargará el nombre del usuario -->
+            <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+            <div class="user-icon">
+                <a href="/perfil.html">
+                <img src="images/usuario.png" alt="Usuario">
+            </a>
+            </div>
+        </div>
+    </header>
+    <script>
+        // Cargar el nombre del usuario desde la sesión del servidor
+        window.addEventListener('DOMContentLoaded', (event) => {
+            fetch('/usuarios/nombre')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.nombreUsuario) {
+                        document.getElementById('user-greeting').textContent = `Bienvenido, ${data.nombreUsuario}`;
+                    } else {
+                        document.getElementById('user-greeting').textContent = 'Bienvenido, Usuario';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('user-greeting').textContent = 'Bienvenido, Usuario';
+                });
+        });
+    
+        // Función para cerrar sesión
+        document.getElementById('logout-button').addEventListener('click', function() {
+            fetch('/usuarios/logout')
+                .then(() => {
+                    window.location.href = '/'; // Redirigir a la página de inicio de sesión (index.html)
+                });
+        });
+    </script>
+    
+    <!-- Restante del HTML sigue igual -->
+    
+
+    <!-- Contenido principal -->
+    <main class="welcome-section">
+        <h2>Bienvenido a la Aplicación de Gamificación en Odontología</h2>
+        <p>
+            Esta plataforma está diseñada para mejorar el aprendizaje de los estudiantes de odontología a través de juegos interactivos y didácticos. 
+            Aquí podrás participar en actividades, resolver casos clínicos y medir tu progreso de una manera divertida y educativa.
+        </p>
+        <a href="#" class="boton-principal">Empezar</a>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
+    </footer>
+
+</body>
+</html>
