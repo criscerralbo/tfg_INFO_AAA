@@ -19,5 +19,5 @@ node app.js
 
 usuarios y contraseñas:
 
-profesor1@tfg.com
+
 profesor123

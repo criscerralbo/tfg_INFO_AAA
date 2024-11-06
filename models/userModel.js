@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 
 // Conectar a la base de datos
 const db = new sqlite3.Database('./database/usuarios.db');
+// Conectar a la base de datos
+
 
 // Crear la tabla de usuarios si no existe
 db.serialize(() => {
@@ -42,19 +44,31 @@ db.serialize(() => {
   });
 
   
-
-  // Crear la tabla de tokens si no existe
-  db.run(`
-    CREATE TABLE IF NOT EXISTS tokens (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL,
-      token TEXT NOT NULL
-    )
-  `, (err) => {
+  db.run(`DROP TABLE IF EXISTS tokens`, (err) => {
     if (err) {
-      console.error('Error al crear la tabla de tokens', err);
+      console.error('Error al eliminar la tabla de tokens:', err);
+    } else {
+      console.log('Tabla de tokens eliminada correctamente.');
     }
   });
+  
+// Crear la tabla de tokens si no existe
+db.run(`
+  CREATE TABLE IF NOT EXISTS tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    token INTEGER NOT NULL,
+    tipo TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )
+`, (err) => {
+  if (err) {
+    console.error('Error al crear la tabla de tokens', err);
+  } else {
+    console.log('Tabla de tokens creada o ya existente');
+  }
+});
+
 
   // Crear usuarios por defecto: Profesor y Alumno
   db.run(`

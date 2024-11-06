@@ -1,7 +1,18 @@
 // userRoutes.js
 const express = require('express');
 const router = express.Router();
-const { registrarUsuario, iniciarSesion, verificarUsuario, obtenerPerfil, actualizarPerfil, cerrarSesion } = require('../controllers/userController');
+
+const { 
+    registrarUsuario, 
+    iniciarSesion, 
+    verificarUsuario, 
+    obtenerPerfil, 
+    actualizarPerfil, 
+    cerrarSesion, 
+    recuperarContrasena,
+    resetearContrasena, 
+    verificarCodigo  // Asegúrate de que verificarCodigo esté aquí
+} = require('../controllers/userController');
 
 // Ruta para registrar un usuario
 router.post('/registrar', registrarUsuario);
@@ -28,5 +39,12 @@ router.post('/actualizarPerfil', actualizarPerfil);
 
 // Ruta para cerrar sesión (usando el método del controlador)
 router.get('/logout', cerrarSesion);
+
+// Nueva ruta para la recuperación de contraseña
+router.post('/recuperarContrasena', recuperarContrasena);
+
+router.post('/verificarCodigo', verificarCodigo);
+
+router.post('/resetearContrasena', resetearContrasena);
 
 module.exports = router;

@@ -11,6 +11,43 @@ document.getElementById('show-login').addEventListener('click', function (e) {
   document.getElementById('login-container').style.display = 'block';
 });
 
+// Alternar al formulario de recuperación de contraseña
+document.getElementById('show-password-recovery').addEventListener('click', function (e) {
+  e.preventDefault();
+  document.getElementById('login-container').style.display = 'none';
+  document.getElementById('password-recovery-container').style.display = 'block';
+});
+
+// Regresar al formulario de inicio de sesión desde recuperación de contraseña
+document.getElementById('show-login-from-recovery').addEventListener('click', function (e) {
+  e.preventDefault();
+  document.getElementById('password-recovery-container').style.display = 'none';
+  document.getElementById('login-container').style.display = 'block';
+});
+
+// Regresar al formulario de inicio de sesión desde verificación de código
+document.getElementById('show-login-from-verification').addEventListener('click', function (e) {
+  e.preventDefault();
+  document.getElementById('code-verification-container').style.display = 'none';
+  document.getElementById('login-container').style.display = 'block';
+});
+
+// Regresar al formulario de inicio de sesión desde verificación de código
+document.getElementById('show-login-from-reset').addEventListener('click', function (e) {
+  e.preventDefault();
+  document.getElementById('password-reset-container').style.display = 'none';
+  document.getElementById('login-container').style.display = 'block';
+});
+
+
+//************Actualziar
+// ir al verificacion de codigo desde recuperar contraseña
+document.getElementById('show-verification-from-recovery').addEventListener('click', function (e) {
+  e.preventDefault();
+  document.getElementById('password-recovery-container').style.display = 'none';
+  document.getElementById('code-verification-container').style.display = 'block';
+});
+
 // Enviar el formulario de inicio de sesión
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
@@ -101,6 +138,102 @@ document.getElementById('verifyForm').addEventListener('submit', async function 
     document.getElementById('verification-container').style.display = 'none';
     document.getElementById('login-container').style.display = 'block';
   }
+});
+
+// Enviar el formulario de recuperación de contraseña
+document.getElementById('passwordRecoveryForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const email = document.getElementById('recoveryEmail').value;
+  const recoveryErrorMessageDiv = document.getElementById('recovery-error-message');
+
+  const response = await fetch('/usuarios/recuperarContrasena', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email })
+  });
+
+  const data = await response.json();
+
+  if (response.ok) {
+    document.getElementById('password-recovery-container').style.display = 'none';
+    document.getElementById('code-verification-container').style.display = 'block'; // Ir al formulario de verificación de código
+  } else {
+    recoveryErrorMessageDiv.textContent = data.error || 'Error al recuperar la contraseña';
+    recoveryErrorMessageDiv.style.display = 'block';
+  }
+});
+
+// Enviar el formulario de verificación de código para resetear contraseña
+document.getElementById('codeVerificationForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const email = document.getElementById('verificationEmail').value;
+  const token = document.getElementById('verificationToken').value;
+  const verificationMessageDiv = document.getElementById('verification-message');
+
+  const response = await fetch('/usuarios/verificarCodigo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, token })
+  });
+
+  const data = await response.json();
+
+  if (response.ok) {
+    verificationMessageDiv.textContent = data.message;
+    verificationMessageDiv.style.color = 'green';
+    document.getElementById('code-verification-container').style.display = 'none';
+    document.getElementById('password-reset-container').style.display = 'block';
+  } else {
+    verificationMessageDiv.textContent = data.error || 'Código de verificación incorrecto';
+    verificationMessageDiv.style.color = 'red';
+  }
+
+  verificationMessageDiv.style.display = 'block';
+});
+
+// Enviar el formulario de restablecimiento de contraseña
+document.getElementById('passwordResetForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const email = document.getElementById('resetEmail').value;
+  const token = document.getElementById('resetToken').value;
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const resetMessageDiv = document.getElementById('reset-message');
+
+  resetMessageDiv.textContent = '';
+  resetMessageDiv.style.display = 'none';
+
+  if (newPassword !== confirmPassword) {
+    resetMessageDiv.textContent = 'Las contraseñas no coinciden';
+    resetMessageDiv.style.color = 'red';
+    resetMessageDiv.style.display = 'block';
+    return;
+  }
+
+  const response = await fetch('/usuarios/resetearContrasena', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, newPassword, token })
+  });
+
+  const data = await response.json();
+
+  if (response.ok) {
+    resetMessageDiv.textContent = data.message;
+    resetMessageDiv.style.color = 'green';
+    document.getElementById('password-reset-container').style.display = 'none';
+    document.getElementById('login-container').style.display = 'block';
+  } else {
+    resetMessageDiv.textContent = data.error || 'Error al restablecer la contraseña';
+    resetMessageDiv.style.color = 'red';
+  }
+
+  resetMessageDiv.style.display = 'block';
 });
 
 window.addEventListener('DOMContentLoaded', (event) => {

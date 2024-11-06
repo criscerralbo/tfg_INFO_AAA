@@ -67,6 +67,101 @@ exports.registrarUsuario = (req, res) => {
         }
     );
 };
+// userController.js - Recuperar contraseña
+exports.recuperarContrasena = (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'El campo de correo es obligatorio' });
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@ucm\.es$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Debe usar un correo institucional (@ucm.es)' });
+    }
+
+    // Verificar si el usuario existe en la base de datos
+    db.get(`SELECT * FROM usuarios WHERE email = ?`, [email], (err, user) => {
+        if (err) {
+            console.error('Error al buscar el usuario en la base de datos:', err);
+            return res.status(500).json({ error: 'Error al procesar la solicitud' });
+        }
+
+        if (!user) {
+            return res.status(404).json({ error: 'Correo no registrado' });
+        }
+
+        // Generar código de verificación
+        const verificationCode = Math.floor(100000 + Math.random() * 900000);
+        console.log('Código de verificación generado:', verificationCode); // Log para verificar el código generado
+
+        // Intentar insertar el código en la base de datos
+        db.run(
+            `INSERT INTO tokens (email, token, tipo) VALUES (?, ?, 'recuperacion')`,
+            [email, verificationCode],
+            function (err) {
+                if (err) {
+                    console.error('Error al guardar el código de verificación en la base de datos:', err);
+                    return res.status(500).json({ error: 'Error al generar el código de verificación' });
+                }
+
+                console.log('Token insertado en la base de datos correctamente'); // Log para confirmar la inserción
+
+                // Enviar el correo con el código de verificación
+                client.sendEmail({
+                    "From": "ccerralb@ucm.es",
+                    "To": email,
+                    "Subject": "Código de Verificación - Recuperación de Contraseña",
+                    "TextBody": `Tu código de verificación es: ${verificationCode}. Usa este código para restablecer tu contraseña.`
+                }, (error, result) => {
+                    if (error) {
+                        console.error('Error al enviar el correo de verificación:', error);
+                        return res.status(500).json({ error: 'Error al enviar el código de verificación' });
+                    }
+                    console.log('Correo de verificación enviado:', result);
+                    res.status(200).json({ message: 'Se ha enviado un código de verificación a tu correo.' });
+                });
+            }
+        );
+    });
+};
+
+
+exports.verificarCodigo = (req, res) => {
+    const { email, token } = req.body;
+
+    db.get(`SELECT * FROM tokens WHERE email = ? AND token = ? AND tipo = 'recuperacion'`, [email, token], (err, row) => {
+        if (err || !row) {
+            return res.status(400).json({ error: 'Código de verificación incorrecto o expirado.' });
+        }
+
+        res.status(200).json({ message: 'Código de verificación correcto. Puedes restablecer tu contraseña.' });
+    });
+};
+
+
+// userController.js - Restablecer contraseña
+
+exports.resetearContrasena = (req, res) => {
+    const { email, newPassword, token } = req.body;
+
+    db.get(`SELECT * FROM tokens WHERE email = ? AND token = ? AND tipo = 'recuperacion'`, [email, token], (err, row) => {
+        if (err || !row) {
+            return res.status(400).json({ error: 'Código de verificación incorrecto o expirado.' });
+        }
+
+        db.run(`DELETE FROM tokens WHERE email = ? AND tipo = 'recuperacion'`, [email]);
+
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+        db.run(`UPDATE usuarios SET password = ? WHERE email = ?`, [hashedPassword, email], (err) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error al actualizar la contraseña' });
+            }
+            res.status(200).json({ message: 'Contraseña actualizada con éxito. Ahora puedes iniciar sesión.' });
+        });
+    });
+};
 
 // Verificar usuario (cuando el usuario introduce el código de verificación)
 exports.verificarUsuario = (req, res) => {
@@ -87,38 +182,8 @@ exports.verificarUsuario = (req, res) => {
         });
     });
 };
-/*
-// Iniciar Sesión
-exports.iniciarSesion = (req, res) => {
-    const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).send('Todos los campos son obligatorios');
-    }
 
-    db.get(`SELECT * FROM usuarios WHERE email = ?`, [email], (err, row) => {
-        if (err || !row) {
-            return res.status(400).send('El usuario no existe.');
-        }
-
-        const passwordIsValid = bcrypt.compareSync(password, row.password);
-        if (!passwordIsValid) {
-            return res.status(400).send('Contraseña incorrecta.');
-        }
-
-        if (row.verificado === 0) {
-            return res.status(400).send('El usuario no ha sido verificado.');
-        }
-
-        // Guardar el nombre y el email del usuario en la sesión
-        req.session.nombreUsuario = row.nombre;
-        req.session.emailUsuario = row.email;
-
-        // Redirigir a la página de inicio
-        res.redirect('/inicio');
-    });
-};
-*/
 exports.iniciarSesion = (req, res) => {
     const { email, password } = req.body;
 

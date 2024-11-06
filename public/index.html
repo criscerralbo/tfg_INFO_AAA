@@ -31,11 +31,54 @@
           <div id="error-message" style="color: red; display: none;"></div> <!-- Para mostrar errores -->
         </form>
         <div class="extra-options">
-          <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+          <p><a href="#" id="show-password-recovery">¿Olvidaste tu contraseña?</a></p>
           <p>¿No tienes una cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
         </div>
       </div>
 
+      <!-- Formulario de Recuperación de Contraseña, inicialmente oculto -->
+      <div id="password-recovery-container" style="display: none;">
+        <h2>Recuperación de Contraseña</h2>
+        <form id="passwordRecoveryForm" action="/usuarios/recuperarContrasena" method="POST">
+          <input type="email" id="recoveryEmail" name="email" placeholder="Correo Electrónico" required>
+          <button type="submit">Enviar</button>
+          <div id="recovery-error-message" style="color: red; display: none;"></div> <!-- Para mostrar errores de recuperación -->
+        </form>
+        <div class="extra-options">
+          <p><a href="#" id="show-login-from-recovery">Regresar al inicio de sesión</a></p>
+          <p><a href="#" id="show-verification-from-recovery">Verificar codigo para restaurar contraseña</a></p>
+        </div>
+      </div>
+
+                <!-- Formulario de Verificación de Código DE VERIFICACION DE CONTRASEÑA-->
+                <div id="code-verification-container" style="display: none;">
+                  <h2>Verificación de Código</h2>
+                  <form id="codeVerificationForm">
+                    <input type="email" id="verificationEmail" name="email" placeholder="Correo Electrónico" required>
+                    <input type="text" id="verificationToken" name="token" placeholder="Código de Verificación" required>
+                    <button type="submit">Verificar Código</button>
+                    <div id="verification-message" style="color: red; display: none;"></div>
+                  </form>
+                  <div class="extra-options">
+                    <p><a href="#" id="show-login-from-verification">Volver al inicio de sesión</a></p>
+                  </div>
+                </div>
+
+                <!-- Formulario de Restablecimiento de Contraseña -->
+                <div id="password-reset-container" style="display: none;">
+                  <h2>Restablecer Contraseña</h2>
+                  <form id="passwordResetForm">
+                    <input type="email" id="resetEmail" name="email" placeholder="Correo Electrónico" required>
+                    <input type="text" id="resetToken" name="token" placeholder="Código de Verificación" required>
+                    <input type="password" id="newPassword" name="newPassword" placeholder="Nueva Contraseña" required>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar Nueva Contraseña" required>
+                    <button type="submit">Restablecer Contraseña</button>
+                    <div id="reset-message" style="color: red; display: none;"></div>
+                  </form>
+                  <div class="extra-options">
+                    <p><a href="#" id="show-login-from-reset">Regresar al inicio de sesión</a></p>
+                  </div>
+                </div>
 
       <!-- Formulario de Registro, inicialmente oculto -->
       <div id="register-container" style="display: none;">
