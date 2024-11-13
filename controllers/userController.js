@@ -8,51 +8,51 @@ const client = new postmark.ServerClient('1c87cd46-32dc-4b31-a451-92175549348f')
 // Registrar usuario
 exports.registrarUsuario = (req, res) => {
     const { nombre, email, password, rol } = req.body;
-
+  
     if (!nombre || !email || !password || !rol) {
-        return res.status(400).send('Todos los campos son obligatorios');
+      return res.status(400).json({ error_message: 'Todos los campos son obligatorios' });
     }
-
+  
     const emailRegex = /^[a-zA-Z0-9._%+-]+@ucm\.es$/;
     if (!emailRegex.test(email)) {
-        return res.status(400).send('Debe usar un correo institucional (@ucm.es)');
+      return res.status(400).json({ error_message: 'Debe usar un correo institucional (@ucm.es)' });
     }
-
+  
     const hashedPassword = bcrypt.hashSync(password, 10);
     const token = Math.floor(100000 + Math.random() * 900000);
-
-    // Obtener el rol_id basado en el rol proporcionado
+  
     db.query(`SELECT id FROM roles WHERE nombre = ?`, [rol], (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(400).send('Rol inválido');
-        }
-
-        const rol_id = results[0].id;
-
-        db.query(
-            `INSERT INTO usuarios (nombre, email, password, rol_id, verificado) VALUES (?, ?, ?, ?, 0)`,
-            [nombre, email, hashedPassword, rol_id],
-            (err) => {
-                if (err) {
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        return res.status(400).send('El correo ya está registrado.');
-                    }
-                    return res.status(500).send('Error al registrar usuario');
-                }
-
-                client.sendEmail({
-                    "From": "ccerralb@ucm.es",
-                    "To": email,
-                    "Subject": "Verificación de correo - Gestión de Usuarios",
-                    "TextBody": `Gracias por registrarte. Tu código de verificación es: ${token}`
-                });
-
-                db.query(`INSERT INTO tokens (email, token, tipo) VALUES (?, ?, 'verificacion')`, [email, token]);
-                res.status(200).send('Se ha enviado un correo de verificación a su email.');
+      if (err || results.length === 0) {
+        return res.status(400).json({ error_message: 'Rol inválido' });
+      }
+  
+      const rol_id = results[0].id;
+  
+      db.query(
+        `INSERT INTO usuarios (nombre, email, password, rol_id, verificado) VALUES (?, ?, ?, ?, 0)`,
+        [nombre, email, hashedPassword, rol_id],
+        (err) => {
+          if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+              return res.status(400).json({ error_message: 'El correo ya está registrado.' });
             }
-        );
+            return res.status(500).json({ error_message: 'Error al registrar usuario' });
+          }
+  
+          client.sendEmail({
+            "From": "ccerralb@ucm.es",
+            "To": email,
+            "Subject": "Verificación de correo - Gestión de Usuarios",
+            "TextBody": `Gracias por registrarte. Tu código de verificación es: ${token}`
+          });
+  
+          db.query(`INSERT INTO tokens (email, token, tipo) VALUES (?, ?, 'verificacion')`, [email, token]);
+          res.status(200).json({ success_message: 'Registro exitoso. Por favor, revisa tu correo para verificar tu cuenta, habrá llegado en el spam.' });
+        }
+      );
     });
-};
+  };
+  
 
 // Recuperar contraseña
 exports.recuperarContrasena = (req, res) => {
@@ -132,20 +132,21 @@ exports.resetearContrasena = (req, res) => {
 // Verificar usuario
 exports.verificarUsuario = (req, res) => {
     const { email, token } = req.body;
-
+  
     db.query(`SELECT * FROM tokens WHERE email = ? AND token = ? AND tipo = 'verificacion'`, [email, token], (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(400).send('Código de verificación incorrecto.');
+      if (err || results.length === 0) {
+        return res.status(400).json({ error: 'Código de verificación incorrecto o expirado.' });
+      }
+  
+      db.query(`UPDATE usuarios SET verificado = 1 WHERE email = ?`, [email], (err) => {
+        if (err) {
+          return res.status(500).json({ error: 'Error al verificar el usuario.' });
         }
-
-        db.query(`UPDATE usuarios SET verificado = 1 WHERE email = ?`, [email], (err) => {
-            if (err) {
-                return res.status(500).send('Error al verificar el usuario.');
-            }
-            res.status(200).send('Usuario verificado con éxito.');
-        });
+        res.status(200).json({ message: 'Usuario verificado con éxito.' });
+      });
     });
-};
+  };
+  
 
 // Iniciar sesión
 exports.iniciarSesion = (req, res) => {

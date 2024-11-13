@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Usuarios - Gamificación en Odontología</title>
-    <link rel="stylesheet" href="/css/style.css"> <!-- Estilos generales -->
+    <link rel="stylesheet" href="/css/inicio.css"> <!-- Estilos generales -->
 </head>
 <body>
 
@@ -16,11 +16,24 @@
             <button id="logout-button" class="logout-button">Cerrar Sesión</button>
             <div class="user-icon">
                 <a href="/perfil.html">
-                <img src="images/usuario.png" alt="Usuario">
-            </a>
+                    <img src="images/usuario.png" alt="Usuario">
+                </a>
             </div>
         </div>
     </header>
+
+    <!-- Modal de confirmación de cierre de sesión -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+            <div class="modal-buttons">
+                <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+                <button id="cancelLogout" class="cancel-button">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Cargar el nombre del usuario desde la sesión del servidor
         window.addEventListener('DOMContentLoaded', (event) => {
@@ -37,18 +50,29 @@
                     document.getElementById('user-greeting').textContent = 'Bienvenido, Usuario';
                 });
         });
-    
-        // Función para cerrar sesión
+
+        // Mostrar el modal de confirmación
         document.getElementById('logout-button').addEventListener('click', function() {
+            document.getElementById('logoutModal').style.display = 'block';
+        });
+
+        // Cerrar el modal al hacer clic en "Cancelar" o en la "X"
+        document.getElementById('cancelLogout').addEventListener('click', function() {
+            document.getElementById('logoutModal').style.display = 'none';
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('logoutModal').style.display = 'none';
+        });
+
+        // Confirmar cierre de sesión
+        document.getElementById('confirmLogout').addEventListener('click', function() {
             fetch('/usuarios/logout')
                 .then(() => {
-                    window.location.href = '/'; // Redirigir a la página de inicio de sesión (index.html)
+                    window.location.href = '/'; // Redirigir a la página de inicio de sesión
                 });
         });
     </script>
-    
-    <!-- Restante del HTML sigue igual -->
-    
 
     <!-- Contenido principal -->
     <main class="welcome-section">

@@ -88,9 +88,12 @@
           <input type="email" id="email" name="email" placeholder="Correo" required>
           <input type="password" id="password" name="password" placeholder="Contraseña" required>
           <button type="submit">Registrar</button>
+          <div id="register-error-message" style="color: red; display: none;"></div>
+          <div id="register-message" style="display: none; color: green;"></div>
         </form>
         <div class="extra-options">
           <p>¿Ya tienes una cuenta? <a href="#" id="show-login">Inicia sesión aquí</a></p>
+          <p><a href="#" id="show-ver">Ya tengo un código de verificación</a></p>
         </div>
       </div>
 
@@ -101,7 +104,12 @@
           <input type="email" id="verifyEmail" name="email" placeholder="Correo" required>
           <input type="text" id="verificationCode" name="token" placeholder="Código de verificación" required>
           <button type="submit">Verificar</button>
+          <div id="verification-error-message" style="color: red; display: none;"></div>
+          <div id="verification-success-message" style="color: green; display: none;"></div>
         </form>
+        <div class="extra-options">
+          <p><a href="#" id="show-login-from-verContra">Regresar al inicio de sesión</a></p>
+        </div>
       </div>
 
     </div>
