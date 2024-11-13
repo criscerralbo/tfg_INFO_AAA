@@ -14,6 +14,8 @@
         <div class="user-section">
             <span id="user-greeting">Bienvenido</span> <!-- Aquí se cargará el nombre del usuario -->
             <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+            <!-- boton administrador que solo aparece a los usuarios administradores -->
+            <button id="admin-button" class="admin-button" style="display: none;">Administración</button>
             <div class="user-icon">
                 <a href="/perfil.html">
                     <img src="images/usuario.png" alt="Usuario">
@@ -45,12 +47,19 @@
                     } else {
                         document.getElementById('user-greeting').textContent = 'Bienvenido, Usuario';
                     }
+                    if (data.rol === 'administrador') { // Mostrar botón solo si el usuario es administrador
+                        document.getElementById('admin-button').style.display = 'block';
+                    }
                 })
+                
                 .catch(() => {
                     document.getElementById('user-greeting').textContent = 'Bienvenido, Usuario';
                 });
         });
-
+                // Redirigir al panel de administración
+                document.getElementById('admin-button').addEventListener('click', function() {
+                    window.location.href = '/admin.html';
+                })
         // Mostrar el modal de confirmación
         document.getElementById('logout-button').addEventListener('click', function() {
             document.getElementById('logoutModal').style.display = 'block';

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Usuarios</title>
+    <link rel="stylesheet" href="/css/admin.css"> <!-- Archivo CSS para estilos -->
+</head>
+<body>
+    <header>
+        <h1>Administración de Usuarios</h1>
+        <button onclick="window.location.href='/inicio'">Volver a Inicio</button>
+    </header>
+    <main>
+        <div class="search-container">
+            <input type="text" id="nameInput" placeholder="Buscar por nombre">
+            <input type="text" id="emailInput" placeholder="Buscar por correo">
+            
+            <select id="roleFilter">
+                <option value="">Todos los roles</option>
+                <option value="alumno">Alumno</option>
+                <option value="profesor">Profesor</option>
+                <option value="administrador">Administrador</option>
+            </select>
+        
+            <select id="verifiedFilter">
+                <option value="">Verificado</option>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
+            </select>
+        </div>
+        
+        
+     <!-- Contenedor para mensajes de error -->
+<!-- Contenedor para mensajes de estado (errores y confirmaciones) -->
+<div id="admin-status-message" style="display: none; padding: 10px; margin-top: 10px;"></div>
+<!-- Modal de confirmación para guardar o eliminar usuario -->
+<div id="actionModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeActionModal">&times;</span>
+        <h2 id="modalMessage">¿Estás seguro?</h2>
+        <div class="modal-buttons">
+            <button id="confirmAction" class="confirm-button">Sí</button>
+            <button id="cancelAction" class="cancel-button">Cancelar</button>
+        </div>
+    </div>
+</div>
+<div class="table-container">
+        <table id="users-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Verificado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+                <!-- Las filas de usuarios se insertarán aquí -->
+            </tbody>
+        </table>
+    </div>
+        <button id="add-user-button">+ Añadir Usuario</button> <!-- Botón para añadir usuario -->
+        
+        <!-- Modal para añadir un nuevo usuario -->
+<!-- Modal específico para añadir un nuevo usuario -->
+<div id="addUserModal" class="add-user-modal">
+    <div class="add-user-modal-content">
+        <span class="close-add-user-modal" id="closeAddUserModal">&times;</span>
+        <h2>Añadir Nuevo Usuario</h2>
+        <p>Contraseña predeterminada: <strong>12345678</strong></p>
+        
+        <!-- Contenedor para mensajes de error dentro del modal -->
+        <div id="addUserErrorMessage" class="error-message" style="display: none;"></div>
+
+        <form id="addUserForm">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+
+            <label for="email">Correo:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="rol">Rol:</label>
+            <select id="rol" name="rol" required>
+                <option value="">Seleccionar rol</option>
+                <option value="alumno">Alumno</option>
+                <option value="profesor">Profesor</option>
+                <option value="administrador">Administrador</option>
+            </select>
+
+            <button type="submit" class="submit-button">Crear Usuario</button>
+        </form>
+            </div>
+        </div>
+    </main>
+   
+    <script src="/admin.js"></script> <!-- Archivo JavaScript para la lógica -->
+ <!-- Lógica de JavaScript para búsquedas y filtrado -->
+
+     
+</body>
+</html>

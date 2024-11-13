@@ -4,6 +4,7 @@
 la url donde se corre es 
 
 http://localhost:3000/
+activar xaamp
 
 ##debemos activar mi_entorno para ejecutar
 

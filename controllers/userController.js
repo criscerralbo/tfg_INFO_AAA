@@ -1,7 +1,7 @@
 const db = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const postmark = require('postmark');
-
+const dbo = require('../db'); // Conexión a la base de datos
 // Conectar con Postmark usando tu API Key
 const client = new postmark.ServerClient('1c87cd46-32dc-4b31-a451-92175549348f');
 
@@ -53,6 +53,63 @@ exports.registrarUsuario = (req, res) => {
     });
   };
   
+
+
+exports.registrarAdm = async (req, res) => {
+    try {
+        const { nombre, email, rol } = req.body;
+        const password = '12345678'; // Contraseña predeterminada
+        const verificado = true; // Usuarios creados por el administrador estarán verificados
+
+        // Validación básica de datos
+        if (!nombre || !email || !rol) {
+            return res.status(400).json({ error_message: 'Todos los campos son obligatorios.' });
+        }
+
+        // Verificar si el usuario ya existe
+        dbo.query(`SELECT * FROM usuarios WHERE email = ?`, [email], (err, results) => {
+            if (err) {
+                console.error('Error al verificar el usuario:', err);
+                return res.status(500).json({ error_message: 'Hubo un error al verificar el usuario.' });
+            }
+
+            if (results && results.length > 0) {
+                // Si el usuario ya existe
+                return res.status(400).json({ error_message: 'El correo ya está registrado.' });
+            } else {
+                // Obtener rol_id desde la tabla roles
+                dbo.query(`SELECT id FROM roles WHERE nombre = ?`, [rol], (err, rolResults) => {
+                    if (err || rolResults.length === 0) {
+                        console.error('Error al obtener el rol_id:', err);
+                        return res.status(500).json({ error_message: 'Error al obtener el rol_id para el usuario.' });
+                    }
+
+                    const rol_id = rolResults[0].id; // Asignar el id correcto de roles
+
+                    // Hashear la contraseña predeterminada
+                    const hashedPassword = bcrypt.hashSync(password, 10);
+
+                    // Crear el usuario sin enviar correo de verificación
+                    dbo.query(
+                        `INSERT INTO usuarios (nombre, email, password, rol_id, verificado) VALUES (?, ?, ?, ?, ?)`,
+                        [nombre, email, hashedPassword, rol_id, verificado],
+                        (err) => {
+                            if (err) {
+                                console.error('Error al crear el usuario:', err);
+                                return res.status(500).json({ error_message: 'Hubo un error al crear el usuario.' });
+                            }
+                            res.status(201).json({ success_message: 'Usuario creado exitosamente.' });
+                        }
+                    );
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error al registrar usuario por el administrador:', error);
+        res.status(500).json({ error_message: 'Hubo un error al crear el usuario.' });
+    }
+};
+
 
 // Recuperar contraseña
 exports.recuperarContrasena = (req, res) => {
@@ -177,9 +234,30 @@ exports.iniciarSesion = (req, res) => {
 
             req.session.nombreUsuario = user.nombre;
             req.session.emailUsuario = user.email;
-            req.session.rol = user.rol;
+            req.session.rol = user.rol_id;
 
             res.status(200).json({ success: true, rol: user.rol });
+        }
+    );
+};
+exports.obtenerNombreYRol = (req, res) => {
+    if (!req.session.emailUsuario) {
+        return res.status(401).json({ mensaje: 'No ha iniciado sesión' });
+    }
+
+    db.query(
+        `SELECT usuarios.nombre, roles.nombre AS rol FROM usuarios
+         JOIN roles ON usuarios.rol_id = roles.id
+         WHERE usuarios.email = ?`, 
+        [req.session.emailUsuario], 
+        (err, results) => {
+            if (err || results.length === 0) {
+                return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+            }
+            res.json({
+                nombreUsuario: results[0].nombre,
+                rol: results[0].rol
+            });
         }
     );
 };
@@ -243,5 +321,53 @@ exports.cerrarSesion = (req, res) => {
             return res.status(500).send('Error al cerrar la sesión');
         }
         res.redirect('/');
+    });
+};
+
+exports.obtenerTodosLosUsuarios = (req, res) => {
+    db.query(`
+        SELECT usuarios.id, usuarios.nombre, usuarios.email, usuarios.verificado, roles.nombre AS rol 
+        FROM usuarios 
+        JOIN roles ON usuarios.rol_id = roles.id
+    `, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Error al obtener los usuarios' });
+        res.json(results);
+    });
+};
+
+// Actualizar el usuario con nombre, email y rol
+exports.actualizarUsuario = (req, res) => {
+    const { id } = req.params;
+    const { nombre, email, rol } = req.body;
+
+    // Obtener el rol_id correspondiente al nombre del rol proporcionado
+    db.query('SELECT id FROM roles WHERE nombre = ?', [rol], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(500).json({ error: 'Error al obtener el rol' });
+        }
+
+        const rol_id = results[0].id;
+
+        // Actualizar el usuario con el nuevo nombre, email y rol_id
+        db.query('UPDATE usuarios SET nombre = ?, email = ?, rol_id = ? WHERE id = ?', [nombre, email, rol_id, id], (err, results) => {
+            if (err) return res.status(500).json({ error: 'Error al actualizar usuario' });
+            res.json({ message: 'Usuario actualizado' });
+        });
+    });
+};
+exports.verificarUsuarioAdm = (req, res) => {
+    const { id } = req.params;
+
+    db.query('UPDATE usuarios SET verificado = 1 WHERE id = ?', [id], (err, results) => {
+        if (err) return res.status(500).json({ error: 'Error al verificar usuario' });
+        res.json({ message: 'Usuario verificado' });
+    });
+};
+
+exports.eliminarUsuario= (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM usuarios WHERE id = ?', [id], (err, results) => {
+        if (err) return res.status(500).json({ error: 'Error al eliminar usuario' });
+        res.json({ message: 'Usuario eliminado' });
     });
 };

@@ -1,6 +1,7 @@
 const db = require('../db');  // Conexión a la base de datos desde db.js
 const bcrypt = require('bcrypt');
 
+
 // Crear la tabla de roles si no existe
 db.query(`
   CREATE TABLE IF NOT EXISTS roles (
