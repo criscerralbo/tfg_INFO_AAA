@@ -14,6 +14,7 @@ const {
     registrarAdm,
     verificarUsuarioAdm,
     recuperarContrasena,
+    eliminarCuenta,
     resetearContrasena, 
     verificarCodigo,
     obtenerTodosLosUsuarios, // Nuevo: Obtener todos los usuarios
@@ -42,8 +43,12 @@ router.get('/nombre', (req, res) => {
     });
 });
 
+
+
 */// Ruta para obtener el nombre y rol del usuario desde la sesión
 router.get('/nombre', obtenerNombreYRol);
+
+router.delete('/eliminarCuenta', eliminarCuenta);
 
 // Ruta para obtener datos del perfil del usuario (usando el método del controlador)
 router.get('/perfil', obtenerPerfil);

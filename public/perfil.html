@@ -15,6 +15,8 @@
             <button id="logout-button" class="logout-button">Cerrar Sesión</button>
         </div>
     </header>
+    
+    <div id="perfil-status-message" style="display: none; padding: 10px; margin-top: 10px;"></div>
 
     <!-- Modal de confirmación de cierre de sesión -->
     <div id="logoutModal" class="modal">
@@ -34,101 +36,44 @@
             <h2>Editar Perfil</h2>
             <label for="nombre">Nombre</label>
             <input type="text" id="nombre" name="nombre" value="" required>
-
+            
             <label for="email">Correo</label>
-            <input type="email" id="email" name="email" value="" readonly>
-
-            <label for="currentPassword">Contraseña (Actual para cambiar)</label>
-            <input type="password" id="currentPassword" name="currentPassword" placeholder="Introduce la contraseña actual para cambiar">
-
-            <label for="newPassword">Nueva Contraseña (opcional)</label>
-            <input type="password" id="newPassword" name="newPassword" placeholder="Introduce una nueva contraseña si quieres cambiarla">
+            <input type="email" id="email" name="email" value="" required>
+            
+            <label for="currentPassword">Contraseña Actual (Solo para cambiar la contraseña)</label>
+            <input type="password" id="currentPassword" name="currentPassword" placeholder="Introduce la contraseña actual si deseas cambiarla">
+            
+            <label for="newPassword">Nueva Contraseña (Opcional)</label>
+            <input type="password" id="newPassword" name="newPassword" placeholder="Introduce una nueva contraseña si deseas cambiarla">
+            
+            <label for="confirmNewPassword">Confirmar Nueva Contraseña</label>
+            <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="Confirma la nueva contraseña">
 
             <button type="submit">Guardar Cambios</button>
         </form>
     </main>
+<!-- Botón para eliminar cuenta -->
+<button id="delete-account-button" class="delete-account-button">Eliminar Cuenta</button>
+
+<!-- Modal de confirmación para eliminar cuenta -->
+<div id="deleteAccountModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeDeleteAccountModal">&times;</span>
+        <h2>¿Estás seguro de que deseas eliminar tu cuenta?</h2>
+        <p>Esta acción es irreversible.</p>
+        <div class="modal-buttons">
+            <button id="confirmDeleteAccount" class="confirm-button">Sí, eliminar cuenta</button>
+            <button id="cancelDeleteAccount" class="cancel-button">Cancelar</button>
+        </div>
+    </div>
+</div>
 
     <!-- Footer -->
     <footer>
         © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
     </footer>
 
-    <script>
-        // Cargar datos del perfil del usuario desde el servidor
-        window.addEventListener('DOMContentLoaded', (event) => {
-            fetch('/usuarios/perfil')
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.nombre && data.email) {
-                        document.getElementById('nombre').value = data.nombre;
-                        document.getElementById('email').value = data.email;
-                    }
-                })
-                .catch(err => {
-                    console.error('Error al cargar los datos del perfil:', err);
-                    alert('Hubo un problema al cargar los datos del perfil. Por favor, inténtalo de nuevo.');
-                });
-        });
+    <script src="/perfil.js"></script>
 
-        // Mostrar el modal de confirmación de cierre de sesión
-        document.getElementById('logout-button').addEventListener('click', function() {
-            document.getElementById('logoutModal').style.display = 'block';
-        });
-
-        // Cerrar el modal al hacer clic en "Cancelar" o en la "X"
-        document.getElementById('cancelLogout').addEventListener('click', function() {
-            document.getElementById('logoutModal').style.display = 'none';
-        });
-
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('logoutModal').style.display = 'none';
-        });
-
-        // Confirmar cierre de sesión
-        document.getElementById('confirmLogout').addEventListener('click', function() {
-            fetch('/usuarios/logout')
-                .then(() => {
-                    window.location.href = '/'; // Redirigir a la página de inicio de sesión
-                });
-        });
-
-        // Función para volver a inicio (redirigir a /inicio)
-        document.getElementById('inicio-button').addEventListener('click', function() {
-            window.location.href = '/inicio'; // Redirigir a la página de inicio
-        });
-
-        // Enviar el formulario para actualizar datos del usuario
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const nombre = document.getElementById('nombre').value;
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-
-            if (!nombre.trim()) {
-                alert('El nombre no puede estar vacío');
-                return;
-            }
-
-            try {
-                const response = await fetch('/usuarios/actualizarPerfil', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre, currentPassword, newPassword })
-                });
-
-                if (response.ok) {
-                    alert(await response.text());
-                    document.getElementById('currentPassword').value = '';
-                    document.getElementById('newPassword').value = '';
-                } else {
-                    alert(`Error al actualizar el perfil: ${await response.text()}`);
-                }
-            } catch (error) {
-                console.error("Error al actualizar el perfil:", error);
-                alert('Hubo un problema al actualizar el perfil. Por favor, inténtalo de nuevo.');
-            }
-        });
-    </script>
 </body>
 </html>

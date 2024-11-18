@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessageDiv.style.display = 'none';
             sessionStorage.removeItem('statusMessage');
             sessionStorage.removeItem('statusType');
-        }, 10000);
+        }, 5000);
     }
 
     loadUsers();
@@ -213,7 +213,7 @@ document.getElementById('addUserForm').addEventListener('submit', function(event
     const email = document.getElementById('email').value;
     const rol = document.getElementById('rol').value;
 
-    fetch('/usuarios/registrar', {
+    fetch('/usuarios/registrarAdm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre, email, password: 'default123', rol })

@@ -282,37 +282,65 @@ exports.obtenerPerfil = (req, res) => {
     );
 };
 
-// Actualizar datos del perfil del usuario
 exports.actualizarPerfil = (req, res) => {
-    const { nombre, currentPassword, newPassword } = req.body;
+    const { nombre, email, currentPassword, newPassword, confirmNewPassword } = req.body;
 
     if (!req.session.emailUsuario) {
         return res.status(401).send('No ha iniciado sesión');
     }
 
-    db.query(`SELECT * FROM usuarios WHERE email = ?`, [req.session.emailUsuario], (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(400).send('Error al encontrar el usuario');
+    // Verificar si el usuario quiere cambiar la contraseña
+    if (newPassword || confirmNewPassword) {
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({ error: 'La nueva contraseña y la confirmación no coinciden' });
         }
 
-        const user = results[0];
-        if (!bcrypt.compareSync(currentPassword, user.password)) {
-            return res.status(400).send('Contraseña incorrecta');
+        // Verificar que se introdujo la contraseña actual
+        if (!currentPassword) {
+            return res.status(400).json({ error: 'Debe introducir la contraseña actual para cambiar la contraseña' });
         }
 
-        const hashedPassword = newPassword ? bcrypt.hashSync(newPassword, 10) : user.password;
+        // Consultar el usuario en la base de datos para verificar la contraseña actual
+        db.query(`SELECT * FROM usuarios WHERE email = ?`, [req.session.emailUsuario], (err, results) => {
+            if (err || results.length === 0) {
+                return res.status(400).send('Error al encontrar el usuario');
+            }
 
-        db.query(`UPDATE usuarios SET nombre = ?, password = ? WHERE email = ?`,
-            [nombre, hashedPassword, user.email],
+            const user = results[0];
+            if (!bcrypt.compareSync(currentPassword, user.password)) {
+                return res.status(400).send('Contraseña actual incorrecta');
+            }
+
+            const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+            // Actualizar nombre, correo y contraseña
+            db.query(`UPDATE usuarios SET nombre = ?, email = ?, password = ? WHERE email = ?`,
+                [nombre, email, hashedPassword, user.email],
+                (err) => {
+                    if (err) {
+                        return res.status(500).send('Error al actualizar el perfil');
+                    }
+                    req.session.emailUsuario = email; // Actualizar el email en la sesión
+                    res.send('Perfil actualizado con éxito');
+                }
+            );
+        });
+    } else {
+        // Si no se va a cambiar la contraseña, solo actualiza el nombre y correo sin pedir la contraseña
+        db.query(`UPDATE usuarios SET nombre = ?, email = ? WHERE email = ?`,
+            [nombre, email, req.session.emailUsuario],
             (err) => {
                 if (err) {
                     return res.status(500).send('Error al actualizar el perfil');
                 }
+                req.session.emailUsuario = email; // Actualizar el email en la sesión
                 res.send('Perfil actualizado con éxito');
             }
         );
-    });
+    }
 };
+
+
 
 // Cerrar sesión
 exports.cerrarSesion = (req, res) => {
@@ -371,3 +399,34 @@ exports.eliminarUsuario= (req, res) => {
         res.json({ message: 'Usuario eliminado' });
     });
 };
+
+exports.eliminarCuenta = (req, res) => {
+    if (!req.session.emailUsuario) {
+        return res.status(401).json({ error: 'No ha iniciado sesión' });
+    }
+
+    const email = req.session.emailUsuario;
+
+    // Eliminar usuario de la base de datos
+    db.query('DELETE FROM usuarios WHERE email = ?', [email], (err, result) => {
+        if (err) {
+            console.error('Error al eliminar la cuenta:', err);
+            return res.status(500).json({ error: 'Error al eliminar la cuenta' });
+        }
+
+        // Comprobar si la cuenta fue realmente eliminada
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Destruir la sesión tras eliminar la cuenta
+        req.session.destroy(err => {
+            if (err) {
+                console.error('Error al cerrar sesión:', err);
+                return res.status(500).json({ error: 'Error al cerrar sesión después de eliminar la cuenta' });
+            }
+            res.status(200).json({ message: 'Cuenta eliminada con éxito' });
+        });
+    });
+};
+

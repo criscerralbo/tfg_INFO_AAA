@@ -1,22 +1,58 @@
-/* Estilos para la página del perfil */
-body {
+/* Importar fuente Poppins de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
     font-family: 'Poppins', sans-serif;
     background-color: #f7f9fa;
-    margin: 0;
+    height: 100%;
+}
+
+body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100vh;
 }
 
+/* Header */
 header {
     background-color: #508bbd;
     color: white;
     padding: 20px;
+    text-align: left;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.user-icon img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+}
+
+.user-section span {
+    margin-right: 10px;
+    color: #ffffff;
+    font-size: 1.1rem;
 }
 /* Estilos para el modal de confirmación */
 .modal {
@@ -94,68 +130,6 @@ header {
     cursor: pointer;
 }
 
-.profile-container {
-    background-color: white;
-    padding: 2rem;
-    margin: auto;
-    width: 400px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-.profile-container h2 {
-    color: #2980b9;
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #2c3e50;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #bdc3c7;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #2980b9;
-    border: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #3498db;
-}
-
-.inicio-button {
-    background-color: #509b84;
-    color: white;
-    border: none;
-    padding: 6px 12px; /* Reducido para hacer el botón más pequeño */
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 10px;
-    font-size: 0.9rem; /* Reducir el tamaño de fuente */
-}
-
-.inicio-button:hover {
-    background-color: #509b84;
-}
-
 .logout-button {
     background-color: #e74c3c;
     color: white;
@@ -168,15 +142,225 @@ button:hover {
 }
 
 .logout-button:hover {
-    background-color: #c0392b;
+    background-color: #e74c3c;
+}
+
+/* Contenedor principal */
+.container {
+    background-color: white;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+}
+
+/* Títulos generales */
+h1 {
+    font-size: 24px;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 1.5rem;
+    color: #2980b9;
+}
+
+/* Formularios */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* Campos de entrada */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+    color: #2c3e50;
+}
+
+/* Botones */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #2980b9;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+button:hover {
+    background-color: #3498db;
+}
+
+/* Opciones adicionales */
+.extra-options {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.extra-options a {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+.extra-options a:hover {
+    text-decoration: underline;
+}
+
+/* Contenido principal para la página de inicio */
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; /* Para que el contenido ocupe el espacio necesario entre header y footer */
+    padding: 0 20px;
+    text-align: center;
+}
+
+.welcome-section h2 {
+    color: #508bbd;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.welcome-section p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    color: #4d4d4d;
+    font-weight: 300;
+}
+
+.boton-principal {
+    background-color: #508bbd;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.boton-principal:hover {
+    background-color: #346a91;
+}
+.message-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    margin: 10px 0;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.confirm-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    background-color: #c82333;
+}
+
+.cancel-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancel-button:hover {
+    background-color: #5a6268;
 }
 
 
+.message-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+/* Footer */
 footer {
     background-color: #333;
     color: white;
     text-align: center;
-    padding: 10px;
+    padding: 10px 0;
+    width: 100%;
     font-size: 0.9rem;
     font-weight: 300;
+    position: relative;
+    bottom: 0;
+}
+
+/* Estilo responsivo */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+
+    header h1 {
+        font-size: 18px;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .boton-principal {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
 }
