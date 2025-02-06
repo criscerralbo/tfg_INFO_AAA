@@ -1,0 +1,190 @@
+/* Importar fuente Poppins de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f7f9fa;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Header */
+header {
+    background-color: #508bbd;
+    color: white;
+    padding: 20px;
+    text-align: left;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+}
+
+.user-section span {
+    margin-right: 10px;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+
+.logout-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    background-color: white;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Estilo de formularios */
+form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+form input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+form button {
+    padding: 10px 20px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #3498db;
+}
+
+/* Títulos */
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Lista de grupos */
+#mis-grupos {
+    margin-top: 20px;
+}
+
+.grupo-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.grupo-item p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #2c3e50;
+}
+
+.grupo-item p strong {
+    color: #2980b9;
+}
+
+.grupo-item:hover {
+    background-color: #eef5f9;
+    border-color: #508bbd;
+    transition: all 0.3s ease;
+}
+
+/* Botón dentro de la lista */
+.boton-eliminar {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.boton-eliminar:hover {
+    background-color: #c0392b;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+    font-size: 0.9rem;
+    font-weight: 300;
+    position: relative;
+    bottom: 0;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    form input[type="text"],
+    form button {
+        width: 100%;
+    }
+
+    .grupo-item p {
+        font-size: 0.9rem;
+    }
+}

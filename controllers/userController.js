@@ -235,6 +235,8 @@ exports.iniciarSesion = (req, res) => {
             req.session.nombreUsuario = user.nombre;
             req.session.emailUsuario = user.email;
             req.session.rol = user.rol_id;
+            req.session.usuarioId = user.id;
+            console.log('Sesión iniciada:', req.session);
 
             res.status(200).json({ success: true, rol: user.rol });
         }

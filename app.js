@@ -1,15 +1,16 @@
-// app.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const userRoutes = require('./routes/userRoutes');
-const path = require('path');
 const session = require('express-session');
+const path = require('path');
+const userRoutes = require('./routes/userRoutes');
+const groupRoutes = require('./routes/groupRoutes');
 
 const app = express();
 
 // Middleware para analizar datos JSON y datos del formulario (URL-encoded)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 
 // Servir archivos estáticos desde la carpeta "public"
 app.use(express.static(path.join(__dirname, 'public')));
@@ -26,8 +27,35 @@ app.use(session({
     }
 }));
 
-// Rutas de usuarios (registro, verificación, inicio de sesión, etc.)
+// ==============================
+// Middleware para JSON y formularios
+// ==============================
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// ==============================
+// Servir archivos estáticos
+// ==============================
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ==============================
+// Middleware para depuración de sesión
+// ==============================
+app.use((req, res, next) => {
+    console.log('Sesión actual en middleware:', req.session);
+    next();
+});
+
+
+// ==============================
+// Rutas
+// ==============================
+// Rutas de usuarios (registro, login, etc.)
 app.use('/usuarios', userRoutes);
+
+// Rutas de grupos (gestión de grupos)
+app.use('/api/groups', groupRoutes);
+
 
 // Ruta para la pantalla de inicio (luego de iniciar sesión)
 app.get('/inicio', (req, res) => {

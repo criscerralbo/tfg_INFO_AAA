@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statusMessageDiv.style.display = 'none';
             sessionStorage.removeItem('statusMessage');
             sessionStorage.removeItem('statusType');
-        }, 5000);
+        }, 3000);
     }
 
     // Cargar datos del perfil del usuario
