@@ -1,23 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     const formCrearGrupo = document.getElementById('form-crear-grupo');
+    const mensajeEstado = document.getElementById('mensaje-estado');
 
-    // Verificar si el formulario existe
     if (!formCrearGrupo) {
         console.error('Formulario de creación de grupo no encontrado.');
         return;
     }
 
-    // Event Listener para crear un grupo
     formCrearGrupo.addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombreGrupo = document.getElementById('nombre-grupo').value.trim();
 
         if (nombreGrupo === '') {
-            alert('Por favor, introduce un nombre para el grupo.');
+            mostrarMensaje('Por favor, introduce un nombre para el grupo.', 'error');
             return;
         }
-
-        console.log('Formulario enviado. Nombre del grupo:', nombreGrupo);
 
         try {
             const response = await fetch('/api/groups/create', {
@@ -28,30 +25,38 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-            console.log('Respuesta del servidor al crear grupo:', data);
 
             if (data.error) {
-                alert(`Error: ${data.error}`);
+                mostrarMensaje(`Error: ${data.error}`, 'error');
             } else {
-                alert(`Grupo creado con éxito. Código: ${data.codigo}`);
-                cargarMisGrupos(); // Recargar lista de grupos automáticamente
+                mostrarMensaje(`Grupo creado con éxito. Código: ${data.codigo}`, 'success');
+                cargarMisGrupos();
             }
         } catch (err) {
             console.error('Error al crear el grupo:', err);
-            alert('Ocurrió un error al crear el grupo.');
+            mostrarMensaje('Ocurrió un error al crear el grupo.', 'error');
         }
     });
 
-    // Cargar los grupos al cargar la página
     cargarMisGrupos();
 });
 
-// Función para cargar los grupos del usuario
+function mostrarMensaje(mensaje, tipo) {
+    const mensajeEstado = document.getElementById('mensaje-estado');
+    mensajeEstado.textContent = mensaje;
+    mensajeEstado.className = tipo === 'success' ? 'mensaje-success' : 'mensaje-error';
+    mensajeEstado.style.display = 'block';
+
+    setTimeout(() => {
+        mensajeEstado.style.display = 'none';
+    }, 4000);
+}
+
 async function cargarMisGrupos() {
     try {
         const response = await fetch('/api/groups/mis-grupos', {
             method: 'GET',
-            credentials: 'include' // Enviar cookies de sesión
+            credentials: 'include'
         });
 
         if (!response.ok) {
@@ -60,7 +65,7 @@ async function cargarMisGrupos() {
 
         const grupos = await response.json();
         const gruposContainer = document.getElementById('lista-grupos');
-        gruposContainer.innerHTML = ''; // Limpiar el contenido anterior
+        gruposContainer.innerHTML = '';
 
         grupos.forEach(grupo => {
             const grupoElemento = document.createElement('li');
@@ -68,18 +73,17 @@ async function cargarMisGrupos() {
                 <p><strong>Nombre:</strong> ${grupo.nombre}</p>
                 <p><strong>Código:</strong> ${grupo.identificador}</p>
                 <p><strong>Creado el:</strong> ${new Date(grupo.creado_en).toLocaleString()}</p>
-                <button class="detalles-button" onclick="irADetalles(${grupo.id})">Detalles</button>
+                <button class="detalles-button" onclick="irADetalles(${grupo.id})">Ver Detalles</button>
             `;
             gruposContainer.appendChild(grupoElemento);
         });
 
     } catch (error) {
         console.error('Error al cargar los grupos:', error);
-        alert('No se pudieron cargar los grupos.');
+        mostrarMensaje('No se pudieron cargar los grupos.', 'error');
     }
 }
 
-// Función para redirigir a la página de detalles del grupo
 function irADetalles(grupoId) {
     window.location.href = `/detalles.html?grupoId=${grupoId}`;
 }

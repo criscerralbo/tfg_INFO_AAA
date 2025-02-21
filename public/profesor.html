@@ -5,23 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mis Grupos - Profesor</title>
   <link rel="stylesheet" href="css/profesor.css">
+  <script src="profesor.js" defer></script>
 </head>
 <body>
-  <h1>Gestión de Grupos</h1>
+  <header>
+    <h1>Gestión de Grupos</h1>
+    <button class="btn-back" onclick="window.history.back()">← Volver</button>
+  </header>
+  <div id="mensaje-estado" class="mensaje-oculto"></div>
 
-  <section id="crear-grupo">
-    <h2>Crear Nuevo Grupo</h2>
-    <form id="form-crear-grupo">
-      <input type="text" id="nombre-grupo" placeholder="Nombre del grupo" required>
-      <button type="submit">Crear Grupo</button>
-    </form>
-  </section>
-
-  <section id="mis-grupos">
-    <h2>Mis Grupos</h2>
-    <ul id="lista-grupos"></ul>
-  </section>
-
-  <script src="profesor.js"></script>
+  <main class="container">
+    <section id="crear-grupo">
+      <h2>Crear Nuevo Grupo</h2>
+      <form id="form-crear-grupo">
+        <input type="text" id="nombre-grupo" placeholder="Nombre del grupo" required>
+        <button type="submit">Crear Grupo</button>
+      </form>
+    </section>
+  
+    <section id="mis-grupos">
+      <h2>Mis Grupos</h2>
+      <ul id="lista-grupos" class="grupo-lista"></ul>
+    </section>
+  </main>
+  
+  <footer>
+    <p>© 2025 Gestión de Grupos - Todos los derechos reservados</p>
+  </footer>
 </body>
 </html>

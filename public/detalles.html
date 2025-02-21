@@ -4,23 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles del Grupo</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/detalles.css">
 </head>
 <body>
-    <header>Detalles del Grupo</header>
+    <header>
+        <h1>Gestión de Grupos</h1>
+        <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      </header>
+
+    <div id="mensaje-estado" class="mensaje-oculto"></div>
+    <button id="btn-eliminar-grupo" class="btn-danger" style="display:none;" onclick="mostrarModalEliminar()">Eliminar Grupo</button>
+  
     <main>
         <div id="detalle-grupo"></div>
-        <h3>Buscar y Añadir Usuarios</h3>
-<div>
-    <input type="text" id="buscar-usuario" placeholder="Buscar por nombre o email">
-    <button onclick="buscarUsuarios()">Buscar</button>
-</div>
-<div id="resultados-busqueda"></div>
 
+        <h3>Buscar y Añadir Usuarios</h3>
+        <div>
+            <input type="text" id="buscar-usuario" placeholder="Buscar por nombre o email">
+            <button onclick="buscarUsuarios()">Buscar</button>
+        </div>
+        <div id="resultados-busqueda"></div>
     </main>
-    <footer>
-        <a href="/profesor.html">Volver</a>
-    </footer>
+
+    <!-- Modal de Confirmación -->
+    <div id="modal-eliminar" class="modal">
+        <div class="modal-contenido">
+            <h3>¿Estás seguro de que deseas eliminar este grupo?</h3>
+            <p>Esta acción no se puede deshacer.</p>
+            <div class="modal-botones">
+                <button onclick="confirmarEliminarGrupo()" class="btn-danger">Eliminar</button>
+                <button onclick="cerrarModalEliminar()" class="btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/detalles.js"></script>
 </body>
 </html>

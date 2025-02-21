@@ -145,6 +145,33 @@ exports.addTeacher = (req, res) => {
     );
 };
 
+exports.eliminarGrupo = (req, res) => {
+    const { grupoId } = req.body;
+    const usuarioId = req.session.usuarioId;
+
+    if (!grupoId || !usuarioId) {
+        return res.status(400).json({ error: 'Datos incompletos' });
+    }
+
+    db.query(`SELECT propietario_id FROM grupos WHERE id = ?`, [grupoId], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(404).json({ error: 'Grupo no encontrado' });
+        }
+
+        if (results[0].propietario_id !== usuarioId) {
+            return res.status(403).json({ error: 'No tienes permiso para eliminar este grupo.' });
+        }
+
+        db.query(`DELETE FROM grupos WHERE id = ?`, [grupoId], (err) => {
+            if (err) {
+                console.error('Error al eliminar el grupo:', err);
+                return res.status(500).json({ error: 'Error al eliminar el grupo.' });
+            }
+            res.status(200).json({ success: 'Grupo eliminado correctamente.' });
+        });
+    });
+};
+
 
 
 exports.getGroupsByOwner = (req, res) => {

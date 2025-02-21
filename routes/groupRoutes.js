@@ -13,7 +13,7 @@ router.post('/create', groupController.createGroup);
 router.get('/mis-grupos', groupController.getGroupsByOwner);
 
 // Nuevas rutas
-router.post('/add-member', groupController.addMember);           // Añadir miembro manualmente
+         // Añadir miembro manualmente
 router.put('/accept-request', groupController.acceptRequest);    // Aceptar solicitud de alumno
 router.delete('/remove-member', groupController.removeMember);   // Eliminar miembro del grupo
 router.post('/add-teacher', groupController.addTeacher);         // Añadir profesor al grupo

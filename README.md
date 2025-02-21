@@ -12,7 +12,7 @@ conda activate mi_entorno
 
 #debemos estar en la ruta de la carpeta
 
-cd C:/Users/cristina.cerralbo/Desktop/proyectos/tfg
+cd C:\Users\Cris\OneDrive - Universidad Complutense de Madrid (UCM)\Escritorio\asignaturas\tfg\tfg_INFO\tfg
 
 debemos ejecutar 
 

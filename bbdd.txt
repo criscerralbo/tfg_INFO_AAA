@@ -1,0 +1,97 @@
+DROP DATABASE IF EXISTS odon;
+CREATE DATABASE odon;
+USE odon;
+
+-- Tabla de Roles
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Tabla de Usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol_id INT NOT NULL,
+    verificado BOOLEAN DEFAULT FALSE,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+-- Tabla de Tokens
+CREATE TABLE IF NOT EXISTS tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    tipo ENUM('verificacion', 'recuperacion') NOT NULL,
+    fecha_expiracion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla de Grupos
+CREATE TABLE IF NOT EXISTS grupos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    identificador VARCHAR(50) UNIQUE NOT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    propietario_id INT NOT NULL,
+    FOREIGN KEY (propietario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla de Relación Usuario-Grupo
+CREATE TABLE IF NOT EXISTS grupo_miembros (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    grupo_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    rol_id INT NOT NULL,
+    estado ENUM('pendiente', 'aprobado') DEFAULT 'pendiente',
+    FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+-- Tabla de Solicitudes de Grupos
+CREATE TABLE IF NOT EXISTS solicitudes_grupo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    grupo_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    estado ENUM('pendiente', 'aprobado', 'rechazado') DEFAULT 'pendiente',
+    fecha_solicitud TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla de Actividades
+CREATE TABLE IF NOT EXISTS actividades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    tipo ENUM('quiz', 'caso clínico', 'otro') NOT NULL,
+    id_profesor INT NOT NULL,
+    FOREIGN KEY (id_profesor) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla de Resultados
+CREATE TABLE IF NOT EXISTS resultados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    actividad_id INT NOT NULL,
+    puntuacion INT NOT NULL,
+    fecha_realizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (actividad_id) REFERENCES actividades(id) ON DELETE CASCADE
+);
+
+-- Tabla de Mensajes
+CREATE TABLE IF NOT EXISTS mensajes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    remitente_id INT NOT NULL,
+    destinatario_id INT,
+    grupo_id INT,
+    contenido TEXT NOT NULL,
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (remitente_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE SET NULL,
+    FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE SET NULL
+);
