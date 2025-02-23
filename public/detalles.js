@@ -187,41 +187,61 @@ async function buscarUsuarios() {
 }
 
 function mostrarResultados(usuarios) {
-  const resultadosBusqueda = document.getElementById('resultados-busqueda');
-  resultadosBusqueda.innerHTML = '';
-  if (usuarios.length === 0) {
-    resultadosBusqueda.innerHTML = '<p>No se encontraron usuarios</p>';
-    return;
-  }
-  usuarios.forEach(user => {
-    const userElement = document.createElement('div');
-    // Se espera que el endpoint incluya también "rolId" (modifica la consulta en el backend para devolverlo)
-    userElement.innerHTML = `
-      <p>${user.nombre} (${user.email}) - ${user.rol}
-      <button onclick="anadirMiembro(${user.id}, ${user.rolId})">Añadir</button></p>
-    `;
-    resultadosBusqueda.appendChild(userElement);
-  });
+    const resultadosBusqueda = document.getElementById('resultados-busqueda');
+    resultadosBusqueda.innerHTML = '';
+    if (usuarios.length === 0) {
+        resultadosBusqueda.innerHTML = '<p>No se encontraron usuarios</p>';
+        return;
+    }
+    usuarios.forEach(user => {
+        console.log("usuarioId:", user.id, "rolId:", user.rolId);  // Verifica que rolId ya tiene un valor válido
+        const userElement = document.createElement('div');
+        userElement.innerHTML = `
+            <p>${user.nombre} (${user.email}) - ${user.rol}
+            <button onclick="anadirMiembro(${user.id}, ${user.rolId})">Añadir</button></p>
+        `;
+        resultadosBusqueda.appendChild(userElement);
+    });
 }
 
-async function anadirMiembro(usuarioId, rolId) {
-  const params = new URLSearchParams(window.location.search);
-  const grupoId = params.get('grupoId');
-  try {
-    const response = await fetch('/api/groups/add-member', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ grupoId, usuarioId, rolId })
-    });
-    if (!response.ok) throw new Error('Error al añadir miembro');
-    mostrarMensaje('Usuario añadido correctamente', 'success');
-    cargarDetalles();
-  } catch (error) {
-    console.error('Error al añadir miembro:', error);
-    mostrarMensaje('No se pudo añadir el usuario', 'error');
+  
+  
+  async function anadirMiembro(usuarioId, rolId) {
+    const params = new URLSearchParams(window.location.search);
+    const grupoId = params.get('grupoId');
+    console.log("grupoId:", grupoId);  // Añadir este log para verificar que grupoId está siendo recibido correctamente
+    console.log("usuarioId:", usuarioId, "rolId:", rolId);  // Verificar que usuarioId y rolId son correctos
+  
+    // Verificar que los datos no sean nulos o vacíos
+    if (!grupoId || !usuarioId || !rolId) {
+      mostrarMensaje("Faltan datos requeridos", "error");
+      return;
+    }
+  
+    try {
+      const response = await fetch('/api/groups/add-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ grupoId, usuarioId, rolId })
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        mostrarMensaje(`Error: ${error.error}`, 'error');
+        throw new Error(error.error);
+      }
+  
+      mostrarMensaje('Usuario añadido correctamente', 'success');
+      cargarDetalles();
+    } catch (error) {
+      console.error('Error al añadir miembro:', error);
+      mostrarMensaje('No se pudo añadir el usuario', 'error');
+    }
   }
-}
+  
+  
+  
 
 // Función para cargar las solicitudes de unión del grupo
 async function cargarSolicitudes() {

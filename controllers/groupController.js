@@ -66,27 +66,50 @@ exports.createGroup = (req, res) => {
 
 exports.anadirMiembro = (req, res) => {
     const { grupoId, usuarioId, rolId } = req.body;
-
-    if (!grupoId || !usuarioId) {
-        return res.status(400).json({ error: 'Faltan datos requeridos' });
+  
+    console.log("Datos recibidos:", grupoId, usuarioId, rolId);
+  
+    // Verificar que los datos no sean nulos o vacíos
+    if (!grupoId || !usuarioId || !rolId) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' });
     }
-
+  
+    // Comprobar si el usuario ya está en el grupo
     db.query(
-        `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado)
-         VALUES (?, ?, ?, 'aprobado')`,
-        [grupoId, usuarioId, rolId],
-        (err) => {
+      `SELECT * FROM grupo_miembros WHERE grupo_id = ? AND usuario_id = ?`,
+      [grupoId, usuarioId],
+      (err, rows) => {
+        if (err) {
+          console.error('Error al comprobar si el usuario está en el grupo:', err);
+          return res.status(500).json({ error: 'Error al comprobar miembro' });
+        }
+  
+        // Si el usuario ya está en el grupo, devolver un error
+        if (rows.length > 0) {
+          return res.status(400).json({ error: 'El usuario ya está en el grupo' });
+        }
+  
+        // Si no está, añadir al usuario
+        db.query(
+          `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado)
+           VALUES (?, ?, ?, 'aprobado')`,
+          [grupoId, usuarioId, rolId],
+          (err) => {
             if (err) {
-                console.error('Error al añadir miembro:', err);
-                return res.status(500).json({ error: 'No se pudo añadir el miembro al grupo' });
+              console.error('Error al añadir miembro:', err);
+              return res.status(500).json({ error: 'No se pudo añadir el miembro al grupo' });
             }
             res.status(200).json({ success: 'Usuario añadido correctamente' });
-        }
+          }
+        );
+      }
     );
-};
+  };
+  
+  
 
 
-exports.buscarUsuarios = (req, res) => {
+  exports.buscarUsuarios = (req, res) => {
     const { query } = req.query; // Parámetro de búsqueda
 
     if (!query) {
@@ -94,7 +117,7 @@ exports.buscarUsuarios = (req, res) => {
     }
 
     db.query(
-        `SELECT u.id, u.nombre, u.email, r.nombre AS rol
+        `SELECT u.id, u.nombre, u.email, r.id AS rolId, r.nombre AS rol  -- Seleccionamos tanto el rol_id como el nombre del rol
          FROM usuarios u
          JOIN roles r ON u.rol_id = r.id
          WHERE u.nombre LIKE ? OR u.email LIKE ? 
@@ -110,6 +133,7 @@ exports.buscarUsuarios = (req, res) => {
         }
     );
 };
+
 
 exports.getJoinRequests = (req, res) => {
     const grupoId = req.params.grupoId;
@@ -153,10 +177,11 @@ exports.removeMember = (req, res) => {
     const { grupoId, usuarioId } = req.body;
     const userSessionId = req.session.usuarioId;  // ID del usuario logueado
 
-    // Evitar que el profesor se elimine a sí mismo
-    if (userSessionId === usuarioId) {
-        return res.status(403).json({ error: 'No puedes eliminarte a ti mismo.' });
-    }
+   // Evitar que el profesor se elimine a sí mismo
+if (Number(userSessionId) === Number(usuarioId)) {
+    return res.status(403).json({ error: 'No puedes eliminarte a ti mismo.' });
+}
+
 
     db.query(
         `DELETE FROM grupo_miembros WHERE grupo_id = ? AND usuario_id = ?`,

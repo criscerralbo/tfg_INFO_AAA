@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumno - Gestión de Grupos</title>
+    <link rel="stylesheet" href="/css/alumno.css">
+</head>
+<body>
+    <header>
+        <h1>Gestión de Grupos</h1>
+        <div class="user-section">
+            <button class="btn-back" onclick="window.history.back()">← Volver</button>
+            <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Buscar y Unirse a Grupos -->
+        <section id="buscar-unirse">
+            <h2>Buscar Grupos</h2>
+            <input type="text" id="buscar-grupo" placeholder="Buscar por nombre o número de referencia">
+            <button onclick="buscarGrupos()">Buscar</button>
+            <div id="resultados-busqueda"></div>
+        </section>
+
+        <!-- Ver los Grupos Matriculados -->
+        <section id="grupos-matriculados">
+            <h2>Mis Grupos</h2>
+            <div id="grupos-lista"></div>
+        </section>
+
+        <!-- Detalles del Grupo -->
+        <section id="grupo-detalle" style="display: none;">
+            <h2>Detalles del Grupo</h2>
+            <div id="miembros-grupo"></div>
+            <input type="text" id="buscar-miembro" placeholder="Buscar miembro por nombre">
+            <button onclick="buscarMiembros()">Buscar Miembro</button>
+        </section>
+    </main>
+
+    <script src="/alumno.js"></script>
+</body>
+</html>
