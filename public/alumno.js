@@ -11,8 +11,9 @@ async function buscarGrupos() {
     try {
         const response = await fetch(`/api/alumno/buscar-grupos?query=${query}`, {
             method: 'GET',
-            credentials: 'include'
+            credentials: 'include'  // Para incluir las cookies de sesión si es necesario
         });
+
         if (!response.ok) throw new Error('Error al buscar grupos');
         
         const grupos = await response.json();
@@ -40,13 +41,12 @@ function mostrarResultadosGrupos(grupos) {
     });
 }
 
-// Solicitar unirse a un grupo
 async function solicitarUnirse(grupoId) {
     try {
         const response = await fetch('/api/alumno/solicitar-unirse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            credentials: 'include',  // Para incluir las cookies de sesión si es necesario
             body: JSON.stringify({ grupoId })
         });
 
@@ -57,6 +57,7 @@ async function solicitarUnirse(grupoId) {
         alert('Error al enviar la solicitud');
     }
 }
+
 
 // Función para ver los grupos matriculados
 async function cargarGruposMatriculados() {

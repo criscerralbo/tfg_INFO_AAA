@@ -270,3 +270,44 @@ exports.getGroupsByOwner = (req, res) => {
 };
 
 
+exports.buscarGrupos = (req, res) => {
+    const { query } = req.query; // Término de búsqueda
+
+    if (!query) {
+        return res.status(400).json({ error: 'Se requiere un término de búsqueda' });
+    }
+
+    // Buscar grupos por nombre o identificador
+    db.query(
+        `SELECT id, nombre, identificador FROM grupos WHERE nombre LIKE ? OR identificador LIKE ? LIMIT 10`,
+        [`%${query}%`, `%${query}%`],
+        (err, results) => {
+            if (err) {
+                console.error('Error al buscar grupos:', err);
+                return res.status(500).json({ error: 'Error al buscar grupos' });
+            }
+            res.status(200).json(results);  // Devuelve los grupos encontrados
+        }
+    );
+};
+exports.solicitarUnirse = (req, res) => {
+    const { grupoId } = req.body;
+    const usuarioId = req.session.usuarioId;
+
+    if (!grupoId || !usuarioId) {
+        return res.status(400).json({ error: 'Datos incompletos para la solicitud' });
+    }
+
+    // Insertar solicitud de unión en la tabla de solicitudes
+    db.query(
+        `INSERT INTO solicitudes_grupo (grupo_id, usuario_id, estado) VALUES (?, ?, 'pendiente')`,
+        [grupoId, usuarioId],
+        (err) => {
+            if (err) {
+                console.error('Error al solicitar unirse al grupo:', err);
+                return res.status(500).json({ error: 'Error al enviar la solicitud' });
+            }
+            res.status(200).json({ success: 'Solicitud enviada correctamente' });
+        }
+    );
+};

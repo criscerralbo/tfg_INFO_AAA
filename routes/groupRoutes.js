@@ -24,6 +24,9 @@ router.get('/buscar-usuarios', groupController.buscarUsuarios);
 router.post('/add-member', groupController.anadirMiembro);
 router.delete('/delete-group', groupController.eliminarGrupo);
 
+router.get('/buscar-grupos', groupController.buscarGrupos); // Buscar grupos
+router.post('/solicitar-unirse', groupController.solicitarUnirse); // Solicitar unirse
+
 
 module.exports = router;
 
