@@ -9,35 +9,74 @@
 <body>
     <header>
         <h1>Gestión de Grupos</h1>
-        <button class="btn-back" onclick="window.history.back()">← Volver</button>
-      </header>
-
-    <div id="mensaje-estado" class="mensaje-oculto"></div>
-    <button id="btn-eliminar-grupo" class="btn-danger" style="display:none;" onclick="mostrarModalEliminar()">Eliminar Grupo</button>
-  
-    <main>
-        <div id="detalle-grupo"></div>
-
-        <h3>Buscar y Añadir Usuarios</h3>
-        <div>
-            <input type="text" id="buscar-usuario" placeholder="Buscar por nombre o email">
-            <button onclick="buscarUsuarios()">Buscar</button>
+        <div class="user-section">
+          <button class="btn-back" onclick="window.history.back()">← Volver</button>
+          <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+          <div class="user-icon">
+              <a href="/perfil.html">
+                  <img src="images/usuario.png" alt="Usuario">
+              </a>
+          </div>
         </div>
-        <div id="resultados-busqueda"></div>
-    </main>
+    </header>
 
-    <!-- Modal de Confirmación -->
-    <div id="modal-eliminar" class="modal">
-        <div class="modal-contenido">
-            <h3>¿Estás seguro de que deseas eliminar este grupo?</h3>
-            <p>Esta acción no se puede deshacer.</p>
-            <div class="modal-botones">
-                <button onclick="confirmarEliminarGrupo()" class="btn-danger">Eliminar</button>
-                <button onclick="cerrarModalEliminar()" class="btn-cancel">Cancelar</button>
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+            <div class="modal-buttons">
+                <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+                <button id="cancelLogout" class="cancel-button">Cancelar</button>
             </div>
         </div>
     </div>
+    
+    <main>
+      <section id="miembros-section">
+         <h2>Miembros del Grupo</h2>
+         <button id="btn-eliminar-grupo" class="btn-danger" onclick="mostrarModalEliminarGrupo()">Eliminar Grupo</button>
+         <div id="lista-miembros"></div>
+         <button id="btn-admin-usuarios" onclick="toggleAdmin()">Administrar Usuarios</button>
+      </section>
 
+      <section id="acciones-section">
+         <div id="buscar-anadir">
+            <h3>Buscar y Añadir Usuarios</h3>
+            <input type="text" id="buscar-usuario" placeholder="Buscar por nombre o email">
+            <button onclick="buscarUsuarios()">Buscar</button>
+            <div id="resultados-busqueda"></div>
+         </div>
+         <div id="solicitudes-section">
+            <h3>Solicitudes de Unión</h3>
+            <div id="solicitudes-join"></div>
+         </div>
+      </section>
+    </main>
+
+    <!-- Modal para eliminar grupo -->
+    <div id="modal-eliminar" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="cerrarModalEliminarGrupo()">&times;</span>
+          <h2>¿Estás seguro de que deseas eliminar este grupo?</h2>
+          <div class="modal-buttons">
+            <button class="confirm-button" onclick="confirmarEliminarGrupo()">Sí, eliminar</button>
+            <button class="cancel-button" onclick="cerrarModalEliminarGrupo()">Cancelar</button>
+          </div>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar miembro -->
+    <div id="modal-eliminar-miembro" class="modal">
+        <div class="modal-content">
+          <span class="close" id="closeModalEliminarMiembro" onclick="cerrarModalEliminarMiembro()">&times;</span>
+          <h2 id="modal-eliminar-miembro-mensaje">¿Estás seguro de eliminar a X?</h2>
+          <div class="modal-buttons">
+            <button id="confirmar-eliminar-miembro" class="confirm-button" onclick="confirmarEliminarMiembro()">Sí, eliminar</button>
+            <button class="cancel-button" onclick="cerrarModalEliminarMiembro()">Cancelar</button>
+          </div>
+        </div>
+    </div>
+  
     <script src="/detalles.js"></script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Lógica para crear un nuevo grupo ---
     const formCrearGrupo = document.getElementById('form-crear-grupo');
     const mensajeEstado = document.getElementById('mensaje-estado');
 
@@ -30,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarMensaje(`Error: ${data.error}`, 'error');
             } else {
                 mostrarMensaje(`Grupo creado con éxito. Código: ${data.codigo}`, 'success');
+                
+                // Limpiar el campo de texto
+                document.getElementById('nombre-grupo').value = '';
+                
+                // Recargar la lista de grupos
                 cargarMisGrupos();
             }
         } catch (err) {
@@ -38,9 +44,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Lógica para cargar la lista de grupos ---
     cargarMisGrupos();
+
+    // --- Lógica para el modal de cierre de sesión ---
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            document.getElementById('logoutModal').style.display = 'block';
+        });
+    }
+
+    const cancelLogout = document.getElementById('cancelLogout');
+    if (cancelLogout) {
+        cancelLogout.addEventListener('click', () => {
+            document.getElementById('logoutModal').style.display = 'none';
+        });
+    }
+
+    const closeModal = document.getElementById('closeModal');
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            document.getElementById('logoutModal').style.display = 'none';
+        });
+    }
+
+    const confirmLogout = document.getElementById('confirmLogout');
+    if (confirmLogout) {
+        confirmLogout.addEventListener('click', () => {
+            fetch('/usuarios/logout')
+                .then(() => {
+                    window.location.href = '/'; // Redirigir a la página de inicio de sesión
+                });
+        });
+    }
 });
 
+// --- Funciones auxiliares ---
 function mostrarMensaje(mensaje, tipo) {
     const mensajeEstado = document.getElementById('mensaje-estado');
     mensajeEstado.textContent = mensaje;

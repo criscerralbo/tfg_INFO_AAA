@@ -20,6 +20,25 @@ body {
     justify-content: space-between;
 }
 
+.grupo-lista {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.grupo-lista li {
+    width: 100%;
+    max-width: 500px;
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: left;
+    background-color: #f9f9f9;
+}
+
 /* Header */
 header {
     background-color: #508bbd;
@@ -32,10 +51,40 @@ header {
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+/* Mensajes de estado */
+.mensaje-success {
+    background-color: #d4edda; /* Verde claro */
+    color: #155724;           /* Verde oscuro */
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.mensaje-error {
+    background-color: #f8d7da; /* Rojo claro */
+    color: #721c24;           /* Rojo oscuro */
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+/* Si quieres un estado oculto inicial */
+.mensaje-oculto {
+    display: none;
+}
+
 
 header h1 {
     margin: 0;
     font-size: 1.8rem;
+}
+
+.user-icon img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
 }
 
 .user-section {
@@ -48,75 +97,215 @@ header h1 {
     color: #ffffff;
     font-size: 1.1rem;
 }
-
-.btn-back {
-    background-color: #2980b9;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
+/* Estilos para el modal de confirmación */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
 }
 
-.btn-back:hover {
-    background-color: #1f6690;
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.confirm-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    background-color: #c0392b;
+}
+
+.cancel-button {
+    background-color: #bdc3c7;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-button:hover {
+    background-color: #95a5a6;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.logout-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px; /* Reducido para hacer el botón más pequeño */
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 0.9rem; /* Reducir el tamaño de fuente */
+}
+
+.logout-button:hover {
+    background-color: #e74c3c;
 }
 
 /* Contenedor principal */
 .container {
-    max-width: 800px;
-    margin: 30px auto;
     background-color: white;
     padding: 2rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
     text-align: center;
+    margin: 0 auto;
 }
 
-/* Estilo de formularios */
+/* Títulos generales */
+h1 {
+    font-size: 24px;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 1.5rem;
+    color: #2980b9;
+}
+
+/* Formularios */
 form {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
-form input[type="text"] {
-    flex: 1;
+/* Campos de entrada */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
     padding: 10px;
+    margin-bottom: 10px;
     border: 1px solid #bdc3c7;
     border-radius: 4px;
     font-size: 16px;
+    box-sizing: border-box;
+    color: #2c3e50;
 }
 
-form button {
-    padding: 10px 20px;
+/* Botones */
+button {
+    width: 100%;
+    padding: 12px;
     background-color: #2980b9;
-    color: white;
     border: none;
+    color: white;
+    font-size: 16px;
     border-radius: 4px;
     cursor: pointer;
+    margin-bottom: 10px;
 }
 
-form button:hover {
+button:hover {
     background-color: #3498db;
 }
 
-/* Botón de detalles */
-.detalles-button {
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
+/* Opciones adicionales */
+.extra-options {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.extra-options a {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+.extra-options a:hover {
+    text-decoration: underline;
+}
+
+/* Contenido principal para la página de inicio */
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; /* Para que el contenido ocupe el espacio necesario entre header y footer */
+    padding: 0 20px;
     text-align: center;
 }
 
-.detalles-button:hover {
-    background-color: #27ae60;
+.welcome-section h2 {
+    color: #508bbd;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.welcome-section p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    color: #4d4d4d;
+    font-weight: 300;
+}
+
+.boton-principal {
+    background-color: #508bbd;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.boton-principal:hover {
+    background-color: #346a91;
 }
 
 /* Footer */
@@ -128,27 +317,26 @@ footer {
     width: 100%;
     font-size: 0.9rem;
     font-weight: 300;
-}
-/* Mensajes de estado */
-.mensaje-oculto {
-    display: none;
-    text-align: center;
-    font-size: 1rem;
-    margin: 15px auto;
-    padding: 10px;
-    width: 90%;
-    max-width: 600px;
-    border-radius: 5px;
+    position: relative;
+    bottom: 0;
 }
 
-.mensaje-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
+/* Estilo responsivo */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
 
-.mensaje-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    header h1 {
+        font-size: 18px;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .boton-principal {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
 }

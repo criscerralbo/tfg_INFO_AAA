@@ -12,39 +12,57 @@ exports.createGroup = (req, res) => {
     const propietarioId = req.session.usuarioId;
 
     if (!nombre || !propietarioId) {
-        console.error('Datos faltantes:', { nombre, propietarioId });
         return res.status(400).json({ error: 'Faltan datos para crear el grupo' });
     }
 
-    const identificador = Math.random().toString(36).substring(2, 8);
-
-    db.query(
-        `INSERT INTO grupos (nombre, identificador, propietario_id) VALUES (?, ?, ?)`,
-        [nombre, identificador, propietarioId],
-        (err, result) => {
-            if (err) {
-                console.error('Error al crear el grupo:', err);
-                return res.status(500).json({ error: 'Error al crear el grupo' });
-            }
-
-            console.log('Grupo creado con éxito, ID:', result.insertId);
-
-            const grupoId = result.insertId;
-
-            db.query(
-                `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado) VALUES (?, ?, ?, 'aprobado')`,
-                [grupoId, propietarioId, 2],
-                (err) => {
-                    if (err) {
-                        console.error('Error al agregar al propietario como miembro:', err);
-                        return res.status(500).json({ error: 'Grupo creado, pero no se pudo asignar al propietario' });
-                    }
-                    res.status(201).json({ success: 'Grupo creado con éxito', codigo: identificador });
-                }
-            );
+    // Verificar si el nombre del grupo ya existe (puedes decidir si es global o solo del profesor)
+    db.query(`SELECT id FROM grupos WHERE nombre = ?`, [nombre], (err, rows) => {
+        if (err) {
+            console.error('Error al comprobar nombre de grupo:', err);
+            return res.status(500).json({ error: 'Error interno al comprobar nombre de grupo' });
         }
-    );
+
+        if (rows.length > 0) {
+            // Ya existe un grupo con ese nombre
+            return res.status(400).json({ error: 'El nombre del grupo ya existe. Elige otro nombre.' });
+        }
+
+        // Si el nombre no existe, proceder a crearlo
+        const identificador = Math.random().toString(36).substring(2, 8);
+
+        db.query(
+            `INSERT INTO grupos (nombre, identificador, propietario_id) VALUES (?, ?, ?)`,
+            [nombre, identificador, propietarioId],
+            (err, result) => {
+                if (err) {
+                    console.error('Error al crear el grupo:', err);
+                    return res.status(500).json({ error: 'Error al crear el grupo' });
+                }
+
+                const grupoId = result.insertId;
+
+                db.query(
+                    `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado)
+                     VALUES (?, ?, 2, 'aprobado')`,
+                    [grupoId, propietarioId],
+                    (err) => {
+                        if (err) {
+                            console.error('Error al agregar al propietario como miembro:', err);
+                            return res
+                              .status(500)
+                              .json({ error: 'Grupo creado, pero no se pudo asignar al propietario' });
+                        }
+                        res.status(201).json({
+                            success: 'Grupo creado con éxito',
+                            codigo: identificador
+                        });
+                    }
+                );
+            }
+        );
+    });
 };
+
 
 exports.anadirMiembro = (req, res) => {
     const { grupoId, usuarioId, rolId } = req.body;
@@ -76,9 +94,10 @@ exports.buscarUsuarios = (req, res) => {
     }
 
     db.query(
-        `SELECT id, nombre, email 
-         FROM usuarios 
-         WHERE nombre LIKE ? OR email LIKE ? 
+        `SELECT u.id, u.nombre, u.email, r.nombre AS rol
+         FROM usuarios u
+         JOIN roles r ON u.rol_id = r.id
+         WHERE u.nombre LIKE ? OR u.email LIKE ? 
          LIMIT 10`,
         [`%${query}%`, `%${query}%`],
         (err, results) => {
@@ -92,6 +111,24 @@ exports.buscarUsuarios = (req, res) => {
     );
 };
 
+exports.getJoinRequests = (req, res) => {
+    const grupoId = req.params.grupoId;
+    db.query(
+       `SELECT u.id as usuario_id, u.nombre, r.nombre as rol
+        FROM grupo_miembros gm
+        JOIN usuarios u ON gm.usuario_id = u.id
+        JOIN roles r ON gm.rol_id = r.id
+        WHERE gm.grupo_id = ? AND gm.estado = 'pendiente'`,
+       [grupoId],
+       (err, results) => {
+           if (err) {
+               console.error('Error al obtener solicitudes:', err);
+               return res.status(500).json({ error: 'Error al obtener solicitudes' });
+           }
+           res.status(200).json(results);
+       }
+    );
+};
 
 
 // Aceptar solicitud
@@ -114,6 +151,12 @@ exports.acceptRequest = (req, res) => {
 // Eliminar miembro
 exports.removeMember = (req, res) => {
     const { grupoId, usuarioId } = req.body;
+    const userSessionId = req.session.usuarioId;  // ID del usuario logueado
+
+    // Evitar que el profesor se elimine a sí mismo
+    if (userSessionId === usuarioId) {
+        return res.status(403).json({ error: 'No puedes eliminarte a ti mismo.' });
+    }
 
     db.query(
         `DELETE FROM grupo_miembros WHERE grupo_id = ? AND usuario_id = ?`,
@@ -127,6 +170,7 @@ exports.removeMember = (req, res) => {
         }
     );
 };
+/*
 
 // Añadir profesor
 exports.addTeacher = (req, res) => {
@@ -144,10 +188,10 @@ exports.addTeacher = (req, res) => {
         }
     );
 };
-
+*/
 exports.eliminarGrupo = (req, res) => {
     const { grupoId } = req.body;
-    const usuarioId = req.session.usuarioId;
+    const usuarioId = req.session.usuarioId; // el ID del usuario en sesión
 
     if (!grupoId || !usuarioId) {
         return res.status(400).json({ error: 'Datos incompletos' });
@@ -158,7 +202,8 @@ exports.eliminarGrupo = (req, res) => {
             return res.status(404).json({ error: 'Grupo no encontrado' });
         }
 
-        if (results[0].propietario_id !== usuarioId) {
+        // Ajuste: comparar como número para evitar discrepancias de tipo
+        if (Number(results[0].propietario_id) !== Number(usuarioId)) {
             return res.status(403).json({ error: 'No tienes permiso para eliminar este grupo.' });
         }
 
@@ -171,6 +216,7 @@ exports.eliminarGrupo = (req, res) => {
         });
     });
 };
+
 
 
 
