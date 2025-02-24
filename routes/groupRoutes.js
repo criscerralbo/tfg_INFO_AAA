@@ -10,11 +10,17 @@ router.post('/create', groupController.createGroup);
 // Añadir miembro al grupo
 router.post('/add-member', groupController.anadirMiembro);
 
+// Añadir una ruta para buscar usuarios
+router.get('/buscar-usuarios', groupController.buscarUsuarios);
+
 // Ver solicitudes de unirse a un grupo
 router.get('/join-requests/:grupoId', groupController.getJoinRequests);
 
 // Aceptar solicitud de unirse
 router.post('/accept-request', groupController.acceptRequest);
+
+// Ruta para rechazar una solicitud de unión
+router.post('/rechazar-solicitud', groupController.rechazarSolicitud);
 
 // Eliminar miembro del grupo
 router.delete('/remove-member', groupController.removeMember);

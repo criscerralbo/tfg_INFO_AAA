@@ -32,9 +32,20 @@
     </div>
     
     <main>
+     
+      <div id="detalles-grupo">
+        <h3>Detalles del Grupo</h3>
+        <!-- Aquí se mostrarán los detalles del grupo -->
+        
+      </div> 
+    
+     
+      
       <section id="miembros-section">
+        <button id="btn-eliminar-grupo" class="btn-danger" onclick="mostrarModalEliminarGrupo()">Eliminar Grupo</button>
+   
          <h2>Miembros del Grupo</h2>
-         <button id="btn-eliminar-grupo" class="btn-danger" onclick="mostrarModalEliminarGrupo()">Eliminar Grupo</button>
+        
          <div id="lista-miembros"></div>
          <button id="btn-admin-usuarios" onclick="toggleAdmin()">Administrar Usuarios</button>
       </section>
@@ -76,6 +87,9 @@
           </div>
         </div>
     </div>
+    <footer>
+      <p>© 2025 Gestión de Grupos - Todos los derechos reservados</p>
+    </footer>
   
     <script src="/detalles.js"></script>
 </body>

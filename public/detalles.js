@@ -128,6 +128,14 @@ async function cargarDetalles() {
       return;
     }
     const grupo = await response.json();
+     // Mostrar los detalles del grupo
+     const detallesGrupo = document.getElementById('detalles-grupo');
+     detallesGrupo.innerHTML = `
+       <h3>Detalles del Grupo</h3>
+       <p><strong>Nombre:</strong> ${grupo.nombre}</p>
+       <p><strong>ID:</strong> ${grupo.identificador}</p>
+       <p><strong>Fecha de Creación:</strong> ${grupo.creado_en}</p>
+     `;
 
     // Renderizar la lista de miembros en la sección superior
     const listaMiembros = document.getElementById('lista-miembros');
@@ -272,38 +280,51 @@ async function cargarSolicitudes() {
 }
 
 async function aceptarSolicitud(grupoId, usuarioId) {
+  console.log('Datos enviados: grupoId =', grupoId, 'usuarioId =', usuarioId);  // Verificar los valores
   try {
-    const response = await fetch('/api/groups/accept-request', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ grupoId, usuarioId })
-    });
-    if (!response.ok) throw new Error('Error al aceptar la solicitud');
-    mostrarMensaje('Solicitud aceptada', 'success');
-    cargarDetalles();
+      const response = await fetch('/api/groups/accept-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ grupoId, usuarioId })
+      });
+
+      if (!response.ok) throw new Error('Error al aceptar la solicitud');
+
+      mostrarMensaje('Solicitud aceptada', 'success');
+
+      // Aquí puedes actualizar la UI para eliminar la solicitud aceptada
+      cargarSolicitudes();  // Recargar las solicitudes para actualizar la interfaz
   } catch (error) {
-    console.error('Error al aceptar solicitud:', error);
-    mostrarMensaje('No se pudo aceptar la solicitud', 'error');
+      console.error('Error al aceptar solicitud:', error);
+      mostrarMensaje('No se pudo aceptar la solicitud', 'error');
   }
 }
 
+
+
+
 async function rechazarSolicitud(grupoId, usuarioId) {
   try {
-    const response = await fetch('/api/groups/remove-member', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ grupoId, usuarioId })
-    });
-    if (!response.ok) throw new Error('Error al rechazar la solicitud');
-    mostrarMensaje('Solicitud rechazada', 'success');
-    cargarDetalles();
+      const response = await fetch('/api/groups/rechazar-solicitud', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ grupoId, usuarioId })
+      });
+
+      if (!response.ok) throw new Error('Error al rechazar la solicitud');
+
+      mostrarMensaje('Solicitud rechazada', 'success');
+
+      // Aquí puedes actualizar la UI para eliminar la solicitud rechazada
+      cargarSolicitudes();  // Recargar las solicitudes para actualizar la interfaz
   } catch (error) {
-    console.error('Error al rechazar solicitud:', error);
-    mostrarMensaje('No se pudo rechazar la solicitud', 'error');
+      console.error('Error al rechazar solicitud:', error);
+      mostrarMensaje('No se pudo rechazar la solicitud', 'error');
   }
 }
+
 
 // Inicialización: carga detalles y configura búsqueda dinámica
 window.addEventListener('DOMContentLoaded', () => {

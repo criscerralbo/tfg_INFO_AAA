@@ -100,36 +100,136 @@ exports.getJoinRequests = (req, res) => {
     const grupoId = req.params.grupoId;
     db.query(
         `SELECT u.id as usuario_id, u.nombre, r.nombre as rol
-         FROM grupo_miembros gm
-         JOIN usuarios u ON gm.usuario_id = u.id
-         JOIN roles r ON gm.rol_id = r.id
-         WHERE gm.grupo_id = ? AND gm.estado = 'pendiente'`,
+         FROM solicitudes_grupo sg
+         JOIN usuarios u ON sg.usuario_id = u.id
+         JOIN roles r ON u.rol_id = r.id
+         WHERE sg.grupo_id = ? AND sg.estado = 'pendiente'`,
         [grupoId],
         (err, results) => {
             if (err) {
                 console.error('Error al obtener solicitudes:', err);
                 return res.status(500).json({ error: 'Error al obtener solicitudes' });
             }
-            res.status(200).json(results);
+            res.status(200).json(results); // Devolver los resultados de la consulta
         }
     );
+    
 };
+exports.rechazarSolicitud = (req, res) => {
+    const { grupoId, usuarioId } = req.body;
+
+    // Iniciar una transacción para asegurar que todo se ejecute correctamente
+    db.beginTransaction((err) => {
+        if (err) {
+            console.error('Error al iniciar la transacción:', err);
+            return res.status(500).json({ error: 'Error al iniciar la transacción' });
+        }
+
+        // 1. Eliminar la solicitud de la tabla 'solicitudes_grupo'
+        db.query(
+            `DELETE FROM solicitudes_grupo WHERE grupo_id = ? AND usuario_id = ? AND estado = 'pendiente'`,
+            [grupoId, usuarioId],
+            (err) => {
+                if (err) {
+                    console.error('Error al eliminar solicitud:', err);
+                    return db.rollback(() => {
+                        res.status(500).json({ error: 'Error al rechazar solicitud' });
+                    });
+                }
+
+                // Si todo ha ido bien, confirmar la transacción
+                db.commit((err) => {
+                    if (err) {
+                        console.error('Error al confirmar la transacción:', err);
+                        return db.rollback(() => {
+                            res.status(500).json({ error: 'Error al rechazar la solicitud' });
+                        });
+                    }
+
+                    res.status(200).json({ success: 'Solicitud rechazada correctamente' });
+                });
+            }
+        );
+    });
+};
+
+  
 
 exports.acceptRequest = (req, res) => {
     const { grupoId, usuarioId } = req.body;
 
-    db.query(
-        `UPDATE grupo_miembros SET estado = 'aprobado' WHERE grupo_id = ? AND usuario_id = ?`,
-        [grupoId, usuarioId],
-        (err) => {
-            if (err) {
-                console.error('Error al aceptar solicitud:', err);
-                return res.status(500).json({ error: 'Error al aceptar solicitud' });
-            }
-            res.status(200).json({ success: 'Solicitud aceptada correctamente' });
+    // Iniciar una transacción para asegurar que todo se ejecute correctamente
+    db.beginTransaction((err) => {
+        if (err) {
+            console.error('Error al iniciar la transacción:', err);
+            return res.status(500).json({ error: 'Error al iniciar la transacción' });
         }
-    );
+
+        // 1. Obtener el rol del usuario desde la tabla 'usuarios'
+        db.query(
+            `SELECT rol_id FROM usuarios WHERE id = ?`,
+            [usuarioId],
+            (err, results) => {
+                if (err) {
+                    console.error('Error al obtener el rol del usuario:', err);
+                    return db.rollback(() => {
+                        res.status(500).json({ error: 'Error al obtener el rol del usuario' });
+                    });
+                }
+
+                if (results.length === 0) {
+                    return db.rollback(() => {
+                        res.status(404).json({ error: 'Usuario no encontrado' });
+                    });
+                }
+
+                const rolId = results[0].rol_id;
+
+                // 2. Añadir al usuario como miembro en la tabla 'grupo_miembros'
+                db.query(
+                    `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado)
+                     VALUES (?, ?, ?, 'aprobado')`,
+                    [grupoId, usuarioId, rolId],
+                    (err) => {
+                        if (err) {
+                            console.error('Error al agregar miembro:', err);
+                            return db.rollback(() => {
+                                res.status(500).json({ error: 'Error al agregar miembro al grupo' });
+                            });
+                        }
+
+                        // 3. Eliminar la solicitud de la tabla 'solicitudes_grupo'
+                        db.query(
+                            `DELETE FROM solicitudes_grupo WHERE grupo_id = ? AND usuario_id = ?`,
+                            [grupoId, usuarioId],
+                            (err) => {
+                                if (err) {
+                                    console.error('Error al eliminar solicitud:', err);
+                                    return db.rollback(() => {
+                                        res.status(500).json({ error: 'Error al eliminar solicitud' });
+                                    });
+                                }
+
+                                // Confirmar la transacción si todo ha ido bien
+                                db.commit((err) => {
+                                    if (err) {
+                                        console.error('Error al confirmar la transacción:', err);
+                                        return db.rollback(() => {
+                                            res.status(500).json({ error: 'Error al aceptar la solicitud' });
+                                        });
+                                    }
+
+                                    res.status(200).json({ success: 'Solicitud aceptada correctamente' });
+                                });
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    });
 };
+
 
 exports.removeMember = (req, res) => {
     const { grupoId, usuarioId } = req.body;
@@ -196,6 +296,29 @@ exports.getGroupsByOwner = (req, res) => {
             if (err) {
                 console.error('Error al obtener grupos:', err);
                 return res.status(500).json({ error: 'Error al obtener grupos' });
+            }
+            res.status(200).json(results);
+        }
+    );
+};
+exports.buscarUsuarios = (req, res) => {
+    const { query } = req.query; // Parámetro de búsqueda
+
+    if (!query) {
+        return res.status(400).json({ error: 'Se requiere un término de búsqueda' });
+    }
+
+    db.query(
+        `SELECT u.id, u.nombre, u.email, r.id AS rolId, r.nombre AS rol
+         FROM usuarios u
+         JOIN roles r ON u.rol_id = r.id
+         WHERE u.nombre LIKE ? OR u.email LIKE ? 
+         LIMIT 10`,
+        [`%${query}%`, `%${query}%`],
+        (err, results) => {
+            if (err) {
+                console.error('Error al buscar usuarios:', err);
+                return res.status(500).json({ error: 'Error al buscar usuarios' });
             }
             res.status(200).json(results);
         }

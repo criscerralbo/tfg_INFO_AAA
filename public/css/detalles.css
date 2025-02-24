@@ -8,6 +8,7 @@
     box-sizing: border-box;
 }
 
+
 html, body {
     font-family: 'Poppins', sans-serif;
     background-color: #f7f9fa;
@@ -51,7 +52,17 @@ header {
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-/* Mensajes de estado */
+/* Botón "Eliminar Grupo" en esquina superior izquierda */
+#btn-eliminar-grupo {
+    background-color: #e74c3c; /* rojo */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    float: left; /* Lo coloca en la esquina superior izquierda */
+    margin-top: 10px;
+}/* Mensajes de estado */
 .mensaje-success {
     background-color: #d4edda; /* Verde claro */
     color: #155724;           /* Verde oscuro */
@@ -361,3 +372,4 @@ footer {
         padding: 10px 20px;
     }
 }
+
