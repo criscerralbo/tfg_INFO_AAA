@@ -1,9 +1,5 @@
-// controllers/groupController.js
-
 const Group = require('../models/groupModel');
-
 const db = require('../db');
-
 
 exports.createGroup = (req, res) => {
     console.log('Solicitud recibida para crear grupo:', req.body);
@@ -15,7 +11,7 @@ exports.createGroup = (req, res) => {
         return res.status(400).json({ error: 'Faltan datos para crear el grupo' });
     }
 
-    // Verificar si el nombre del grupo ya existe (puedes decidir si es global o solo del profesor)
+    // Verificar si el nombre del grupo ya existe
     db.query(`SELECT id FROM grupos WHERE nombre = ?`, [nombre], (err, rows) => {
         if (err) {
             console.error('Error al comprobar nombre de grupo:', err);
@@ -27,7 +23,7 @@ exports.createGroup = (req, res) => {
             return res.status(400).json({ error: 'El nombre del grupo ya existe. Elige otro nombre.' });
         }
 
-        // Si el nombre no existe, proceder a crearlo
+        // Crear el grupo
         const identificador = Math.random().toString(36).substring(2, 8);
 
         db.query(
@@ -41,16 +37,14 @@ exports.createGroup = (req, res) => {
 
                 const grupoId = result.insertId;
 
+                // Añadir al propietario como miembro automáticamente
                 db.query(
-                    `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado)
-                     VALUES (?, ?, 2, 'aprobado')`,
+                    `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado) VALUES (?, ?, 2, 'aprobado')`,
                     [grupoId, propietarioId],
                     (err) => {
                         if (err) {
                             console.error('Error al agregar al propietario como miembro:', err);
-                            return res
-                              .status(500)
-                              .json({ error: 'Grupo creado, pero no se pudo asignar al propietario' });
+                            return res.status(500).json({ error: 'Grupo creado, pero no se pudo asignar al propietario' });
                         }
                         res.status(201).json({
                             success: 'Grupo creado con éxito',
@@ -63,99 +57,64 @@ exports.createGroup = (req, res) => {
     });
 };
 
-
 exports.anadirMiembro = (req, res) => {
     const { grupoId, usuarioId, rolId } = req.body;
-  
     console.log("Datos recibidos:", grupoId, usuarioId, rolId);
-  
-    // Verificar que los datos no sean nulos o vacíos
+
     if (!grupoId || !usuarioId || !rolId) {
-      return res.status(400).json({ error: 'Faltan datos requeridos' });
+        return res.status(400).json({ error: 'Faltan datos requeridos' });
     }
-  
+
     // Comprobar si el usuario ya está en el grupo
     db.query(
-      `SELECT * FROM grupo_miembros WHERE grupo_id = ? AND usuario_id = ?`,
-      [grupoId, usuarioId],
-      (err, rows) => {
-        if (err) {
-          console.error('Error al comprobar si el usuario está en el grupo:', err);
-          return res.status(500).json({ error: 'Error al comprobar miembro' });
-        }
-  
-        // Si el usuario ya está en el grupo, devolver un error
-        if (rows.length > 0) {
-          return res.status(400).json({ error: 'El usuario ya está en el grupo' });
-        }
-  
-        // Si no está, añadir al usuario
-        db.query(
-          `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado)
-           VALUES (?, ?, ?, 'aprobado')`,
-          [grupoId, usuarioId, rolId],
-          (err) => {
+        `SELECT * FROM grupo_miembros WHERE grupo_id = ? AND usuario_id = ?`,
+        [grupoId, usuarioId],
+        (err, rows) => {
             if (err) {
-              console.error('Error al añadir miembro:', err);
-              return res.status(500).json({ error: 'No se pudo añadir el miembro al grupo' });
+                console.error('Error al comprobar si el usuario está en el grupo:', err);
+                return res.status(500).json({ error: 'Error al comprobar miembro' });
             }
-            res.status(200).json({ success: 'Usuario añadido correctamente' });
-          }
-        );
-      }
+
+            // Si el usuario ya está en el grupo, devolver un error
+            if (rows.length > 0) {
+                return res.status(400).json({ error: 'El usuario ya está en el grupo' });
+            }
+
+            // Si no está, añadir al usuario
+            db.query(
+                `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado) VALUES (?, ?, ?, 'aprobado')`,
+                [grupoId, usuarioId, rolId],
+                (err) => {
+                    if (err) {
+                        console.error('Error al añadir miembro:', err);
+                        return res.status(500).json({ error: 'No se pudo añadir el miembro al grupo' });
+                    }
+                    res.status(200).json({ success: 'Usuario añadido correctamente' });
+                }
+            );
+        }
     );
-  };
-  
-  
+};
 
-
-  exports.buscarUsuarios = (req, res) => {
-    const { query } = req.query; // Parámetro de búsqueda
-
-    if (!query) {
-        return res.status(400).json({ error: 'Se requiere un término de búsqueda' });
-    }
-
+exports.getJoinRequests = (req, res) => {
+    const grupoId = req.params.grupoId;
     db.query(
-        `SELECT u.id, u.nombre, u.email, r.id AS rolId, r.nombre AS rol  -- Seleccionamos tanto el rol_id como el nombre del rol
-         FROM usuarios u
-         JOIN roles r ON u.rol_id = r.id
-         WHERE u.nombre LIKE ? OR u.email LIKE ? 
-         LIMIT 10`,
-        [`%${query}%`, `%${query}%`],
+        `SELECT u.id as usuario_id, u.nombre, r.nombre as rol
+         FROM grupo_miembros gm
+         JOIN usuarios u ON gm.usuario_id = u.id
+         JOIN roles r ON gm.rol_id = r.id
+         WHERE gm.grupo_id = ? AND gm.estado = 'pendiente'`,
+        [grupoId],
         (err, results) => {
             if (err) {
-                console.error('Error al buscar usuarios:', err);
-                return res.status(500).json({ error: 'Error al buscar usuarios' });
+                console.error('Error al obtener solicitudes:', err);
+                return res.status(500).json({ error: 'Error al obtener solicitudes' });
             }
-
             res.status(200).json(results);
         }
     );
 };
 
-
-exports.getJoinRequests = (req, res) => {
-    const grupoId = req.params.grupoId;
-    db.query(
-       `SELECT u.id as usuario_id, u.nombre, r.nombre as rol
-        FROM grupo_miembros gm
-        JOIN usuarios u ON gm.usuario_id = u.id
-        JOIN roles r ON gm.rol_id = r.id
-        WHERE gm.grupo_id = ? AND gm.estado = 'pendiente'`,
-       [grupoId],
-       (err, results) => {
-           if (err) {
-               console.error('Error al obtener solicitudes:', err);
-               return res.status(500).json({ error: 'Error al obtener solicitudes' });
-           }
-           res.status(200).json(results);
-       }
-    );
-};
-
-
-// Aceptar solicitud
 exports.acceptRequest = (req, res) => {
     const { grupoId, usuarioId } = req.body;
 
@@ -172,16 +131,14 @@ exports.acceptRequest = (req, res) => {
     );
 };
 
-// Eliminar miembro
 exports.removeMember = (req, res) => {
     const { grupoId, usuarioId } = req.body;
     const userSessionId = req.session.usuarioId;  // ID del usuario logueado
 
-   // Evitar que el profesor se elimine a sí mismo
-if (Number(userSessionId) === Number(usuarioId)) {
-    return res.status(403).json({ error: 'No puedes eliminarte a ti mismo.' });
-}
-
+    // Evitar que el profesor se elimine a sí mismo
+    if (Number(userSessionId) === Number(usuarioId)) {
+        return res.status(403).json({ error: 'No puedes eliminarte a ti mismo.' });
+    }
 
     db.query(
         `DELETE FROM grupo_miembros WHERE grupo_id = ? AND usuario_id = ?`,
@@ -195,28 +152,10 @@ if (Number(userSessionId) === Number(usuarioId)) {
         }
     );
 };
-/*
 
-// Añadir profesor
-exports.addTeacher = (req, res) => {
-    const { grupoId, usuarioId } = req.body;
-
-    db.query(
-        `INSERT INTO grupo_miembros (grupo_id, usuario_id, rol_id, estado) VALUES (?, ?, (SELECT id FROM roles WHERE nombre = 'profesor'), 'aprobado')`,
-        [grupoId, usuarioId],
-        (err) => {
-            if (err) {
-                console.error('Error al añadir profesor:', err);
-                return res.status(500).json({ error: 'Error al añadir profesor' });
-            }
-            res.status(200).json({ success: 'Profesor añadido correctamente' });
-        }
-    );
-};
-*/
 exports.eliminarGrupo = (req, res) => {
     const { grupoId } = req.body;
-    const usuarioId = req.session.usuarioId; // el ID del usuario en sesión
+    const usuarioId = req.session.usuarioId;
 
     if (!grupoId || !usuarioId) {
         return res.status(400).json({ error: 'Datos incompletos' });
@@ -227,7 +166,6 @@ exports.eliminarGrupo = (req, res) => {
             return res.status(404).json({ error: 'Grupo no encontrado' });
         }
 
-        // Ajuste: comparar como número para evitar discrepancias de tipo
         if (Number(results[0].propietario_id) !== Number(usuarioId)) {
             return res.status(403).json({ error: 'No tienes permiso para eliminar este grupo.' });
         }
@@ -242,18 +180,13 @@ exports.eliminarGrupo = (req, res) => {
     });
 };
 
-
-
-
 exports.getGroupsByOwner = (req, res) => {
     const propietarioId = req.session.usuarioId;
 
-    // Verificar si el usuarioId está presente (solo por seguridad)
     if (!propietarioId) {
         return res.status(500).json({ error: 'Error interno: Propietario no definido.' });
     }
 
-    // Consulta para obtener grupos por propietario
     db.query(
         `SELECT id, nombre, identificador, creado_en 
          FROM grupos 
@@ -269,15 +202,13 @@ exports.getGroupsByOwner = (req, res) => {
     );
 };
 
-
 exports.buscarGrupos = (req, res) => {
-    const { query } = req.query; // Término de búsqueda
+    const { query } = req.query;
 
     if (!query) {
         return res.status(400).json({ error: 'Se requiere un término de búsqueda' });
     }
 
-    // Buscar grupos por nombre o identificador
     db.query(
         `SELECT id, nombre, identificador FROM grupos WHERE nombre LIKE ? OR identificador LIKE ? LIMIT 10`,
         [`%${query}%`, `%${query}%`],
@@ -286,10 +217,11 @@ exports.buscarGrupos = (req, res) => {
                 console.error('Error al buscar grupos:', err);
                 return res.status(500).json({ error: 'Error al buscar grupos' });
             }
-            res.status(200).json(results);  // Devuelve los grupos encontrados
+            res.status(200).json(results);
         }
     );
 };
+
 exports.solicitarUnirse = (req, res) => {
     const { grupoId } = req.body;
     const usuarioId = req.session.usuarioId;
@@ -298,7 +230,6 @@ exports.solicitarUnirse = (req, res) => {
         return res.status(400).json({ error: 'Datos incompletos para la solicitud' });
     }
 
-    // Insertar solicitud de unión en la tabla de solicitudes
     db.query(
         `INSERT INTO solicitudes_grupo (grupo_id, usuario_id, estado) VALUES (?, ?, 'pendiente')`,
         [grupoId, usuarioId],
@@ -308,6 +239,65 @@ exports.solicitarUnirse = (req, res) => {
                 return res.status(500).json({ error: 'Error al enviar la solicitud' });
             }
             res.status(200).json({ success: 'Solicitud enviada correctamente' });
+        }
+    );
+};
+
+exports.getGroupsForStudent = (req, res) => {
+    const usuarioId = req.session.usuarioId;
+
+    db.query(
+        `SELECT g.id, g.nombre, g.identificador 
+         FROM grupos g
+         JOIN grupo_miembros gm ON g.id = gm.grupo_id
+         WHERE gm.usuario_id = ? AND gm.estado = 'aprobado'`,
+        [usuarioId],
+        (err, results) => {
+            if (err) {
+                console.error('Error al obtener los grupos matriculados:', err);
+                return res.status(500).json({ error: 'Error interno al obtener grupos' });
+            }
+
+            res.status(200).json(results);
+        }
+    );
+};
+
+exports.getGroupDetails = (req, res) => {
+    const grupoId = req.params.id;
+
+    db.query(
+        `SELECT g.nombre, g.identificador, g.creado_en, 
+                u.nombre AS miembro_nombre, u.id as miembro_id, r.nombre AS rol
+         FROM grupos g
+         LEFT JOIN grupo_miembros gm ON g.id = gm.grupo_id
+         LEFT JOIN usuarios u ON gm.usuario_id = u.id
+         LEFT JOIN roles r ON gm.rol_id = r.id
+         WHERE g.id = ?`,
+        [grupoId],
+        (err, results) => {
+            if (err) {
+                console.error('Error en la consulta SQL:', err.message);
+                return res.status(500).json({ error: 'Error interno del servidor' });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'Grupo no encontrado' });
+            }
+
+            const grupo = {
+                id: parseInt(grupoId),
+                nombre: results[0].nombre,
+                identificador: results[0].identificador,
+                creado_en: results[0].creado_en,
+                miembros: results.map(row => ({
+                    nombre: row.miembro_nombre,
+                    rol: row.rol,
+                    id: row.miembro_id
+                }))
+            };
+
+            res.status(200).json(grupo);
         }
     );
 };

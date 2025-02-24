@@ -56,6 +56,8 @@ app.use('/usuarios', userRoutes);
 // Rutas de grupos (gestión de grupos)
 app.use('/api/groups', groupRoutes);
 
+// Para las rutas de los grupos de los alumnos, mantén el prefijo '/api/alumno'
+app.use('/api/alumno', groupRoutes);
 
 // Ruta para la pantalla de inicio (luego de iniciar sesión)
 app.get('/inicio', (req, res) => {

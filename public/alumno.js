@@ -41,6 +41,7 @@ function mostrarResultadosGrupos(grupos) {
     });
 }
 
+// Función para solicitar unirse a un grupo
 async function solicitarUnirse(grupoId) {
     try {
         const response = await fetch('/api/alumno/solicitar-unirse', {
@@ -58,14 +59,14 @@ async function solicitarUnirse(grupoId) {
     }
 }
 
-
-// Función para ver los grupos matriculados
+// Función para cargar los grupos en los que el alumno está matriculado
 async function cargarGruposMatriculados() {
     try {
         const response = await fetch('/api/alumno/grupos-matriculados', {
             method: 'GET',
             credentials: 'include'
         });
+
         if (!response.ok) throw new Error('Error al obtener los grupos matriculados');
         
         const grupos = await response.json();
@@ -75,7 +76,7 @@ async function cargarGruposMatriculados() {
     }
 }
 
-// Mostrar los grupos en los que el alumno está matriculado
+// Mostrar los grupos matriculados
 function mostrarGruposMatriculados(grupos) {
     const gruposLista = document.getElementById('grupos-lista');
     gruposLista.innerHTML = '';
@@ -121,44 +122,38 @@ function mostrarDetallesGrupo(grupo) {
     });
 }
 
-// Función para buscar miembros del grupo
-async function buscarMiembros() {
-    const query = document.getElementById('buscar-miembro').value.trim();
-    const miembrosGrupo = document.getElementById('miembros-grupo');
-    
-    if (query === '') {
-        miembrosGrupo.innerHTML = 'Introduce un nombre para buscar miembros.';
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/alumno/buscar-miembros?query=${query}`, {
-            method: 'GET',
-            credentials: 'include'
-        });
-        if (!response.ok) throw new Error('Error al buscar miembros');
-
-        const miembros = await response.json();
-        mostrarMiembrosBusqueda(miembros);
-    } catch (error) {
-        console.error('Error al buscar miembros:', error);
-    }
-}
-
-// Mostrar los resultados de búsqueda de miembros
-function mostrarMiembrosBusqueda(miembros) {
-    const miembrosGrupo = document.getElementById('miembros-grupo');
-    miembrosGrupo.innerHTML = '<h3>Miembros del Grupo</h3>';
-    if (miembros.length === 0) {
-        miembrosGrupo.innerHTML += '<p>No se encontraron miembros.</p>';
-        return;
-    }
-    miembros.forEach(miembro => {
-        miembrosGrupo.innerHTML += `<p>${miembro.nombre} (${miembro.rol})</p>`;
-    });
-}
-
 // Cargar los grupos matriculados al cargar la página
 window.addEventListener('DOMContentLoaded', () => {
+    // --- Lógica para el modal de cierre de sesión ---
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            document.getElementById('logoutModal').style.display = 'block';
+        });
+    }
+
+    const cancelLogout = document.getElementById('cancelLogout');
+    if (cancelLogout) {
+        cancelLogout.addEventListener('click', () => {
+            document.getElementById('logoutModal').style.display = 'none';
+        });
+    }
+
+    const closeModal = document.getElementById('closeModal');
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            document.getElementById('logoutModal').style.display = 'none';
+        });
+    }
+
+    const confirmLogout = document.getElementById('confirmLogout');
+    if (confirmLogout) {
+        confirmLogout.addEventListener('click', () => {
+            fetch('/usuarios/logout')
+                .then(() => {
+                    window.location.href = '/'; // Redirigir a la página de inicio de sesión
+                });
+        });
+    }
     cargarGruposMatriculados();
 });

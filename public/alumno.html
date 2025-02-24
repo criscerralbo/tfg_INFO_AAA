@@ -12,8 +12,25 @@
         <div class="user-section">
             <button class="btn-back" onclick="window.history.back()">← Volver</button>
             <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+            <!-- boton administrador que solo aparece a los usuarios administradores -->
+             <div class="user-icon">
+                <a href="/perfil.html">
+                    <img src="images/usuario.png" alt="Usuario">
+                </a>
+            </div>
         </div>
     </header>
+     <!-- Modal de confirmación de cierre de sesión -->
+<div id="logoutModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+        <div class="modal-buttons">
+            <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+            <button id="cancelLogout" class="cancel-button">Cancelar</button>
+        </div>
+    </div>
+  </div>
 
     <main>
         <!-- Buscar y Unirse a Grupos -->
