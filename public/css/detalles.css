@@ -352,6 +352,26 @@ footer {
     position: relative;
     bottom: 0;
 }
+#mensaje-estado {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
+    background-color: #f8d7da; /* Red for error */
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+}
+
+#mensaje-estado.mensaje-success {
+    background-color: #d4edda; /* Green for success */
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
 
 /* Estilo responsivo */
 @media (max-width: 768px) {

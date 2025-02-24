@@ -281,23 +281,27 @@ exports.eliminarGrupo = (req, res) => {
 };
 
 exports.getGroupsByOwner = (req, res) => {
-    const propietarioId = req.session.usuarioId;
+    const usuarioId = req.session.usuarioId; // Obtener el ID del profesor desde la sesión
 
-    if (!propietarioId) {
-        return res.status(500).json({ error: 'Error interno: Propietario no definido.' });
+    // Verificar si el usuario está autenticado
+    if (!usuarioId) {
+        return res.status(403).json({ error: 'No estás autorizado a ver los grupos' });
     }
 
+    // Consulta para obtener los grupos gestionados por el profesor
     db.query(
-        `SELECT id, nombre, identificador, creado_en 
-         FROM grupos 
-         WHERE propietario_id = ?`, 
-        [propietarioId],
+        `SELECT g.id, g.nombre, g.identificador, g.creado_en
+         FROM grupos g
+         JOIN grupo_miembros gm ON g.id = gm.grupo_id
+         WHERE gm.usuario_id = ? AND gm.rol_id = 2 AND gm.estado = 'aprobado'`, // Solo profesores aprobados
+        [usuarioId],
         (err, results) => {
             if (err) {
-                console.error('Error al obtener grupos:', err);
-                return res.status(500).json({ error: 'Error al obtener grupos' });
+                console.error('Error al obtener los grupos:', err);
+                return res.status(500).json({ error: 'Error interno al obtener grupos' });
             }
-            res.status(200).json(results);
+
+            res.status(200).json(results); // Devuelve los grupos donde el usuario es profesor
         }
     );
 };
@@ -353,18 +357,54 @@ exports.solicitarUnirse = (req, res) => {
         return res.status(400).json({ error: 'Datos incompletos para la solicitud' });
     }
 
+    // Comprobar si el usuario ya está en el grupo
     db.query(
-        `INSERT INTO solicitudes_grupo (grupo_id, usuario_id, estado) VALUES (?, ?, 'pendiente')`,
+        `SELECT * FROM grupo_miembros WHERE grupo_id = ? AND usuario_id = ?`,
         [grupoId, usuarioId],
-        (err) => {
+        (err, rows) => {
             if (err) {
-                console.error('Error al solicitar unirse al grupo:', err);
-                return res.status(500).json({ error: 'Error al enviar la solicitud' });
+                console.error('Error al comprobar si el usuario está en el grupo:', err);
+                return res.status(500).json({ error: 'Error al comprobar miembro' });
             }
-            res.status(200).json({ success: 'Solicitud enviada correctamente' });
+
+            // Si el usuario ya es miembro, devolver un mensaje de error
+            if (rows.length > 0) {
+                return res.status(400).json({ error: 'Ya eres miembro de este grupo' });
+            }
+
+            // Comprobar si el usuario ya ha enviado una solicitud pendiente
+            db.query(
+                `SELECT * FROM solicitudes_grupo WHERE grupo_id = ? AND usuario_id = ? AND estado = 'pendiente'`,
+                [grupoId, usuarioId],
+                (err, rows) => {
+                    if (err) {
+                        console.error('Error al comprobar solicitud pendiente:', err);
+                        return res.status(500).json({ error: 'Error al comprobar solicitud pendiente' });
+                    }
+
+                    // Si ya hay una solicitud pendiente, devolver un error
+                    if (rows.length > 0) {
+                        return res.status(400).json({ error: 'Ya has enviado una solicitud a este grupo' });
+                    }
+
+                    // Si no está en el grupo y no tiene solicitud pendiente, crear la solicitud
+                    db.query(
+                        `INSERT INTO solicitudes_grupo (grupo_id, usuario_id, estado) VALUES (?, ?, 'pendiente')`,
+                        [grupoId, usuarioId],
+                        (err) => {
+                            if (err) {
+                                console.error('Error al enviar la solicitud:', err);
+                                return res.status(500).json({ error: 'Error al enviar la solicitud' });
+                            }
+                            res.status(200).json({ success: 'Solicitud enviada correctamente' });
+                        }
+                    );
+                }
+            );
         }
     );
 };
+
 
 exports.getGroupsForStudent = (req, res) => {
     const usuarioId = req.session.usuarioId;
@@ -388,7 +428,9 @@ exports.getGroupsForStudent = (req, res) => {
 
 exports.getGroupDetails = (req, res) => {
     const grupoId = req.params.id;
+    const usuarioId = req.session.usuarioId; // Suponiendo que el ID del usuario está en la sesión
 
+    // Consulta que incluye todos los miembros del grupo y verifica si el usuario es propietario o profesor
     db.query(
         `SELECT g.nombre, g.identificador, g.creado_en, 
                 u.nombre AS miembro_nombre, u.id as miembro_id, r.nombre AS rol
@@ -403,11 +445,11 @@ exports.getGroupDetails = (req, res) => {
                 console.error('Error en la consulta SQL:', err.message);
                 return res.status(500).json({ error: 'Error interno del servidor' });
             }
-
+    
             if (results.length === 0) {
-                return res.status(404).json({ error: 'Grupo no encontrado' });
+                return res.status(404).json({ error: 'Grupo no encontrado o no tienes acceso a este grupo' });
             }
-
+    
             const grupo = {
                 id: parseInt(grupoId),
                 nombre: results[0].nombre,
@@ -419,8 +461,10 @@ exports.getGroupDetails = (req, res) => {
                     id: row.miembro_id
                 }))
             };
-
+    
             res.status(200).json(grupo);
         }
     );
+    
 };
+

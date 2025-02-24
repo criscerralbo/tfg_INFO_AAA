@@ -20,6 +20,7 @@
             </div>
         </div>
     </header>
+    <div id="mensaje-estado" style="display:none;"></div>
      <!-- Modal de confirmación de cierre de sesión -->
 <div id="logoutModal" class="modal">
     <div class="modal-content">
@@ -47,15 +48,17 @@
             <div id="grupos-lista"></div>
         </section>
 
-        <!-- Detalles del Grupo -->
+      <!-- Detalles del Grupo -->
         <section id="grupo-detalle" style="display: none;">
             <h2>Detalles del Grupo</h2>
-            <div id="miembros-grupo"></div>
-            <input type="text" id="buscar-miembro" placeholder="Buscar miembro por nombre">
-            <button onclick="buscarMiembros()">Buscar Miembro</button>
+            <div id="miembros-grupo"></div>  <!-- Aquí se mostrarán los miembros -->
         </section>
-    </main>
 
+    </main>
+    
     <script src="/alumno.js"></script>
 </body>
+<footer>
+    <p>© 2025 Gestión de Grupos - Todos los derechos reservados</p>
+  </footer>
 </html>
