@@ -106,9 +106,35 @@
             Esta plataforma está diseñada para mejorar el aprendizaje de los estudiantes de odontología a través de juegos interactivos y didácticos. 
             Aquí podrás participar en actividades, resolver casos clínicos y medir tu progreso de una manera divertida y educativa.
         </p>
-        <a href="#" class="boton-principal">Empezar</a>
-    </main>
+        <button onclick="redirigirJuego()">Comenzar</button> <!-- Visible para todos los usuarios -->
+        <button id="admin-button" onclick="administrarJuegos()">Administrar Juegos</button> <!-- Solo visible para administradores/profesores -->
+       </main>
+       <script>
+        // Función para redirigir a la plataforma de juegos para todos los usuarios
+        function redirigirJuego() {
+            window.location.href = '/juegos';  // Redirige a la página de juegos
+        }
 
+        // Función para redirigir a la gestión de juegos, solo para administradores/profesores
+        function administrarJuegos() {
+            window.location.href = '/gestionar-juegos';  // Redirige a la página de gestión de juegos
+        }
+
+        // Mostrar el botón de administrar juegos solo si el usuario es admin o profesor
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/ver-rol', {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.rol === 'Profesor' || data.rol === 'Administrador') {
+                    document.getElementById('admin-button').style.display = 'block'; // Mostrar el botón solo para admins y profesores
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
     <!-- Footer -->
     <footer>
         © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
