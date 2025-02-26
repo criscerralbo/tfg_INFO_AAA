@@ -14,6 +14,21 @@ html, body {
     color: #333;
     overflow-x: hidden;
 }
+.user-section {
+    display: flex;
+    align-items: center;
+}
+
+.user-section span {
+    margin-right: 10px;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+.user-icon img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
 
 /* Header */
 header {
@@ -32,7 +47,7 @@ header h1 {
 }
 
 header button {
-    background-color: #e74c3c;
+    background-color: #2980b9;
     color: white;
     border: none;
     padding: 10px 15px;
@@ -41,7 +56,7 @@ header button {
 }
 
 header button:hover {
-    background-color: #c0392b;
+    background-color: #508bbd;
 }
 
 /* Contenedor de la tabla */

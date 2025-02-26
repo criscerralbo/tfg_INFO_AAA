@@ -22,6 +22,7 @@ const {
     eliminarUsuario          // Nuevo: Eliminar un usuario
 } = require('../controllers/userController');
 
+
 // Ruta para registrar un usuario
 router.post('/registrar', registrarUsuario);
 

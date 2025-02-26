@@ -37,7 +37,23 @@
             </div>
         </div>
     </div>
-
+ <!-- Contenido principal -->
+ <main class="welcome-section">
+    <h2>Bienvenido a la Aplicación de Gamificación en Odontología</h2>
+    <p>
+        Esta plataforma está diseñada para mejorar el aprendizaje de los estudiantes de odontología a través de juegos interactivos y didácticos. 
+        Aquí podrás participar en actividades, resolver casos clínicos y medir tu progreso de una manera divertida y educativa.
+    </p>
+    <div class="botones-section">
+    <button id="btn-alumno-comenzar" class="btn-alumno-comenzar" style="display: block;">COMENZAR</button>
+    <button id="btn-adm-juegos" class="btn-adm-juegos" style="display: none;">Asministrar Juegos</button> <!-- Solo visible para administradores/profesores -->
+</div>
+</main>
+   
+<!-- Footer -->
+<footer>
+    © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
+</footer>
     <script>
         // Cargar el nombre del usuario desde la sesión del servidor
         window.addEventListener('DOMContentLoaded', (event) => {
@@ -58,6 +74,12 @@
                     if (data.rol === 'alumno') { // Mostrar botón solo si el usuario es administrador
                         document.getElementById('btn-alumno-grupos').style.display = 'block';
                     }
+                    if (data.rol === 'administrador') { // Mostrar botón solo si el usuario es administrador
+                        document.getElementById('btn-adm-juegos').style.display = 'block';
+                    }
+                    if (data.rol === 'profesor') { // Mostrar botón solo si el usuario es administrador
+                        document.getElementById('btn-adm-juegos').style.display = 'block';
+                    }
                 })
                 
                 .catch(() => {
@@ -75,6 +97,14 @@
                 // Redirigir al panel de administración
                 document.getElementById('btn-alumno-grupos').addEventListener('click', function() {
                     window.location.href = '/alumno.html';
+                })
+                // Redirigir al panel de administración
+                document.getElementById('btn-alumno-comenzar').addEventListener('click', function() {
+                    window.location.href = '/juegos.html';
+                })
+                // Redirigir al panel de administración
+                document.getElementById('btn-adm-juegos').addEventListener('click', function() {
+                    window.location.href = '/adm_juegos.html';
                 })
         // Mostrar el modal de confirmación
         document.getElementById('logout-button').addEventListener('click', function() {
@@ -99,46 +129,7 @@
         });
     </script>
 
-    <!-- Contenido principal -->
-    <main class="welcome-section">
-        <h2>Bienvenido a la Aplicación de Gamificación en Odontología</h2>
-        <p>
-            Esta plataforma está diseñada para mejorar el aprendizaje de los estudiantes de odontología a través de juegos interactivos y didácticos. 
-            Aquí podrás participar en actividades, resolver casos clínicos y medir tu progreso de una manera divertida y educativa.
-        </p>
-        <button onclick="redirigirJuego()">Comenzar</button> <!-- Visible para todos los usuarios -->
-        <button id="admin-button" onclick="administrarJuegos()">Administrar Juegos</button> <!-- Solo visible para administradores/profesores -->
-       </main>
-       <script>
-        // Función para redirigir a la plataforma de juegos para todos los usuarios
-        function redirigirJuego() {
-            window.location.href = '/juegos';  // Redirige a la página de juegos
-        }
-
-        // Función para redirigir a la gestión de juegos, solo para administradores/profesores
-        function administrarJuegos() {
-            window.location.href = '/gestionar-juegos';  // Redirige a la página de gestión de juegos
-        }
-
-        // Mostrar el botón de administrar juegos solo si el usuario es admin o profesor
-        window.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/ver-rol', {
-                method: 'GET',
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.rol === 'Profesor' || data.rol === 'Administrador') {
-                    document.getElementById('admin-button').style.display = 'block'; // Mostrar el botón solo para admins y profesores
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
-    <!-- Footer -->
-    <footer>
-        © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
-    </footer>
+   
 
 </body>
 </html>

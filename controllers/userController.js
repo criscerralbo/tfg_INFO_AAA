@@ -5,24 +5,6 @@ const dbo = require('../db'); // Conexión a la base de datos
 // Conectar con Postmark usando tu API Key
 const client = new postmark.ServerClient('1c87cd46-32dc-4b31-a451-92175549348f');
 
-exports.getRol = (req, res) => {
-    const usuarioId = req.session.usuarioId;
-
-    db.query(
-        `SELECT r.nombre AS rol FROM usuarios u 
-         JOIN roles r ON u.rol_id = r.id
-         WHERE u.id = ?`,
-        [usuarioId],
-        (err, results) => {
-            if (err || results.length === 0) {
-                return res.status(500).json({ error: 'Error al obtener el rol' });
-            }
-
-            res.json({ rol: results[0].rol });
-        }
-    );
-};
-
 
 // Registrar usuario
 exports.registrarUsuario = (req, res) => {

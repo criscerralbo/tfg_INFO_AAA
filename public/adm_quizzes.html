@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrar Quizzes (Modo Kahoot)</title>
+  <link rel="stylesheet" href="css/adm_quizzes.css">
+</head>
+<body>
+  <header>
+    <h1>Lista de Quizzes</h1>
+    <div class="user-section">
+        <button class="btn-back" onclick="window.history.back()">← Volver</button>
+        <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+        <div class="user-icon">
+          <a href="/perfil.html">
+            <img src="images/usuario.png" alt="Usuario">
+          </a>
+        </div>
+      </div>
+  </header>
+   <!-- Modal de confirmación de cierre de sesión -->
+   <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para mensajes -->
+  <div id="mensaje-estado" class="mensaje-oculto"></div>
+
+  <main>
+    <!-- Formulario para crear una nueva pregunta -->
+    <section id="nueva-pregunta">
+      <h2>Agregar Nueva Pregunta</h2>
+      <form id="form-nueva-pregunta">
+        <label for="titulo-quiz">Título del Quiz (opcional):</label><br>
+        <input type="text" id="titulo-quiz" name="titulo-quiz" placeholder="Ej. Quiz de Anatomía" />
+
+        <br><br>
+
+        <label for="texto-pregunta">Texto de la Pregunta:</label><br>
+        <textarea id="texto-pregunta" name="texto-pregunta" rows="2" cols="50" placeholder="Ej. ¿Cuántos huesos conforman la mandíbula?"></textarea>
+
+        <br><br>
+
+        <label for="opcion1">Opción 1:</label><br>
+        <input type="text" id="opcion1" name="opcion1" placeholder="Ej. 1" />
+
+        <br><br>
+
+        <label for="opcion2">Opción 2:</label><br>
+        <input type="text" id="opcion2" name="opcion2" placeholder="Ej. 2" />
+
+        <br><br>
+
+        <label for="opcion3">Opción 3:</label><br>
+        <input type="text" id="opcion3" name="opcion3" placeholder="Ej. 3" />
+
+        <br><br>
+
+        <label for="opcion4">Opción 4:</label><br>
+        <input type="text" id="opcion4" name="opcion4" placeholder="Ej. 4" />
+
+        <br><br>
+
+        <label for="respuesta-correcta">Respuesta Correcta (1, 2, 3, 4):</label><br>
+        <input type="number" id="respuesta-correcta" name="respuesta-correcta" min="1" max="4" />
+
+        <br><br>
+
+        <button type="submit">Guardar Pregunta</button>
+      </form>
+    </section>
+
+    <!-- Lista de preguntas existentes -->
+    <section id="lista-preguntas">
+      <h2>Preguntas Existentes</h2>
+      <ul id="preguntas-ul">
+        <!-- Aquí se mostrarán las preguntas cargadas desde el JS -->
+      </ul>
+    </section>
+  </main>
+
+  <script src="adm_quizzes.js"></script>
+</body>
+</html>

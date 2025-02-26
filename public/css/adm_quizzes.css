@@ -1,7 +1,9 @@
 /* Importar fuente Poppins de Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-/* Estilos generales */
+/* ======================
+   Estilos generales y tipografía
+   ====================== */
 * {
     margin: 0;
     padding: 0;
@@ -20,25 +22,24 @@ body {
     justify-content: space-between;
 }
 
-.grupo-lista {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.logout-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px; /* Reducido para hacer el botón más pequeño */
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 0.9rem; /* Reducir el tamaño de fuente */
 }
 
-.grupo-lista li {
-    width: 100%;
-    max-width: 500px;
-    margin: 10px 0;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    text-align: left;
-    background-color: #f9f9f9;
+.logout-button:hover {
+    background-color: #e74c3c;
 }
 
+/* ======================
+   Header
+   ====================== */
 /* Header */
 header {
     background-color: #508bbd;
@@ -50,24 +51,6 @@ header {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-/* Mensajes de estado */
-.mensaje-success {
-    background-color: #d4edda; /* Verde claro */
-    color: #155724;           /* Verde oscuro */
-    border: 1px solid #c3e6cb;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-}
-
-.mensaje-error {
-    background-color: #f8d7da; /* Rojo claro */
-    color: #721c24;           /* Rojo oscuro */
-    border: 1px solid #f5c6cb;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
 }
 
 /* Si quieres un estado oculto inicial */
@@ -96,6 +79,31 @@ header h1 {
     margin-right: 10px;
     color: #ffffff;
     font-size: 1.1rem;
+}
+
+/* ======================
+   Mensajes de estado
+   ====================== */
+.mensaje-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.mensaje-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.mensaje-oculto {
+    display: none;
 }
 /* Estilos para el modal de confirmación */
 .modal {
@@ -187,8 +195,14 @@ header h1 {
 .logout-button:hover {
     background-color: #e74c3c;
 }
+/* ======================
+   Botones (genéricos y de cabecera)
+   ====================== */
 
-/* Contenedor principal */
+
+/* ======================
+   Contenedores y elementos estilo “Kahoot”
+   ====================== */
 .container {
     background-color: white;
     padding: 2rem;
@@ -200,7 +214,6 @@ header h1 {
     margin: 0 auto;
 }
 
-/* Títulos generales */
 h1 {
     font-size: 24px;
     margin-bottom: 2rem;
@@ -213,7 +226,6 @@ h2 {
     color: #2980b9;
 }
 
-/* Formularios */
 form {
     display: flex;
     flex-direction: column;
@@ -221,21 +233,20 @@ form {
     margin-bottom: 1rem;
 }
 
-/* Campos de entrada */
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="number"],
+textarea {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #bdc3c7;
     border-radius: 4px;
     font-size: 16px;
-    box-sizing: border-box;
     color: #2c3e50;
 }
 
-/* Botones */
 button {
     width: 100%;
     padding: 12px;
@@ -252,7 +263,6 @@ button:hover {
     background-color: #3498db;
 }
 
-/* Opciones adicionales */
 .extra-options {
     font-size: 14px;
     color: #7f8c8d;
@@ -267,48 +277,48 @@ button:hover {
     text-decoration: underline;
 }
 
-/* Contenido principal para la página de inicio */
+/* ======================
+   Layout principal y secciones
+   ====================== */
 main {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-grow: 1; /* Para que el contenido ocupe el espacio necesario entre header y footer */
+    flex-grow: 1;
     padding: 0 20px;
     text-align: center;
 }
 
-.welcome-section h2 {
-    color: #508bbd;
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.welcome-section p {
-    font-size: 1.2rem;
-    margin-top: 10px;
-    color: #4d4d4d;
-    font-weight: 300;
-}
-
-.boton-principal {
-    background-color: #508bbd;
-    color: white;
-    padding: 12px 25px;
-    text-decoration: none;
+/* Estilos para secciones de quizzes, grupos, etc. (estilo Kahoot) */
+#nueva-pregunta,
+#lista-preguntas {
+    background: #fff;
+    padding: 20px;
     border-radius: 5px;
-    margin-top: 20px;
-    display: inline-block;
-    font-size: 1.1rem;
-    font-weight: 500;
+    margin-bottom: 20px;
 }
 
-.boton-principal:hover {
-    background-color: #346a91;
+#lista-preguntas {
+    padding: 20px;
 }
 
-/* Footer */
+#preguntas-ul {
+    list-style: none;
+    padding: 0;
+}
+
+#preguntas-ul li {
+    background: #fafafa;
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+/* ======================
+   Footer
+   ====================== */
 footer {
     background-color: #333;
     color: white;
@@ -321,20 +331,18 @@ footer {
     bottom: 0;
 }
 
-/* Estilo responsivo */
+/* ======================
+   Estilos Responsivos
+   ====================== */
 @media (max-width: 768px) {
     .container {
         width: 90%;
     }
-
+    
     header h1 {
-        font-size: 18px;
-    }
-
-    .welcome-section h2 {
         font-size: 1.5rem;
     }
-
+    
     .boton-principal {
         font-size: 1rem;
         padding: 10px 20px;

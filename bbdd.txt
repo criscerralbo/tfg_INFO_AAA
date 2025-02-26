@@ -82,6 +82,35 @@ CREATE TABLE IF NOT EXISTS resultados (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (actividad_id) REFERENCES actividades(id) ON DELETE CASCADE
 );
+-- Tabla de Juegos (para almacenar diferentes tipos de juegos, en este caso quizzes)
+CREATE TABLE IF NOT EXISTS juegos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    tipo ENUM('quiz', 'caso clínico', 'memoria', 'otro') NOT NULL,
+    id_profesor INT NOT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_profesor) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla de Preguntas (para almacenar las preguntas de un quiz)
+CREATE TABLE IF NOT EXISTS preguntas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_juego INT NOT NULL,
+    texto VARCHAR(255) NOT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_juego) REFERENCES juegos(id) ON DELETE CASCADE
+);
+
+-- Tabla de Opciones (para almacenar las opciones de cada pregunta)
+CREATE TABLE IF NOT EXISTS opciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_pregunta INT NOT NULL,
+    texto VARCHAR(255) NOT NULL,
+    es_correcta BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_pregunta) REFERENCES preguntas(id) ON DELETE CASCADE
+);
+
 
 -- Tabla de Mensajes
 CREATE TABLE IF NOT EXISTS mensajes (

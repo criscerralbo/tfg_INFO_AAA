@@ -4,6 +4,7 @@ const session = require('express-session');
 const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const gameRoutes = require('./routes/gameRoutes');
 
 const app = express();
 
@@ -55,6 +56,8 @@ app.use('/usuarios', userRoutes);
 
 // Rutas de grupos (gestión de grupos)
 app.use('/api/groups', groupRoutes);
+
+app.use('/api/games', gameRoutes);
 
 // Para las rutas de los grupos de los alumnos, mantén el prefijo '/api/alumno'
 app.use('/api/alumno', groupRoutes);

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrar Juegos</title>
+  <link rel="stylesheet" href="css/adm_juegos.css">
+</head>
+<body>
+    <header>
+      <h1>Panel de Administración de Juegos</h1>
+      <div class="user-section">
+        <button class="btn-back" onclick="window.history.back()">← Volver</button>
+        <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+        <div class="user-icon">
+          <a href="/perfil.html">
+            <img src="images/usuario.png" alt="Usuario">
+          </a>
+        </div>
+      </div>
+    </header>
+  
+    <!-- Modal de confirmación de cierre de sesión -->
+    <div id="logoutModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+        <div class="modal-buttons">
+          <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+          <button id="cancelLogout" class="cancel-button">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Contenedor para mensajes de éxito o error -->
+    <div id="mensaje-estado" class="mensaje-oculto"></div>
+  
+    <main>
+      <section id="games-container">
+        <!-- Tarjeta para Quiz -->
+        <div class="game-card" data-game="quiz">
+          <h2>Gestionar Quiz</h2>
+          <p>Crear, editar y eliminar quizzes para los alumnos.</p>
+          <button onclick="startAdminGame('quiz')">Administrar Quiz</button>
+        </div>
+  
+        <!-- Tarjeta para Casos Clínicos -->
+        <div class="game-card" data-game="caso-clinico">
+          <h2>Gestionar Casos Clínicos</h2>
+          <p>Crea y edita casos clínicos para que los alumnos los resuelvan.</p>
+          <button onclick="startAdminGame('caso-clinico')">Administrar Caso Clínico</button>
+        </div>
+  
+        <!-- Tarjeta para Juego de Memoria -->
+        <div class="game-card" data-game="memoria">
+          <h2>Gestionar Juego de Memoria</h2>
+          <p>Crea tableros de memoria, sube imágenes, etc.</p>
+          <button onclick="startAdminGame('memoria')">Administrar Memoria</button>
+        </div>
+      </section>
+    </main>
+  
+    <!-- Modal para la administración de cada juego -->
+    <div id="adm-game-modal" class="modal">
+      <div class="modal-content">
+        <!-- Botón de cierre (la “X”) -->
+        <span class="close" onclick="closeAdminModal()">&times;</span>
+        <div id="adm-game-content">
+          <!-- Aquí se cargará dinámicamente el contenido del juego a administrar -->
+        </div>
+      </div>
+    </div>
+  
+    <!-- Archivo JavaScript con la lógica de administración -->
+    <script src="adm_juegos.js"></script>
+  </body>
+  </html>

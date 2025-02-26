@@ -1,95 +1,107 @@
-const db = require('../db');  // Asegúrate de tener la conexión a la base de datos
+const db = require('../db');
 
-// Página de juegos para alumnos
-exports.juegosAlumnos = (req, res) => {
-    const usuarioId = req.session.usuarioId;
-    // Comprobar el rol del usuario, si es alumno o no
+// Obtener todos los quizzes (juegos de tipo 'quiz')
+exports.getQuizzes = (req, res) => {
+    db.query("SELECT * FROM juegos WHERE tipo = 'quiz'", (err, results) => {
+        if (err) {
+            console.error('Error al obtener quizzes:', err);
+            return res.status(500).json({ error: 'Error al obtener quizzes' });
+        }
+        res.status(200).json(results);
+    });
+};
+
+// Crear un nuevo quiz
+exports.createQuiz = (req, res) => {
+    const { nombre, descripcion } = req.body;
+    const id_profesor = req.session.usuarioId;  // Se asume que el profesor está en sesión
+    if (!nombre || !id_profesor) {
+        return res.status(400).json({ error: 'Faltan datos para crear el quiz' });
+    }
     db.query(
-        `SELECT r.nombre AS rol FROM usuarios u 
-         JOIN roles r ON u.rol_id = r.id
-         WHERE u.id = ?`,
-        [usuarioId],
-        (err, results) => {
-            if (err || results.length === 0) {
-                return res.status(500).json({ error: 'Error al obtener el rol del usuario' });
+        "INSERT INTO juegos (nombre, descripcion, tipo, id_profesor) VALUES (?, ?, 'quiz', ?)",
+        [nombre, descripcion, id_profesor],
+        (err, result) => {
+            if (err) {
+                console.error('Error al crear quiz:', err);
+                return res.status(500).json({ error: 'Error al crear quiz' });
             }
-
-            const rol = results[0].rol;
-
-            if (rol === 'Alumno') {
-                // Redirigir a la plataforma de juegos para alumnos
-                res.render('juegos-alumno.html');  // Renderiza la página de juegos para el alumno
-            } else {
-                res.status(403).json({ error: 'No tienes permisos para acceder a esta página' });
-            }
+            res.status(201).json({ success: 'Quiz creado', quizId: result.insertId });
         }
     );
 };
 
-// Página de gestión de juegos para profesores
-exports.gestionarJuegos = (req, res) => {
-    const usuarioId = req.session.usuarioId;
-    // Comprobar el rol del usuario, si es profesor
-    db.query(
-        `SELECT r.nombre AS rol FROM usuarios u 
-         JOIN roles r ON u.rol_id = r.id
-         WHERE u.id = ?`,
-        [usuarioId],
-        (err, results) => {
-            if (err || results.length === 0) {
-                return res.status(500).json({ error: 'Error al obtener el rol del usuario' });
-            }
-
-            const rol = results[0].rol;
-
-            if (rol === 'Profesor') {
-                // Redirigir a la página de gestión de juegos
-                res.render('gestionar-juegos.html');  // Renderiza la página de gestión de juegos para el profesor
-            } else {
-                res.status(403).json({ error: 'No tienes permisos para acceder a esta página' });
-            }
-        }
-    );
-}
-// Crear un juego para el profesor
-exports.crearJuego = (req, res) => {
-    const { nombreJuego, descripcion } = req.body;
-
-    if (!nombreJuego || !descripcion) {
-        return res.status(400).json({ error: 'Faltan datos del juego' });
+// Agregar una pregunta a un quiz, con sus opciones
+// Se espera en el body: { texto, opciones: [{ texto, es_correcta }, ...] }
+exports.addQuestion = (req, res) => {
+    const quizId = req.params.quizId;
+    const { texto, opciones } = req.body;
+    if (!texto || !opciones || !Array.isArray(opciones) || opciones.length === 0) {
+        return res.status(400).json({ error: 'Faltan datos para agregar la pregunta' });
     }
-
-    // Insertar juego en la base de datos
+    // Insertar la pregunta
     db.query(
-        `INSERT INTO juegos (nombre, descripcion, profesor_id) VALUES (?, ?, ?)`,
-        [nombreJuego, descripcion, req.session.usuarioId],
+        "INSERT INTO preguntas (id_juego, texto) VALUES (?, ?)",
+        [quizId, texto],
         (err, result) => {
             if (err) {
-                console.error('Error al crear juego:', err);
-                return res.status(500).json({ error: 'Error al crear el juego' });
+                console.error('Error al insertar pregunta:', err);
+                return res.status(500).json({ error: 'Error al insertar pregunta' });
             }
-            res.status(201).json({ success: 'Juego creado con éxito' });
+            const preguntaId = result.insertId;
+            // Preparar los valores para cada opción
+            const values = opciones.map(opt => [preguntaId, opt.texto, opt.es_correcta ? 1 : 0]);
+            db.query(
+                "INSERT INTO opciones (id_pregunta, texto, es_correcta) VALUES ?",
+                [values],
+                (err) => {
+                    if (err) {
+                        console.error('Error al insertar opciones:', err);
+                        return res.status(500).json({ error: 'Error al insertar opciones' });
+                    }
+                    res.status(201).json({ success: 'Pregunta y opciones agregadas' });
+                }
+            );
         }
     );
 };
 
-// Agregar un caso clínico
-exports.agregarCasoClinico = (req, res) => {
-    const { juegoId, nombreCaso, descripcionCaso } = req.body;
-
-    if (!juegoId || !nombreCaso || !descripcionCaso) {
-        return res.status(400).json({ error: 'Faltan datos del caso clínico' });
-    }
-
+// Obtener todas las preguntas y sus opciones para un quiz
+exports.getQuestions = (req, res) => {
+    const quizId = req.params.quizId;
     db.query(
-        `INSERT INTO casos_clinicos (juego_id, nombre, descripcion) VALUES (?, ?, ?)`,
-        [juegoId, nombreCaso, descripcionCaso],
-        (err, result) => {
+        "SELECT * FROM preguntas WHERE id_juego = ?",
+        [quizId],
+        (err, preguntas) => {
             if (err) {
-                console.error('Error al agregar caso clínico:', err);
-                return res.status(500).json({ error: 'Error al agregar el caso clínico' });
+                console.error('Error al obtener preguntas:', err);
+                return res.status(500).json({ error: 'Error al obtener preguntas' });
             }
-            res.status(201).json({ success: 'Caso clínico agregado con éxito' });
+            if (preguntas.length === 0) {
+                return res.status(200).json([]);
+            }
+            let preguntasConOpciones = [];
+            let count = 0;
+            preguntas.forEach(pregunta => {
+                db.query(
+                    "SELECT * FROM opciones WHERE id_pregunta = ?",
+                    [pregunta.id],
+                    (err, opciones) => {
+                        if (err) {
+                            console.error('Error al obtener opciones:', err);
+                            return res.status(500).json({ error: 'Error al obtener opciones' });
+                        }
+                        preguntasConOpciones.push({
+                            ...pregunta,
+                            opciones: opciones
+                        });
+                        count++;
+                        if (count === preguntas.length) {
+                            res.status(200).json(preguntasConOpciones);
+                        }
+                    }
+                );
+            });
         }
     );
 };
