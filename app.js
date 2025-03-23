@@ -5,9 +5,6 @@ const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const gameRoutes = require('./routes/gameRoutes');
-// Rutas de la API
-const quizRoutes = require('./routes/quizRoutes');
-const preguntaRoutes = require('./routes/preguntaRoutes');
 
 const app = express();
 
@@ -64,9 +61,6 @@ app.use('/api/games', gameRoutes);
 
 // Para las rutas de los grupos de los alumnos, mantén el prefijo '/api/alumno'
 app.use('/api/alumno', groupRoutes);
-
-app.use('/api/quizzes', quizRoutes);
-app.use('/api/preguntas', preguntaRoutes);
 
 // Ruta para la pantalla de inicio (luego de iniciar sesión)
 app.get('/inicio', (req, res) => {
