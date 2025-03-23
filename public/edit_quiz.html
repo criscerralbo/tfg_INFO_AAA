@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Quiz</title>
+  <link rel="stylesheet" href="css/adm_quizzes.css">
+</head>
+<body>
+  <header>
+    <h1>Editar Quiz</h1>
+    <button onclick="window.history.back()">← Volver</button>
+  </header>
+  <main>
+    <section id="datos-quiz">
+      <h2>Datos del Quiz</h2>
+      <form id="form-editar-quiz">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" required>
+        <br>
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion"></textarea>
+        <br>
+        <button type="submit">Guardar Cambios</button>
+      </form>
+    </section>
+    <section id="preguntas-quiz">
+      <h2>Preguntas</h2>
+      <ul id="lista-preguntas">
+        <!-- Se listarán las preguntas existentes -->
+      </ul>
+      <h3>Agregar Pregunta</h3>
+      <form id="form-nueva-pregunta">
+        <label for="texto-pregunta">Pregunta:</label>
+        <input type="text" id="texto-pregunta" required>
+        <br>
+        <label for="opcion1">Opción 1:</label>
+        <input type="text" id="opcion1" required>
+        <br>
+        <label for="opcion2">Opción 2:</label>
+        <input type="text" id="opcion2" required>
+        <br>
+        <label for="opcion3">Opción 3:</label>
+        <input type="text" id="opcion3" required>
+        <br>
+        <label for="opcion4">Opción 4:</label>
+        <input type="text" id="opcion4" required>
+        <br>
+        <label for="respuesta-correcta">Respuesta Correcta (1-4):</label>
+        <input type="number" id="respuesta-correcta" min="1" max="4" required>
+        <br>
+        <button type="submit">Agregar Pregunta</button>
+      </form>
+    </section>
+  </main>
+  <div id="mensaje-estado" class="mensaje-oculto"></div>
+  <!-- Se incluye el archivo JS con la lógica de edición -->
+  <script src="js/edit_quiz.js"></script>
+</body>
+</html>
