@@ -33,26 +33,58 @@
   <!-- Contenedor para mensajes -->
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
-  <section id="nuevo-quiz">
-    <h2>Crear Nuevo Quiz</h2>
-    <form id="form-nuevo-quiz">
-      <label for="titulo">Título:</label>
-      <input type="text" id="titulo" required>
-      <br>
-      <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion"></textarea>
-      <br>
-      <button type="submit">Crear Quiz</button>
-    </form>
-  </section>
-  
-  <section id="lista-quizzes">
-    <h2>Quizzes Existentes</h2>
-    <ul id="quiz-list">
-      <!-- Se llenará dinámicamente -->
-    </ul>
-  </section>
-</main>
+  <main>
+    <!-- Formulario para crear una nueva pregunta -->
+    <section id="nueva-pregunta">
+      <h2>Agregar Nueva Pregunta</h2>
+      <form id="form-nueva-pregunta">
+        <label for="titulo-quiz">Título del Quiz (opcional):</label><br>
+        <input type="text" id="titulo-quiz" name="titulo-quiz" placeholder="Ej. Quiz de Anatomía" />
+
+        <br><br>
+
+        <label for="texto-pregunta">Texto de la Pregunta:</label><br>
+        <textarea id="texto-pregunta" name="texto-pregunta" rows="2" cols="50" placeholder="Ej. ¿Cuántos huesos conforman la mandíbula?"></textarea>
+
+        <br><br>
+
+        <label for="opcion1">Opción 1:</label><br>
+        <input type="text" id="opcion1" name="opcion1" placeholder="Ej. 1" />
+
+        <br><br>
+
+        <label for="opcion2">Opción 2:</label><br>
+        <input type="text" id="opcion2" name="opcion2" placeholder="Ej. 2" />
+
+        <br><br>
+
+        <label for="opcion3">Opción 3:</label><br>
+        <input type="text" id="opcion3" name="opcion3" placeholder="Ej. 3" />
+
+        <br><br>
+
+        <label for="opcion4">Opción 4:</label><br>
+        <input type="text" id="opcion4" name="opcion4" placeholder="Ej. 4" />
+
+        <br><br>
+
+        <label for="respuesta-correcta">Respuesta Correcta (1, 2, 3, 4):</label><br>
+        <input type="number" id="respuesta-correcta" name="respuesta-correcta" min="1" max="4" />
+
+        <br><br>
+
+        <button type="submit">Guardar Pregunta</button>
+      </form>
+    </section>
+
+    <!-- Lista de preguntas existentes -->
+    <section id="lista-preguntas">
+      <h2>Preguntas Existentes</h2>
+      <ul id="preguntas-ul">
+        <!-- Aquí se mostrarán las preguntas cargadas desde el JS -->
+      </ul>
+    </section>
+  </main>
 
   <script src="adm_quizzes.js"></script>
 </body>
