@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Jugar Quiz</title>
+  <link rel="stylesheet" href="css/jugar_quizz.css">
+</head>
+<body>
+  <header>
+    <h1>Jugar Quiz</h1>
+    <button class="btn-back" onclick="window.history.back()">← Volver</button>
+  </header>
+  
+  <main>
+    <section id="quiz-container">
+      <!-- Se cargará el quiz dinámicamente -->
+    </section>
+  </main>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const quizId = params.get('id');
+      
+      if (!quizId) {
+        document.getElementById('quiz-container').innerHTML = '<p>Quiz no especificado.</p>';
+        return;
+      }
+      
+      cargarQuiz(quizId);
+      
+      async function cargarQuiz(id) {
+        try {
+          const response = await fetch(`/api/quizzes/${id}`);
+          if (response.ok) {
+            const quiz = await response.json();
+            mostrarQuiz(quiz);
+          } else {
+            document.getElementById('quiz-container').innerHTML = '<p>Error al cargar el quiz.</p>';
+          }
+        } catch (error) {
+          console.error(error);
+          document.getElementById('quiz-container').innerHTML = '<p>Error al conectar con el servidor.</p>';
+        }
+      }
+      
+      function mostrarQuiz(quiz) {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = `<h2>${quiz.nombre}</h2>
+          <p>${quiz.descripcion || ''}</p>`;
+          
+        if (quiz.preguntas && quiz.preguntas.length > 0) {
+          quiz.preguntas.forEach((pregunta, index) => {
+            const preguntaDiv = document.createElement('div');
+            preguntaDiv.className = 'pregunta';
+            preguntaDiv.innerHTML = `<p><strong>Pregunta ${index + 1}:</strong> ${pregunta.texto}</p>`;
+            
+            if (pregunta.opciones && pregunta.opciones.length > 0) {
+              const opcionesList = document.createElement('ul');
+              pregunta.opciones.forEach((opcion, idx) => {
+                const li = document.createElement('li');
+                li.textContent = opcion.texto;
+                opcionesList.appendChild(li);
+              });
+              preguntaDiv.appendChild(opcionesList);
+            }
+            
+            container.appendChild(preguntaDiv);
+          });
+        } else {
+          container.innerHTML += '<p>No hay preguntas en este quiz.</p>';
+        }
+      }
+    });
+  </script>
+</body>
+</html>
