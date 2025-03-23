@@ -1,17 +1,17 @@
 const express = require('express');
-const gameController = require('../controllers/gameController');
 const router = express.Router();
+const gameController = require('../controllers/GameController');
 
-// Obtener todos los quizzes
+// Obtener todos los quizzes del profesor
 router.get('/quizzes', gameController.getQuizzes);
 
 // Crear un nuevo quiz
 router.post('/quizzes', gameController.createQuiz);
 
-// Agregar una pregunta a un quiz (se envían las opciones en el body)
-router.post('/quizzes/:quizId/questions', gameController.addQuestion);
+// Obtener detalles de un quiz (incluye preguntas y opciones)
+router.get('/quizzes/:id', gameController.getQuizById);
 
-// Obtener las preguntas (con sus opciones) de un quiz
-router.get('/quizzes/:quizId/questions', gameController.getQuestions);
+// Actualizar un quiz
+router.put('/quizzes/:id', gameController.updateQuiz);
 
 module.exports = router;
