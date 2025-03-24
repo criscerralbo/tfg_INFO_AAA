@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Publicar Quizzes</title>
+  <link rel="stylesheet" href="css/adm_juegos.css">
+</head>
+<body>
+  <!-- Header común -->
+  <header>
+    <h1>Publicar Quizzes</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html">
+          <img src="images/usuario.png" alt="Usuario">
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal de confirmación de logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para mensajes de estado -->
+  <div id="mensaje-estado" class="mensaje-oculto"></div>
+
+  <main>
+    <!-- Sección para mostrar los quizzes propios del profesor -->
+    <section id="mis-quizzes">
+      <h2>Mis Quizzes</h2>
+      <ul id="lista-mis-quizzes">
+        <!-- Se cargarán dinámicamente los quizzes propios -->
+      </ul>
+    </section>
+
+    <!-- Sección para mostrar quizzes públicos de otros profesores -->
+    <section id="public-quizzes">
+      <h2>Quizzes Públicos</h2>
+      <ul id="lista-public-quizzes">
+        <!-- Se cargarán dinámicamente los quizzes públicos -->
+      </ul>
+    </section>
+
+    <!-- Sección para asignar un quiz a un grupo de clases -->
+    <section id="asignar-quiz">
+      <h2>Asignar Quiz a Grupo</h2>
+      <form id="form-asignar-quiz">
+        <label for="quiz-select">Selecciona un Quiz:</label>
+        <select id="quiz-select">
+          <!-- Opciones se llenarán con los quizzes propios -->
+        </select>
+        <br>
+        <!-- Usamos un input con datalist para un buscador/desplegable -->
+        <label for="grupo-input">Seleccione el Grupo:</label>
+        <input type="text" id="grupo-input" list="grupo-list" placeholder="Buscar grupo...">
+        <datalist id="grupo-list">
+          <!-- Opciones se cargarán dinámicamente con los grupos -->
+        </datalist>
+        <br>
+        <button type="submit">Asignar Quiz</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="pub_quizzes.js"></script>
+</body>
+</html>

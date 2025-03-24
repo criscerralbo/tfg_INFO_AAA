@@ -61,11 +61,11 @@ function startAdminGame(gameType) {
       admGameContentDiv.innerHTML = `
         <h2>Administrar Quiz</h2>
         <p>Aquí podrías crear, editar o eliminar quizzes.</p>
-        <button onclick="mostrarMensaje('Creando nuevo quiz...', 'success')">
-          Crear Nuevo Quiz
+       <button onclick="editarQuizzes()" style="margin-left: 10px;">
+          Crear o editar Quizzes
         </button>
         <button onclick="verQuizzes()" style="margin-left: 10px;">
-          Ver Quizzes
+          Ver Quizzes 
         </button>
       `;
       break;
@@ -102,8 +102,12 @@ function startAdminGame(gameType) {
  * Redirige a la pantalla donde se listan los quizzes y se pueden crear preguntas 
  * (nuevo archivo adm_quizzes.html).
  */
-function verQuizzes() {
+function editarQuizzes() {
   window.location.href = 'adm_quizzes.html';
+}
+
+function verQuizzes() {
+  window.location.href = 'pub_quizzes.html';
 }
 
 /** Cierra el modal de administración de juegos. */
