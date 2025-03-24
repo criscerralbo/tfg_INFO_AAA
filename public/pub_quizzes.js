@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarPublicQuizzes();
     cargarQuizSelect();
     cargarGrupos();
+    cargarAsignaciones();
   
     // Asignación de quiz a grupo (usando input con datalist)
     const formAsignar = document.getElementById('form-asignar-quiz');
@@ -52,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         if (res.ok) {
           mostrarMensaje('Quiz asignado correctamente.', 'success');
+          cargarAsignaciones();
           formAsignar.reset();
         } else {
           mostrarMensaje(data.error || 'Error al asignar el quiz.', 'error');
@@ -144,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarMisQuizzes();
         cargarPublicQuizzes();
         cargarQuizSelect();
+       
       } else {
         mostrarMensaje(data.error || 'Error al guardar el quiz.', 'error');
       }
@@ -173,27 +176,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Función para cargar grupos en un datalist para asignación de quiz
-  async function cargarGrupos() {
-    try {
-      const res = await fetch('/api/grupos');
-      if (res.ok) {
-        const grupos = await res.json();
-        const datalist = document.getElementById('grupo-list');
-        datalist.innerHTML = '';
-        grupos.forEach(grupo => {
-          const option = document.createElement('option');
-          option.value = grupo.id;
-          option.label = `${grupo.id} - ${grupo.nombre}${grupo.descripcion ? ' (' + grupo.descripcion + ')' : ''}`;
-          datalist.appendChild(option);
-        });
-      } else {
-        console.error('Error al cargar grupos.');
-      }
-    } catch (err) {
-      console.error(err);
+  /// Función para cargar los grupos (usando el endpoint de tus grupos)
+async function cargarGrupos() {
+  try {
+    const res = await fetch('/api/groups/mis-grupos', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    if (res.ok) {
+      const grupos = await res.json();
+      const datalist = document.getElementById('grupo-list');
+      datalist.innerHTML = '';
+      grupos.forEach(grupo => {
+        const option = document.createElement('option');
+        option.value = grupo.id;  // Se usa el id como valor
+        option.label = `${grupo.identificador} - ${grupo.nombre}${grupo.descripcion ? ' (' + grupo.descripcion + ')' : ''}`;
+        datalist.appendChild(option);
+      });
+    } else {
+      console.error('Error al cargar grupos.');
     }
+  } catch (err) {
+    console.error(err);
   }
+}
+async function cargarAsignaciones() {
+  try {
+    const res = await fetch('/api/pubQuizzes/asignaciones');
+    if (res.ok) {
+      const grupos = await res.json(); 
+      // Estructura: [ { id, nombre, quizzes: [ { id, titulo }, ... ] }, ... ]
+
+      const contenedor = document.getElementById('contenedor-asignaciones');
+      contenedor.innerHTML = '';
+
+      grupos.forEach(grupo => {
+        // Creamos un div para cada grupo
+        const grupoDiv = document.createElement('div');
+        grupoDiv.classList.add('grupo-asignado');
+
+        // Título del grupo
+        const tituloGrupo = document.createElement('h3');
+        tituloGrupo.textContent = `Grupo: ${grupo.nombre}`;
+        grupoDiv.appendChild(tituloGrupo);
+
+        // Lista de quizzes
+        const ul = document.createElement('ul');
+        grupo.quizzes.forEach(q => {
+          const li = document.createElement('li');
+          li.textContent = q.titulo;
+          ul.appendChild(li);
+        });
+        grupoDiv.appendChild(ul);
+
+        contenedor.appendChild(grupoDiv);
+      });
+    } else {
+      mostrarMensaje('Error al cargar las asignaciones.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    mostrarMensaje('Error al conectar con el servidor.', 'error');
+  }
+}
   
   // Función para hacer público un quiz propio
   async function hacerPublico(quizId) {

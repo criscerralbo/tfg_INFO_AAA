@@ -15,5 +15,6 @@ router.post('/asignar', pubQuizzesController.asignarQuiz);
 // Endpoint para hacer público un quiz propio
 router.post('/hacerPublico', pubQuizzesController.hacerPublico);
 
+router.get('/asignaciones', pubQuizzesController.getAsignaciones);
 
 module.exports = router;
