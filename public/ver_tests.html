@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mis Tests Disponibles</title>
+  <link rel="stylesheet" href="css/pub_quizzes.css" />
+</head>
+<body>
+  <header>
+    <h1>Tests Disponibles</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="images/usuario.png" alt="Usuario" /></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal de logout, mensajes, etc. (idénticos a tus otras pantallas) -->
+  <div id="logoutModal" class="modal"> ... </div>
+  <div id="mensaje-estado" class="mensaje-oculto"></div>
+
+  <main>
+    <h2>Quizzes Asignados a mis Grupos</h2>
+    <ul id="lista-quizzes-asignados"></ul>
+  </main>
+
+  <script src="ver_tests.js"></script>
+</body>
+</html>

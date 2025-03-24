@@ -67,11 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
         lista.innerHTML = '';
         quizzes.forEach(quiz => {
           const li = document.createElement('li');
+          li.className = "quiz-card"; // Asigna la clase para aplicar los estilos de card
           li.innerHTML = `
-            <strong>${quiz.titulo}</strong> - ${quiz.descripcion || ''}<br>
-            <button onclick="location.href='edit_quiz.html?id=${quiz.id}'">Editar</button>
-            <button onclick="location.href='play_quiz.html?id=${quiz.id}'">Jugar</button>
-            <button onclick="eliminarQuiz(${quiz.id})">Eliminar</button>
+            <div class="quiz-card-title">${quiz.titulo}</div>
+            <div class="quiz-card-description">${quiz.descripcion || ''}</div>
+            <div class="quiz-card-actions">
+              <button class="edit-button" onclick="location.href='edit_quiz.html?id=${quiz.id}'">Editar</button>
+              <button class="play-button" onclick="location.href='play_quiz.html?id=${quiz.id}'">Jugar</button>
+              <button class="delete-button" onclick="eliminarQuiz(${quiz.id})">Eliminar</button>
+            </div>
           `;
           lista.appendChild(li);
         });

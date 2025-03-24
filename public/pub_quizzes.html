@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Publicar Quizzes</title>
-  <link rel="stylesheet" href="css/adm_juegos.css">
+  <link rel="stylesheet" href="css/pub_quizzes.css">
 </head>
 <body>
   <!-- Header común -->
@@ -35,21 +35,26 @@
   <!-- Contenedor para mensajes de estado -->
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
-  <main>
+  <main class="pub-quizzes-layout">
+    
     <!-- Sección para mostrar los quizzes propios del profesor -->
     <section id="mis-quizzes">
       <h2>Mis Quizzes</h2>
+      <form>
       <ul id="lista-mis-quizzes">
         <!-- Se cargarán dinámicamente los quizzes propios -->
       </ul>
+    </form>
     </section>
 
     <!-- Sección para mostrar quizzes públicos de otros profesores -->
     <section id="public-quizzes">
       <h2>Quizzes Públicos</h2>
+      <form>
       <ul id="lista-public-quizzes">
         <!-- Se cargarán dinámicamente los quizzes públicos -->
       </ul>
+    </form>
     </section>
 
     <!-- Sección para asignar un quiz a un grupo de clases -->

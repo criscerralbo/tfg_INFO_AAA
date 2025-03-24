@@ -76,36 +76,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4000);
   }
   
-  // Cargar los quizzes propios del profesor
-  async function cargarMisQuizzes() {
-    try {
-      const res = await fetch('/api/pubQuizzes/mis');
-      if (res.ok) {
-        const quizzes = await res.json();
-        const lista = document.getElementById('lista-mis-quizzes');
-        lista.innerHTML = '';
-        quizzes.forEach(quiz => {
-          const li = document.createElement('li');
-          li.innerHTML = `<strong>${quiz.titulo}</strong> - ${quiz.descripcion || ''}`;
-          // Si el quiz no es público, se muestra un botón para hacerlo público
-          if (!quiz.publico) {
-            const btnHacerPublico = document.createElement('button');
-            btnHacerPublico.textContent = 'Hacer público';
-            btnHacerPublico.addEventListener('click', () => hacerPublico(quiz.id));
-            li.appendChild(btnHacerPublico);
-          } else {
-            li.innerHTML += ' <em>(Público)</em>';
-          }
-          lista.appendChild(li);
-        });
-      } else {
-        mostrarMensaje('Error al cargar mis quizzes.', 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      mostrarMensaje('Error al conectar con el servidor.', 'error');
+ // Cargar los quizzes propios del profesor
+async function cargarMisQuizzes() {
+  try {
+    const res = await fetch('/api/pubQuizzes/mis');
+    if (res.ok) {
+      const quizzes = await res.json();
+      const lista = document.getElementById('lista-mis-quizzes');
+      lista.innerHTML = '';
+
+      quizzes.forEach(quiz => {
+        // Creamos el <li> con la clase "quiz-card"
+        const li = document.createElement('li');
+        li.className = "quiz-card";
+
+        // Construimos el contenido de la tarjeta
+        // Agregamos (Público) en la descripción si el quiz es público
+        li.innerHTML = `
+          <div class="quiz-card-title">${quiz.titulo}</div>
+          <div class="quiz-card-description">
+            ${quiz.descripcion || ''}
+            ${quiz.publico ? ' <em>(Público)</em>' : ''}
+          </div>
+          <div class="quiz-card-actions">
+            
+             <button type="button" class="edit-button" onclick="window.location.href='edit_quiz.html?id=${quiz.id}'">
+              Editar
+            </button>
+            ${
+              !quiz.publico
+                ? `<button class="public-button" onclick="hacerPublico(${quiz.id})">Hacer público</button>`
+                : ''
+            }
+          </div>
+        `;
+
+        // Finalmente, añadimos la tarjeta a la lista
+        lista.appendChild(li);
+      });
+    } else {
+      mostrarMensaje('Error al cargar mis quizzes.', 'error');
     }
+  } catch (err) {
+    console.error(err);
+    mostrarMensaje('Error al conectar con el servidor.', 'error');
   }
+}
+
+  
   
   // Cargar los quizzes públicos (de otros profesores)
   async function cargarPublicQuizzes() {

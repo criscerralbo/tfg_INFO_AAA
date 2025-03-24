@@ -58,8 +58,7 @@ function startGame(gameType) {
       gameContentDiv.innerHTML = `
         <h2>Quiz Interactivo</h2>
         <p>Prototipo de Quiz: Responde preguntas sobre odontología.</p>
-        <button onclick="mostrarMensaje('Iniciando Quiz Interactivo...', 'success')">
-          Iniciar Quiz
+         <button onclick="window.location.href='ver_tests.html'">  VER MIS QUIZS
         </button>
       `;
       break;

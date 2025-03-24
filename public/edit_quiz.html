@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Editar Quiz</title>
-  <link rel="stylesheet" href="css/adm_quizzes.css">
+  <link rel="stylesheet" href="css/edit_quizzes.css">
 </head>
 <body>
   <header>
@@ -34,8 +34,8 @@
   <!-- Contenedor para mensajes de estado -->
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
-  <main>
-    <section>
+  <main class="edit-quiz-layout">
+    <section class="datos-quiz">
       <h2>Datos del Quiz</h2>
       <form id="form-edit-quiz">
         <label for="titulo-quiz">Título:</label>
@@ -43,42 +43,38 @@
         <br>
   
         <label for="descripcion-quiz">Descripción:</label>
-        <textarea id="descripcion-quiz"></textarea>
-        <br>
+        <input type="text" id="descripcion-quiz">
+        <br><br><br><br><br><br><br><br><br>
         <button type="submit">Actualizar Quiz</button>
         <button type="button" id="btn-eliminar-quiz">Eliminar Quiz</button>
       </form>
     </section>
   
-    <section>
-      <h2>Preguntas del Quiz</h2>
-      <div id="contenedor-preguntas">
-        <!-- Se llenará dinámicamente con las preguntas existentes -->
-      </div>
-  
-      <hr>
+   
+
+    <!-- Columna 3: Nueva Pregunta -->
+    <section class="nueva-pregunta">
   
       <h3>Nueva Pregunta</h3>
       <form id="form-nueva-pregunta">
         <label for="enunciado">Enunciado:</label>
         <input type="text" id="enunciado" required>
-        <br>
+    
   
         <label for="opcionA">Opción A:</label>
         <input type="text" id="opcionA">
-        <br>
+        
   
         <label for="opcionB">Opción B:</label>
         <input type="text" id="opcionB">
-        <br>
-  
+        
         <label for="opcionC">Opción C:</label>
         <input type="text" id="opcionC">
-        <br>
+     
   
         <label for="opcionD">Opción D:</label>
         <input type="text" id="opcionD">
-        <br>
+      
   
         <label for="respuesta">Respuesta Correcta:</label>
         <select id="respuesta">
@@ -87,10 +83,17 @@
           <option value="C">C</option>
           <option value="D">D</option>
         </select>
-        <br>
+     
   
         <button type="submit">Agregar Pregunta</button>
       </form>
+    </section>
+    <section class="preguntas-quiz">
+      <h2>Preguntas del Quiz</h2>
+      <div id="contenedor-preguntas">
+        <!-- Se llenará dinámicamente con las preguntas existentes -->
+      </div>
+  
     </section>
   </main>
 
