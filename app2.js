@@ -9,7 +9,7 @@ const gameRoutes = require('./routes/gameRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const preguntaRoutes = require('./routes/preguntaRoutes');
 const pubQuizzesRoutes = require('./routes/pubQuizzesRoutes');
-
+const testRoutes = require('./routes/testRoutes');
 const app = express();
 
 // Middleware para analizar datos JSON y datos del formulario (URL-encoded)
@@ -69,6 +69,7 @@ app.use('/api/alumno', groupRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/preguntas', preguntaRoutes);
 app.use('/api/pubQuizzes', pubQuizzesRoutes);
+app.use('/api/tests', testRoutes);
 
 // Ruta para la pantalla de inicio (luego de iniciar sesión)
 app.get('/inicio', (req, res) => {

@@ -16,14 +16,23 @@
       </div>
     </div>
   </header>
+<!-- Modal de confirmación de logout -->
+<div id="logoutModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+    <div class="modal-buttons">
+      <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+      <button id="cancelLogout" class="cancel-button">Cancelar</button>
+    </div>
+  </div>
+</div>
 
-  <!-- Modal de logout, mensajes, etc. (idénticos a tus otras pantallas) -->
-  <div id="logoutModal" class="modal"> ... </div>
-  <div id="mensaje-estado" class="mensaje-oculto"></div>
-
+<!-- Contenedor para mensajes de estado -->
+<div id="mensaje-estado" class="mensaje-oculto"></div>
   <main>
     <h2>Quizzes Asignados a mis Grupos</h2>
-    <ul id="lista-quizzes-asignados"></ul>
+    <ul id="lista-tests-asignados"></ul>
   </main>
 
   <script src="ver_tests.js"></script>

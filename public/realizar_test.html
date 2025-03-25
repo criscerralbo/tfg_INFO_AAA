@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Realizar Quizzes</title>
+  <link rel="stylesheet" href="css/test.css">
+</head>
+<body>
+  <!-- Header común -->
+  <header>
+    <h1>Realizar Quizzes</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html">
+          <img src="images/usuario.png" alt="Usuario">
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal de confirmación de logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para mensajes de estado -->
+  <div id="mensaje-estado" class="mensaje-oculto"></div>
+
+  <main>
+    <!-- Sección con datos del Test -->
+    <section>
+      <h2 id="test-titulo"></h2>
+      <p id="test-descripcion"></p>
+    </section>
+
+    <!-- Sección con listado de intentos -->
+    <section>
+      <h3>Mis intentos anteriores</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Score</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-intentos"></tbody>
+      </table>
+    </section>
+
+    <!-- Botones para reanudar o iniciar -->
+    <section>
+      <button id="btn-reanudar" style="display:none;">Reanudar intento</button>
+      <button id="btn-iniciar">Comenzar nuevo intento</button>
+    </section>
+
+    <!-- Sección de preguntas (cuando se inicie/reanude el test) -->
+    <section id="zona-preguntas" style="display:none;">
+      <div id="preguntas-container"></div>
+      <button id="btn-enviar">Enviar respuestas</button>
+    </section>
+  </main>
+
+  <script src="realizar_test.js"></script>
+</body>
+</html>
