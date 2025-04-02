@@ -35,15 +35,12 @@
   <!-- Contenedor para mensajes de estado -->
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
-  <main>
-    <!-- Sección con datos del Test -->
-    <section>
+  <main class="test-layout">
+    <!-- Columna 1 (información del test e intentos) -->
+    <section class="intentos-col">
       <h2 id="test-titulo"></h2>
       <p id="test-descripcion"></p>
-    </section>
-
-    <!-- Sección con listado de intentos -->
-    <section>
+  
       <h3>Mis intentos anteriores</h3>
       <table>
         <thead>
@@ -57,19 +54,19 @@
         </thead>
         <tbody id="tabla-intentos"></tbody>
       </table>
+  
+      <div class="botones-intentos">
+        <button id="btn-reanudar" style="display:none;">Reanudar intento</button>
+        <button id="btn-iniciar">Comenzar nuevo intento</button>
+      </div>
     </section>
-
-    <!-- Botones para reanudar o iniciar -->
-    <section>
-      <button id="btn-reanudar" style="display:none;">Reanudar intento</button>
-      <button id="btn-iniciar">Comenzar nuevo intento</button>
-    </section>
-
-    <!-- Sección de preguntas (cuando se inicie/reanude el test) -->
-    <section id="zona-preguntas" style="display:none;">
-      <div id="preguntas-container"></div>
-      <button id="btn-enviar">Enviar respuestas</button>
-    </section>
+  
+    <!-- Columna 2 (preguntas con scroll + botón enviar) -->
+    <section class="preguntas-col">
+      <section id="zona-preguntas" style="display:none;">
+        <div id="preguntas-container"></div>
+        <button id="btn-enviar">Enviar respuestas</button>
+      </section> </section>
   </main>
 
   <script src="realizar_test.js"></script>

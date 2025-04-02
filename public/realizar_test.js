@@ -155,7 +155,7 @@ function enviarRespuestas(testId) {
   preguntasDivs.forEach(div => {
     const radioSel = div.querySelector('input[type="radio"]:checked');
     if (radioSel) {
-      const name = radioSel.name;  // "pregunta_5"
+      const name = radioSel.name;  // por ej. "pregunta_5"
       const preguntaId = parseInt(name.split('_')[1]);
       const opcionIdSeleccionada = parseInt(radioSel.value);
       answers.push({ preguntaId, opcionIdSeleccionada });
@@ -173,14 +173,30 @@ function enviarRespuestas(testId) {
         mostrarMensaje(data.error, 'error');
         return;
       }
+      // Mostramos mensaje con la nota
       mostrarMensaje(`Test finalizado. Score: ${data.score}%`, 'success');
-      // Podrías recargar la tabla de intentos
+
+      // 1) Ocultamos la zona de preguntas
+      document.getElementById('zona-preguntas').style.display = 'none';
+
+      // 2) Recargamos la tabla de intentos para ver el nuevo
+      fetch(`/api/tests/${testId}/mis-intentos`)
+        .then(res => res.json())
+        .then(intentos => {
+          if (!Array.isArray(intentos)) return;
+          pintarIntentos(intentos);
+        })
+        .catch(err => {
+          console.error(err);
+          mostrarMensaje('Error al recargar intentos', 'error');
+        });
     })
     .catch(err => {
       console.error(err);
       mostrarMensaje('Error al enviar respuestas', 'error');
     });
 }
+
 
 function getParam(name) {
   const search = new URLSearchParams(window.location.search);

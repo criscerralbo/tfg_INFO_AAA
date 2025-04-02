@@ -414,5 +414,99 @@
       font-size: 0.95rem;
     }
   }
-  
-   
+  /* Contenedor general para la pantalla de "realizar test" */
+.test-container {
+  max-width: 1000px;   /* o 1200px, lo que prefieras */
+  margin: 0 auto;      /* centrado horizontal */
+  padding: 20px;       /* espacio interior */
+}
+    /* Contenedor general para la pantalla de "realizar test" */
+.test-container-ver {
+  max-width: 1000px;   /* o 1200px, lo que prefieras */
+  margin: 0 auto;      /* centrado horizontal */
+  padding: 20px;       /* espacio interior */
+}
+   /* Contenedor principal en 2 columnas */
+.test-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 columnas de igual ancho */
+  gap: 20px;
+  max-width: 1200px;    /* Ajusta ancho máximo */
+  margin: 0 auto;       /* Centrado horizontal */
+  padding: 20px;        /* Espacio interno */
+}
+
+/* Columna izquierda (intentos) */
+.intentos-col {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tabla de intentos y sus encabezados */
+.intentos-col table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.intentos-col table thead tr {
+  background-color: #f2f2f2;
+}
+.intentos-col table th,
+.intentos-col table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+.intentos-col table th {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* Botones de iniciar o reanudar */
+.botones-intentos {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Columna derecha (preguntas) */
+.preguntas-col {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scroll interno para la lista de preguntas */
+.preguntas-scroll {
+  flex: 1;               /* Ocupar todo el espacio vertical disponible */
+  overflow-y: auto;      /* Scroll vertical */
+  margin-bottom: 10px;   /* Espacio para separar del botón “Enviar” */
+}
+
+/* Cada pregunta con su texto, margen, etc. */
+.pregunta {
+  margin-bottom: 1rem;
+}
+.pregunta p {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .test-layout {
+    grid-template-columns: 1fr; /* 1 columna en pantallas pequeñas */
+  }
+  .preguntas-col {
+    margin-top: 20px;
+  }
+}

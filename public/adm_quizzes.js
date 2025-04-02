@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="quiz-card-description">${quiz.descripcion || ''}</div>
             <div class="quiz-card-actions">
               <button class="edit-button" onclick="location.href='edit_quiz.html?id=${quiz.id}'">Editar</button>
-              <button class="play-button" onclick="location.href='play_quiz.html?id=${quiz.id}'">Jugar</button>
+              
               <button class="delete-button" onclick="eliminarQuiz(${quiz.id})">Eliminar</button>
             </div>
           `;
