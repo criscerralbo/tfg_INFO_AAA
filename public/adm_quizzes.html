@@ -2,24 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Administrar Quizzes </title>
+  <title>Administrar Quizzes</title>
   <link rel="stylesheet" href="css/adm_quizzes.css">
 </head>
 <body>
   <header>
     <h1>Lista de Quizzes</h1>
     <div class="user-section">
-        <button class="btn-back" onclick="window.history.back()">← Volver</button>
-        <button id="logout-button" class="logout-button">Cerrar Sesión</button>
-        <div class="user-icon">
-          <a href="/perfil.html">
-            <img src="images/usuario.png" alt="Usuario">
-          </a>
-        </div>
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html">
+          <img src="images/usuario.png" alt="Usuario">
+        </a>
       </div>
+    </div>
   </header>
-   <!-- Modal de confirmación de cierre de sesión -->
-   <div id="logoutModal" class="modal">
+
+  <!-- Modal de cierre de sesión -->
+  <div id="logoutModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeModal">&times;</span>
       <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
@@ -30,29 +31,55 @@
     </div>
   </div>
 
-  <!-- Contenedor para mensajes -->
+  <!-- Mensaje de estado -->
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
-  <section id="nuevo-quiz">
-    <h2>Crear Nuevo Quiz</h2>
-    <form id="form-nuevo-quiz">
-      <label for="titulo">Título:</label>
-      <input type="text" id="titulo" required>
-      <br>
-      <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion"></textarea>
-      <br>
-      <button type="submit">Crear Quiz</button>
-    </form>
-  </section>
-  
-  <section id="lista-quizzes">
-    <h2>Quizzes Existentes</h2>
-    <ul id="quiz-list">
-      <!-- Se llenará dinámicamente -->
-    </ul>
-  </section>
-</main>
+  <!-- Contenedor principal con dos columnas -->
+  <main class="main-grid">
+    <!-- Columna de Quizzes -->
+    <section class="quiz-col">
+      <section class="quiz-creation">
+        <h2>Crear Nuevo Quiz</h2>
+        <form id="form-nuevo-quiz">
+          <label for="titulo">Título:</label>
+          <input type="text" id="titulo" required>
+          <br>
+          <label for="descripcion">Descripción:</label>
+          <textarea id="descripcion"></textarea>
+          <br>
+          <button type="submit" class="crear-btn">Crear Quiz</button>
+        </form>
+      </section>
+
+      <section class="quiz-list">
+        <h2>Quizzes Existentes</h2>
+        <ul id="quiz-list">
+          <!-- Dinámico -->
+        </ul>
+      </section>
+    </section>
+
+    <!-- Columna de Emparejamientos -->
+    <section class="emparejamiento-col">
+      <section class="emparejamiento-creation">
+        <h2>Crear Nueva Actividad de Emparejamiento</h2>
+        <form id="form-nuevo-emparejamiento">
+          <label for="nombreEmp">Nombre:</label>
+          <input type="text" id="nombreEmp" required><br>
+          <label for="descripcionEmp">Descripción:</label>
+          <textarea id="descripcionEmp"></textarea><br>
+          <button type="submit" class="crear-btn">Crear Actividad</button>
+        </form>
+      </section>
+
+      <section class="emparejamiento-list">
+        <h2>Actividades de Emparejamiento Existentes</h2>
+        <ul id="emparejamientos-list">
+          <!-- Dinámico -->
+        </ul>
+      </section>
+    </section>
+  </main>
 
   <script src="adm_quizzes.js"></script>
 </body>

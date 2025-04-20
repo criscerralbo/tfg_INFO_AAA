@@ -286,6 +286,10 @@
    }
    
    /* Sección “Crear Nuevo Quiz” y “Lista de Quizzes” */
+   .crear-btn {
+    margin-bottom: 0; /* Quita espacio inferior */
+  }
+  
    .quiz-creation,
    .quiz-list {
        width: 90%;
@@ -310,12 +314,7 @@
        margin-bottom: 0;
    }
    
-   .quiz-creation button {
-       margin-top: 10px;
-       width: auto; /* Que el botón de Crear Quiz sea más pequeño */
-       align-self: flex-start;
-       padding: 10px 20px;
-   }
+ 
    
    /* Listado de quizzes en modo "cards" */
    .quiz-list-items {
@@ -348,8 +347,7 @@
        flex-direction: column;
        justify-content: space-between;
        transition: box-shadow 0.2s ease-in-out;
-       margin-left: 30px;
-       margin-right: 30px;
+       margin:0;
    }
    
    .quiz-card:hover {
@@ -361,13 +359,13 @@
        margin-bottom: 10px;
        color: #2c3e50;
    }
-   
    .quiz-card-actions {
-       display: flex;
-       gap: 10px;
-       margin-top: 10px;
-   }
-   
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+ 
    /* Botones dentro de cada card */
    .quiz-card-actions button {
        flex: 1;
@@ -425,4 +423,143 @@
            padding: 10px 20px;
        }
    }
-   
+   /* === NUEVO: Grid principal con dos columnas === */
+.main-grid {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 30px;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Columnas individuales */
+.quiz-col,
+.emparejamiento-col {
+    flex: 1;
+    max-width: 48%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Mantener estilo consistente con el resto */
+.quiz-creation,
+.quiz-list,
+.emparejamiento-creation,
+.emparejamiento-list {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive: en móviles mostrar en una sola columna */
+@media (max-width: 768px) {
+    .main-grid {
+        flex-direction: column;
+    }
+
+    .quiz-col,
+    .emparejamiento-col {
+        max-width: 100%;
+    }
+}
+/* ===== Unificación visual entre quizzes y emparejamientos ===== */
+
+/* Estilo común para tarjetas */
+.quiz-list-items li,
+.emparejamientos-list-items li,
+#quiz-list li,
+#emparejamientos-list li {
+  background-color: #fafafa;
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.2s ease-in-out;
+  margin-bottom: 10px;
+}
+
+/* Título y descripción */
+.quiz-card-title,
+.emparejamiento-card-title {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.quiz-card-description,
+.emparejamiento-card-description {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Botones */
+.quiz-card-actions,
+.emparejamiento-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.quiz-card-actions button,
+.emparejamiento-card-actions button {
+  flex: 1;
+  background-color: #2980b9;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.quiz-card-actions button:hover,
+.emparejamiento-card-actions button:hover {
+  background-color: #3498db;
+}
+
+.quiz-card-actions .delete-button,
+.emparejamiento-card-actions .delete-button {
+  background-color: #e74c3c;
+}
+
+.quiz-card-actions .delete-button:hover,
+.emparejamiento-card-actions .delete-button:hover {
+  background-color: #c0392b;
+}
+
+.quiz-creation h2,
+.quiz-list h2,
+.emparejamiento-creation h2,
+.emparejamiento-list h2 {
+    text-align: left;
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+.main-grid {
+    padding: 20px 20px 40px 20px; /* más espacio abajo */
+}
+.quiz-creation,
+.quiz-list,
+.emparejamiento-creation,
+.emparejamiento-list {
+    margin-top: 0;
+}
+#quiz-list li,
+#emparejamientos-list li {
+    text-align: left;
+}
+.emparejamiento-card-actions button {
+    width: auto;
+    padding: 8px 16px;
+}
+.emparejamiento-card-actions {
+    justify-content: flex-end;
+}
+

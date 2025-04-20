@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Emparejamiento</title>
+  <link rel="stylesheet" href="css/edit_quizzes.css">
+</head>
+<body>
+  <header>
+    <h1>Editar Actividad de Emparejamiento</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html">
+          <img src="images/usuario.png" alt="Usuario">
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal de logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mensaje-estado" class="mensaje-oculto"></div>
+
+  <main class="edit-quiz-layout">
+    <section class="datos-quiz">
+      <h2>Datos de la Actividad</h2>
+      <form id="form-edit-emparejamiento">
+        <label for="tituloEmp">Nombre:</label>
+        <input type="text" id="tituloEmp" required><br>
+
+        <label for="descripcionEmp">Descripción:</label>
+        <textarea id="descripcionEmp"></textarea><br>
+
+        <button type="submit">Actualizar Actividad</button>
+        <button type="button" id="btn-eliminar-emparejamiento">Eliminar</button>
+      </form>
+    </section>
+
+    <section class="nueva-pregunta">
+      <h3>Agregar Par</h3>
+      <div id="pares-container"></div>
+      <button type="button" onclick="agregarPar()">+ Agregar Par</button>
+    </section>
+  </main>
+
+  <script src="adm_quizzes.js"></script>
+  <script src="edit_emparejamiento.js"></script>
+</body>
+</html>

@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(() => window.location.href = '/');
     });
   }
+// =====================
+  // QUIZZES
+  // =====================
 
  //document.addEventListener('DOMContentLoaded', () => {
     cargarQuizzes();
@@ -104,6 +107,89 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+  // =====================
+  // EMPAREJAMIENTOS
+  // =====================
+
+  cargarEmparejamientos();
+
+  document.getElementById('form-nuevo-emparejamiento').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombreEmp').value.trim();
+    const descripcion = document.getElementById('descripcionEmp').value.trim();
+    const pares = Array.from(document.querySelectorAll('#pares-container div')).map(div => {
+      const inputs = div.querySelectorAll('input');
+      return { palabra: inputs[0].value, imagen: inputs[1].value };
+    });
+
+    try {
+      const res = await fetch('/api/profesor/emparejamientos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, descripcion, pares })
+      });
+
+      if (res.ok) {
+        mostrarMensaje('Actividad creada con éxito', 'success');
+        document.getElementById('form-nuevo-emparejamiento').reset();
+        document.getElementById('pares-container').innerHTML = '';
+        cargarEmparejamientos();
+      } else {
+        const data = await res.json();
+        mostrarMensaje(data.error || 'Error al crear la actividad', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      mostrarMensaje('Error al conectar con el servidor', 'error');
+    }
+  });
+
+  async function eliminarEmparejamiento(id) {
+    if (!confirm('¿Eliminar esta actividad?')) return;
+    try {
+      const res = await fetch(`/api/profesor/emparejamientos/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        mostrarMensaje('Actividad eliminada', 'success');
+        cargarEmparejamientos();
+      } else {
+        const data = await res.json();
+        mostrarMensaje(data.error || 'Error al eliminar', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      mostrarMensaje('Error al conectar con el servidor', 'error');
+    }
+  }
+  
+
+  async function cargarEmparejamientos() {
+    try {
+      const res = await fetch('/api/profesor/emparejamientos');
+      if (!res.ok) throw new Error('Error al obtener emparejamientos');
+      const actividades = await res.json();
+      const lista = document.getElementById('emparejamientos-list');
+      lista.innerHTML = '';
+      actividades.forEach(act => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div class="emparejamiento-card-title">${act.nombre}</div>
+          <div class="emparejamiento-card-description">${act.descripcion || ''}</div>
+          <div class="emparejamiento-card-actions">
+            <button onclick="window.location.href='edit_emparejamiento.html?id=${act.id}'">Editar</button>
+            <button class="delete-button" onclick="eliminarEmparejamiento(${act.id})">Eliminar</button>
+          </div>`;
+        lista.appendChild(li);
+      }
+      );
+    } catch (err) {
+      console.error(err);
+      mostrarMensaje('Error al cargar emparejamientos', 'error');
+    }
+  }
+
+  // =====================
+  // MENSAJES
+  // =====================
   
   function mostrarMensaje(mensaje, tipo) {
     const div = document.getElementById('mensaje-estado');

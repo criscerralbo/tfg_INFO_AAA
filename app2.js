@@ -10,6 +10,8 @@ const quizRoutes = require('./routes/quizRoutes');
 const preguntaRoutes = require('./routes/preguntaRoutes');
 const pubQuizzesRoutes = require('./routes/pubQuizzesRoutes');
 const testRoutes = require('./routes/testRoutes');
+const emparejamientosRoutes = require('./routes/emparejamientosRoutes');
+
 const app = express();
 
 // Middleware para analizar datos JSON y datos del formulario (URL-encoded)
@@ -70,7 +72,7 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/preguntas', preguntaRoutes);
 app.use('/api/pubQuizzes', pubQuizzesRoutes);
 app.use('/api/tests', testRoutes);
-
+app.use('/api', emparejamientosRoutes);
 // Ruta para la pantalla de inicio (luego de iniciar sesión)
 app.get('/inicio', (req, res) => {
     if (!req.session.nombreUsuario) {
