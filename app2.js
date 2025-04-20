@@ -14,8 +14,13 @@ const emparejamientosRoutes = require('./routes/emparejamientosRoutes');
 
 const app = express();
 
+// Middleware para analizar datos JSON y datos del formulario (URL-encoded)
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
+// Servir archivos estáticos desde la carpeta "public"
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware de sesión
 app.use(session({

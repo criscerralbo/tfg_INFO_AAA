@@ -1,4 +1,3 @@
 node_modules/
 *.log
 usuarios.db
-"/uploads"     # evita subirlas al repo

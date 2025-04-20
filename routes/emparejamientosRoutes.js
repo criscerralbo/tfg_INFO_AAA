@@ -1,50 +1,23 @@
 const express = require('express');
-const router  = express.Router();
+const router = express.Router();
 const controller = require('../controllers/emparejamientosController');
-const upload = require('../utils/upload');   // Multer para gestionar archivos
 
-// --------- Ruta de subida de imagen ---------
-router.post(
-  '/profesor/emparejamientos/:id/upload',
-  upload.single('imagen'),
-  controller.subirImagen
-);
+// Crear nueva actividad
+router.post('/profesor/emparejamientos', controller.crearActividad);
 
-// --------- Rutas CRUD de emparejamientos ---------
-// Crear una nueva actividad con pares
-router.post(
-  '/profesor/emparejamientos',
-  controller.crearActividad
-);
+// Listar todas las del profesor
+router.get('/profesor/emparejamientos', controller.obtenerTodosDelProfesor);
 
-// Obtener todas las actividades del profesor
-router.get(
-  '/profesor/emparejamientos',
-  controller.obtenerTodosDelProfesor
-);
+// Obtener una para edición
+router.get('/profesor/emparejamientos/:id', controller.obtenerEmparejamientoPorId);
 
-// Obtener detalle de una actividad y sus pares
-router.get(
-  '/profesor/emparejamientos/:id',
-  controller.obtenerEmparejamientoPorId
-);
+// Editar
+router.put('/profesor/emparejamientos/:id', controller.actualizarEmparejamiento);
 
-// Actualizar actividad y sus pares
-router.put(
-  '/profesor/emparejamientos/:id',
-  controller.actualizarEmparejamiento
-);
+// Eliminar
+router.delete('/profesor/emparejamientos/:id', controller.eliminarEmparejamiento);
 
-// Eliminar actividad y sus pares
-router.delete(
-  '/profesor/emparejamientos/:id',
-  controller.eliminarEmparejamiento
-);
-
-// --------- Ruta de solo lectura para alumnos ---------
-router.get(
-  '/alumno/emparejamientos/:id',
-  controller.obtenerEmparejamientoPorId
-);
+// Ver como alumno
+router.get('/alumno/emparejamientos/:id', controller.obtenerEmparejamientoPorId);
 
 module.exports = router;

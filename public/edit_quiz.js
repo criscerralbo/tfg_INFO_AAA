@@ -1,268 +1,318 @@
-// edit_quiz.js
-(() => {
-  document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  // -- Manejo del modal de logout (igual que en adm_quizzes.js) --
+  const logoutButton = document.getElementById('logout-button');
+  const cancelLogout = document.getElementById('cancelLogout');
+  const closeModal = document.getElementById('closeModal');
+  const confirmLogout = document.getElementById('confirmLogout');
 
-  let preguntas = [];    // { id, enunciado, opciones: [], respuesta_correcta }
-  let editIdx   = null;  // índice de la pregunta en edición
-  let quizId;
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      document.getElementById('logoutModal').style.display = 'block';
+    });
+  }
+  if (cancelLogout) {
+    cancelLogout.addEventListener('click', () => {
+      document.getElementById('logoutModal').style.display = 'none';
+    });
+  }
+  if (closeModal) {
+    closeModal.addEventListener('click', () => {
+      document.getElementById('logoutModal').style.display = 'none';
+    });
+  }
+  if (confirmLogout) {
+    confirmLogout.addEventListener('click', () => {
+      fetch('/usuarios/logout')
+        .then(() => window.location.href = '/');
+    });
+  }
+  // ----------------------------------------------
 
-  // ——— Helpers ———
-  const id = s => document.getElementById(s);
-  async function fetchJSON(url, opts) {
-    const r = await fetch(url, opts);
-    if (!r.ok) throw new Error((await r.json()).error || r.statusText);
-    return r.json();
-  }
-  function toast(msg, tipo = 'info') {
-    const d = id('mensaje-estado');
-    d.textContent = msg;
-    d.className = tipo === 'success' ? 'mensaje-success' : 'mensaje-error';
-    d.style.display = 'block';
-    clearTimeout(d._t);
-    d._t = setTimeout(() => d.style.display = 'none', 4000);
-  }
-  function confirmModal(msg, onOk) {
-    let m = id('confirmModalGen');
-    if (!m) {
-      m = document.createElement('div');
-      m.id = 'confirmModalGen'; 
-      m.className = 'modal';
-      m.innerHTML = `
-        <div class="modal-content">
-          <span class="close" id="cmClose">&times;</span>
-          <p id="cmMsg"></p>
-          <div class="modal-buttons">
-            <button id="cmOk" class="confirm-button">Aceptar</button>
-            <button id="cmCanc" class="cancel-button">Cancelar</button>
-          </div>
-        </div>`;
-      document.body.appendChild(m);
-    }
-    id('cmMsg').textContent = msg;
-    m.style.display = 'block';
-    const cerrar = () => m.style.display = 'none';
-    id('cmClose').onclick = id('cmCanc').onclick = cerrar;
-    id('cmOk').onclick = () => { cerrar(); onOk && onOk(); };
-  }
-  function prepararLogout() {
-    const l = id('logout-button'),
-          c = id('cancelLogout'),
-          x = id('closeModal'),
-          ok= id('confirmLogout');
-    if (!l) return;
-    l.onclick = () => id('logoutModal').style.display = 'block';
-    if (c) c.onclick = () => id('logoutModal').style.display = 'none';
-    if (x) x.onclick = () => id('logoutModal').style.display = 'none';
-    if (ok) ok.onclick = () => fetch('/usuarios/logout').then(()=>location.href='/');
+  // Obtener el ID del quiz desde la URL
+  const params = new URLSearchParams(window.location.search);
+  const quizId = params.get('id');
+  if (!quizId) {
+    mostrarMensaje('No se ha especificado un ID de quiz', 'error');
+    return;
   }
 
-  // ——— Inicialización ———
-  async function init() {
-    prepararLogout();
+  // Referencias a elementos del DOM
+  const tituloInput = document.getElementById('titulo-quiz');
+  const descripcionInput = document.getElementById('descripcion-quiz');
+  const formEditQuiz = document.getElementById('form-edit-quiz');
+  const btnEliminarQuiz = document.getElementById('btn-eliminar-quiz');
 
-    // 1) leer ID de la URL
-    const params = new URLSearchParams(location.search);
-    quizId = params.get('id');
-    if (!quizId) { toast('Falta parámetro ?id', 'error'); return; }
+  const contenedorPreguntas = document.getElementById('contenedor-preguntas');
+  const formNuevaPregunta = document.getElementById('form-nueva-pregunta');
 
-    // 2) refs DOM
-    const tituloIn   = id('titulo-quiz');
-    const descIn     = id('descripcion-quiz');
-    const formQuiz   = id('form-edit-quiz');
-    const btnDelQuiz = id('btn-eliminar-quiz');
+  // Cargar datos del quiz al inicio
+  cargarQuiz();
+  // Cargar preguntas de este quiz
+  cargarPreguntas();
 
-    const secciónTit    = id('pregunta-titulo');
-    const formPreg      = id('form-nueva-pregunta');
-    const inEnunciado   = id('enunciado');
-    const contOpciones  = id('opciones-container');
-    const selResp       = id('respuesta');
-    const btnAddOpt     = id('agregar-opcion');
-    const btnRemOpt     = id('quitar-opcion');
-    const btnSavePreg   = id('btn-agregar-pregunta');
-    const btnCancelPreg = id('btn-cancelar-edicion');
+  // Listener para actualizar el Quiz
+  formEditQuiz.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nuevoTitulo = tituloInput.value.trim();
+    const nuevaDesc = descripcionInput.value.trim();
 
-    const contPreguntas = id('contenedor-preguntas');
-
-    // 3) carga inicial: quiz + preguntas
-    try {
-      const quiz = await fetchJSON(`/api/quizzes/${quizId}`);
-      tituloIn.value = quiz.titulo;
-      descIn.value   = quiz.descripcion || '';
-      // si tu GET /api/quizzes/:id devolvía .preguntas, úsalo; si no:
-      preguntas = (await fetchJSON(`/api/preguntas?quizId=${quizId}`)) || [];
-    } catch (e) {
-      console.error(e);
-      toast('Error al cargar datos','error');
+    if (!nuevoTitulo) {
+      mostrarMensaje('El título es obligatorio', 'error');
       return;
     }
 
-    renderPreguntas();
-    resetFormPregunta();
-
-    // 4) listeners
-    formQuiz.addEventListener('submit', e => {
-      e.preventDefault();
-      confirmModal('¿Actualizar Quiz?', async () => {
-        try {
-          await fetchJSON(`/api/quizzes/${quizId}`, {
-            method: 'PUT',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({
-              titulo: tituloIn.value.trim(),
-              descripcion: descIn.value.trim()
-            })
-          });
-          toast('Quiz actualizado','success');
-        } catch (err) {
-          console.error(err);
-          toast(err.message,'error');
-        }
+    try {
+      const resp = await fetch(`/api/quizzes/${quizId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titulo: nuevoTitulo, descripcion: nuevaDesc })
       });
-    });
-    btnDelQuiz.addEventListener('click', () => {
-      confirmModal('¿Eliminar Quiz completo?', async () => {
-        try {
-          await fetchJSON(`/api/quizzes/${quizId}`, { method:'DELETE' });
-          toast('Quiz eliminado','success');
-          setTimeout(()=>location.href='adm_quizzes.html',500);
-        } catch (err) {
-          console.error(err);
-          toast(err.message,'error');
-        }
-      });
-    });
+      if (resp.ok) {
+        mostrarMensaje('Quiz actualizado correctamente', 'success');
+        // Si quieres recargar, hazlo. O vuelve a cargar los datos...
+        // cargarQuiz();
+      } else {
+        const data = await resp.json();
+        mostrarMensaje(data.error, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      mostrarMensaje('Error al conectar con el servidor', 'error');
+    }
+  });
 
-    formPreg.addEventListener('submit', guardarPregunta);
-    btnCancelPreg.addEventListener('click', resetFormPregunta);
-    btnAddOpt.addEventListener('click', () => addOption(''));
-    btnRemOpt.addEventListener('click', removeOption);
-    contOpciones.addEventListener('input', updateSelect);
+  // Listener para eliminar el Quiz
+  btnEliminarQuiz.addEventListener('click', async () => {
+    if (!confirm('¿Seguro que deseas eliminar este quiz?')) return;
+    try {
+      const resp = await fetch(`/api/quizzes/${quizId}`, { method: 'DELETE' });
+      if (resp.ok) {
+        mostrarMensaje('Quiz eliminado', 'success');
+        // Redirigir a la lista de quizzes
+        window.location.href = 'adm_quizzes.html';
+      } else {
+        const data = await resp.json();
+        mostrarMensaje(data.error, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      mostrarMensaje('Error al conectar con el servidor', 'error');
+    }
+  });
 
-    // delegación en preguntas existentes
-    contPreguntas.addEventListener('click', e => {
-      const btn = e.target.closest('button[data-idx]');
-      if (!btn) return;
-      const idx = +btn.dataset.idx;
-      if (btn.dataset.act === 'edit') startEdit(idx);
-      else deletePregunta(idx);
-    });
-  }
-
-  // ——— UI / lógica de preguntas ———
-  function renderPreguntas() {
-    const cont = id('contenedor-preguntas');
-    cont.innerHTML = '';
-    preguntas.forEach((p,i) => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'pregunta-item';
-      // texto + opciones + respuesta
-      const optsHtml = p.opciones.map((o,j)=>`<p>${String.fromCharCode(65+j)}) ${o}</p>`).join('');
-      wrapper.innerHTML = `
-        <p><strong>${p.enunciado}</strong></p>
-        ${optsHtml}
-        <p><em>Respuesta:</em> ${p.respuesta_correcta}</p>
-        <button data-act="edit" data-idx="${i}">✏️</button>
-        <button data-act="del"  data-idx="${i}">🗑️</button>
-      `;
-      cont.appendChild(wrapper);
-    });
-  }
-
-  function startEdit(idx) {
-    editIdx = idx;
-    const p = preguntas[idx];
-    id('pregunta-titulo').textContent = 'Editar Pregunta';
-    id('btn-agregar-pregunta').textContent = 'Guardar Cambios';
-    id('btn-cancelar-edicion').style.display = 'inline-block';
-
-    id('enunciado').value = p.enunciado;
-    const cont = id('opciones-container');
-    cont.innerHTML = '';
-    p.opciones.forEach(o => addOption(o));
-    updateSelect(p.respuesta_correcta);
-  }
-
-  function resetFormPregunta() {
-    editIdx = null;
-    id('pregunta-titulo').textContent = 'Nueva Pregunta';
-    id('btn-agregar-pregunta').textContent = 'Agregar Pregunta';
-    id('btn-cancelar-edicion').style.display = 'none';
-    id('enunciado').value = '';
-    const cont = id('opciones-container');
-    cont.innerHTML = '';
-    addOption(''); addOption('');
-    updateSelect();
-  }
-
-  async function guardarPregunta(e) {
+  // Listener para añadir nueva pregunta
+  formNuevaPregunta.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const enun = id('enunciado').value.trim();
-    const opts = [...id('opciones-container').querySelectorAll('input')]
-                  .map(i=>i.value.trim()).filter(v=>v);
-    const resp = id('respuesta').value;
-    if (!enun || opts.length < 2) { toast('Enunciado + ≥2 opciones','error'); return; }
+    const enunciado = document.getElementById('enunciado').value.trim();
+    const opcionA = document.getElementById('opcionA').value.trim();
+    const opcionB = document.getElementById('opcionB').value.trim();
+    const opcionC = document.getElementById('opcionC').value.trim();
+    const opcionD = document.getElementById('opcionD').value.trim();
+    const respuesta_correcta = document.getElementById('respuesta').value;
 
-    const payload = { quiz_id: quizId, enunciado: enun, opciones: opts, respuesta_correcta: resp };
-    const url    = editIdx===null ? '/api/preguntas' : `/api/preguntas/${preguntas[editIdx].id}`;
-    const method = editIdx===null ? 'POST' : 'PUT';
+    if (!enunciado) {
+      mostrarMensaje('El enunciado es obligatorio', 'error');
+      return;
+    }
+
+    // -- Podemos verificar el número actual de preguntas en el front (Opcional) --
+    const totalPreguntasActual = contenedorPreguntas.querySelectorAll('.pregunta-item').length;
+    if (totalPreguntasActual >= 10) {
+      mostrarMensaje('Ya hay 10 preguntas, no puedes agregar más.', 'error');
+      return;
+    }
+
+    const body = {
+      quiz_id: quizId,
+      enunciado,
+      opcionA,
+      opcionB,
+      opcionC,
+      opcionD,
+      respuesta_correcta
+    };
 
     try {
-      await fetchJSON(url, {
-        method,
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
+      const resp = await fetch('/api/preguntas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
       });
-      toast(editIdx===null ? 'Pregunta creada' : 'Pregunta actualizada','success');
+      if (resp.ok) {
+        mostrarMensaje('Pregunta creada', 'success');
+        formNuevaPregunta.reset();
+        cargarPreguntas(); // Recargar la lista
+      } else {
+        const data = await resp.json();
+        mostrarMensaje(data.error || 'Error al crear pregunta', 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      mostrarMensaje('Error al conectar con el servidor', 'error');
+    }
+  });
 
-      // recarga
-      preguntas = await fetchJSON(`/api/preguntas?quizId=${quizId}`);
-      renderPreguntas();
-      resetFormPregunta();
-    } catch (err) {
-      console.error(err);
-      toast('Error interno al crear/actualizar pregunta','error');
+  // Función para cargar datos del quiz
+  async function cargarQuiz() {
+    try {
+      const resp = await fetch(`/api/quizzes/${quizId}`);
+      if (resp.ok) {
+        const quiz = await resp.json();
+        tituloInput.value = quiz.titulo;
+        descripcionInput.value = quiz.descripcion || '';
+      } else {
+        const data = await resp.json();
+        mostrarMensaje(data.error, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      mostrarMensaje('Error al conectar con el servidor', 'error');
     }
   }
 
-  function deletePregunta(idx) {
-    confirmModal('¿Eliminar esta pregunta?', async () => {
+  // Función para cargar las preguntas
+  async function cargarPreguntas() {
+    contenedorPreguntas.innerHTML = '';
+    try {
+      const resp = await fetch(`/api/preguntas?quizId=${quizId}`);
+      if (resp.ok) {
+        const preguntas = await resp.json();
+        preguntas.forEach(pregunta => {
+          // Crear HTML para cada pregunta
+          const div = document.createElement('div');
+          div.classList.add('pregunta-item');
+          div.innerHTML = `
+            <p><strong>Enunciado:</strong> ${pregunta.enunciado}</p>
+            <p>A) ${pregunta.opcionA || ''}</p>
+            <p>B) ${pregunta.opcionB || ''}</p>
+            <p>C) ${pregunta.opcionC || ''}</p>
+            <p>D) ${pregunta.opcionD || ''}</p>
+            <p><strong>Respuesta Correcta:</strong> ${pregunta.respuesta_correcta}</p>
+            <button class="btn-editar-pregunta">Editar</button>
+            <button class="btn-eliminar-pregunta">Eliminar</button>
+          `;
+
+          // Botón editar pregunta
+          div.querySelector('.btn-editar-pregunta').addEventListener('click', () => {
+            editarPregunta(pregunta);
+          });
+
+          // Botón eliminar pregunta
+          div.querySelector('.btn-eliminar-pregunta').addEventListener('click', async () => {
+            if (confirm('¿Eliminar esta pregunta?')) {
+              try {
+                const r = await fetch(`/api/preguntas/${pregunta.id}`, { method: 'DELETE' });
+                if (r.ok) {
+                  mostrarMensaje('Pregunta eliminada', 'success');
+                  cargarPreguntas();
+                } else {
+                  const data = await r.json();
+                  mostrarMensaje(data.error, 'error');
+                }
+              } catch (err) {
+                console.error(err);
+                mostrarMensaje('Error al conectar con el servidor', 'error');
+              }
+            }
+          });
+
+          contenedorPreguntas.appendChild(div);
+        });
+      } else {
+        const data = await resp.json();
+        mostrarMensaje(data.error, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      mostrarMensaje('Error al conectar con el servidor', 'error');
+    }
+  }
+
+  // Función para editar una pregunta (muestra un pequeño formulario)
+  function editarPregunta(pregunta) {
+    // Creamos un formulario inline para editar
+    const divEdicion = document.createElement('div');
+    divEdicion.innerHTML = `
+      <h4>Editar pregunta</h4>
+      <label>Enunciado:</label>
+      <input type="text" id="editEnunciado" value="${pregunta.enunciado}">
+      <br>
+      <label>Opción A:</label>
+      <input type="text" id="editA" value="${pregunta.opcionA || ''}">
+      <br>
+      <label>Opción B:</label>
+      <input type="text" id="editB" value="${pregunta.opcionB || ''}">
+      <br>
+      <label>Opción C:</label>
+      <input type="text" id="editC" value="${pregunta.opcionC || ''}">
+      <br>
+      <label>Opción D:</label>
+      <input type="text" id="editD" value="${pregunta.opcionD || ''}">
+      <br>
+      <label>Respuesta Correcta:</label>
+      <select id="editRespuesta">
+        <option value="A" ${pregunta.respuesta_correcta === 'A' ? 'selected' : ''}>A</option>
+        <option value="B" ${pregunta.respuesta_correcta === 'B' ? 'selected' : ''}>B</option>
+        <option value="C" ${pregunta.respuesta_correcta === 'C' ? 'selected' : ''}>C</option>
+        <option value="D" ${pregunta.respuesta_correcta === 'D' ? 'selected' : ''}>D</option>
+      </select>
+      <br>
+      <button id="btn-guardar-cambios">Guardar</button>
+      <button id="btn-cancelar-cambios">Cancelar</button>
+    `;
+    // Insertarlo en la página
+    const oldDiv = contenedorPreguntas.querySelector('.pregunta-item');
+    // O, mejor, creamos un popup. Pero para simplicidad, lo insertamos al final.
+    contenedorPreguntas.appendChild(divEdicion);
+
+    // Listeners
+    divEdicion.querySelector('#btn-guardar-cambios').addEventListener('click', async () => {
+      const enunciado = divEdicion.querySelector('#editEnunciado').value.trim();
+      const opcionA = divEdicion.querySelector('#editA').value.trim();
+      const opcionB = divEdicion.querySelector('#editB').value.trim();
+      const opcionC = divEdicion.querySelector('#editC').value.trim();
+      const opcionD = divEdicion.querySelector('#editD').value.trim();
+      const respuesta_correcta = divEdicion.querySelector('#editRespuesta').value;
+
+      if (!enunciado) {
+        mostrarMensaje('El enunciado es obligatorio', 'error');
+        return;
+      }
+
       try {
-        await fetchJSON(`/api/preguntas/${preguntas[idx].id}`, { method:'DELETE' });
-        toast('Pregunta eliminada','success');
-        preguntas.splice(idx,1);
-        renderPreguntas();
-        resetFormPregunta();
+        const r = await fetch(`/api/preguntas/${pregunta.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enunciado, opcionA, opcionB, opcionC, opcionD, respuesta_correcta })
+        });
+        if (r.ok) {
+          mostrarMensaje('Pregunta actualizada', 'success');
+          // Recargar preguntas y quitar el formulario
+          cargarPreguntas();
+          divEdicion.remove();
+        } else {
+          const data = await r.json();
+          mostrarMensaje(data.error, 'error');
+        }
       } catch (err) {
         console.error(err);
-        toast('Error al eliminar pregunta','error');
+        mostrarMensaje('Error al conectar con el servidor', 'error');
       }
+    });
+
+    divEdicion.querySelector('#btn-cancelar-cambios').addEventListener('click', () => {
+      divEdicion.remove();
     });
   }
 
-  // — opciones dinámicas —
-  function addOption(val) {
-    const div = document.createElement('div');
-    div.className = 'opcion-item';
-    div.innerHTML = `<input type="text" value="${val}" required>`;
-    id('opciones-container').appendChild(div);
-    updateSelect();
+  // Función para mostrar mensajes
+  function mostrarMensaje(mensaje, tipo) {
+    const div = document.getElementById('mensaje-estado');
+    div.textContent = mensaje;
+    div.className = (tipo === 'success') ? 'mensaje-success' : 'mensaje-error';
+    div.style.display = 'block';
+    setTimeout(() => {
+      div.style.display = 'none';
+    }, 4000);
   }
-  function removeOption() {
-    const cont = id('opciones-container');
-    if (cont.children.length > 2) {
-      cont.removeChild(cont.lastElementChild);
-      updateSelect();
-    }
-  }
-  function updateSelect(selected) {
-    const sel = id('respuesta');
-    sel.innerHTML = '';
-    [...id('opciones-container').querySelectorAll('input')].forEach((inp,i) => {
-      const opt = document.createElement('option');
-      opt.value = String.fromCharCode(65 + i);
-      opt.textContent = `${opt.value}) ${inp.value}`;
-      sel.appendChild(opt);
-    });
-    if (selected) sel.value = selected;
-  }
-})();
+});

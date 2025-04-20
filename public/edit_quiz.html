@@ -19,6 +19,7 @@
     </div>
   </header>
 
+  <!-- Modal de confirmación de logout (idéntico a tus otros HTML) -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeModal">&times;</span>
@@ -30,6 +31,7 @@
     </div>
   </div>
 
+  <!-- Contenedor para mensajes de estado -->
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
   <main class="edit-quiz-layout">
@@ -39,6 +41,7 @@
         <label for="titulo-quiz">Título:</label>
         <input type="text" id="titulo-quiz" required>
         <br>
+  
         <label for="descripcion-quiz">Descripción:</label>
         <input type="text" id="descripcion-quiz">
         <br><br><br><br><br><br><br><br><br>
@@ -46,44 +49,58 @@
         <button type="button" id="btn-eliminar-quiz">Eliminar Quiz</button>
       </form>
     </section>
+  
+   
 
+    <!-- Columna 3: Nueva Pregunta -->
     <section class="nueva-pregunta">
-      <h3 id="pregunta-titulo">Nueva Pregunta</h3>
-
+  
+      <h3>Nueva Pregunta</h3>
       <form id="form-nueva-pregunta">
         <label for="enunciado">Enunciado:</label>
         <input type="text" id="enunciado" required>
-
-        <div id="opciones-container">
-          <div class="opcion-item">
-            <label>Opción A:</label>
-            <input type="text" name="opciones[]" required>
-          </div>
-          <div class="opcion-item">
-            <label>Opción B:</label>
-            <input type="text" name="opciones[]" required>
-          </div>
-        </div>
-
-        <button type="button" id="agregar-opcion">+ Añadir opción</button>
-        <button type="button" id="quitar-opcion">- Quitar opción</button>
-
+    
+  
+        <label for="opcionA">Opción A:</label>
+        <input type="text" id="opcionA">
+        
+  
+        <label for="opcionB">Opción B:</label>
+        <input type="text" id="opcionB">
+        
+        <label for="opcionC">Opción C:</label>
+        <input type="text" id="opcionC">
+     
+  
+        <label for="opcionD">Opción D:</label>
+        <input type="text" id="opcionD">
+      
+  
         <label for="respuesta">Respuesta Correcta:</label>
-        <select id="respuesta" name="respuesta" required></select>
-
-        <div class="acciones-pregunta">
-          <button type="submit" id="btn-agregar-pregunta">Agregar Pregunta</button>
-          <button type="button" id="btn-cancelar-edicion" style="display:none">Cancelar</button>
-        </div>
-          </form>
+        <select id="respuesta">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+     
+  
+        <button type="submit">Agregar Pregunta</button>
+      </form>
     </section>
-
     <section class="preguntas-quiz">
       <h2>Preguntas del Quiz</h2>
-      <div id="contenedor-preguntas"></div>
+      <div id="contenedor-preguntas">
+        <!-- Se llenará dinámicamente con las preguntas existentes -->
+      </div>
+  
     </section>
   </main>
 
+  <!-- Scripts -->
+  <!-- Este archivo (adm_quizzes.js) maneja cosas como el modal de logout -->
+  <script src="adm_quizzes.js"></script>
+  <!-- El script de edición (inspirado en GForms) -->
   <script src="edit_quiz.js"></script>
 </body>
 </html>
