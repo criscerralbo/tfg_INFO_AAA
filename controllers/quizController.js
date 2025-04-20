@@ -36,8 +36,8 @@ exports.createQuiz = (req, res) => {
     }
 
     // 2) Insertar cada pregunta + opciones
-    const sqlPregunta = 'INSERT INTO preguntas (id_quiz, texto) VALUES (?, ?)';
-    const sqlOpcion = 'INSERT INTO opciones (id_pregunta, texto, correcta) VALUES (?, ?, ?)';
+    const sqlPregunta = 'INSERT INTO preguntas (quiz_id, texto) VALUES (?, ?)';
+    const sqlOpcion = 'INSERT INTO opciones (id_pregunta, texto, es_correcta) VALUES (?, ?, ?)';
 
     preguntas.forEach((pregunta) => {
       db.query(sqlPregunta, [quizId, pregunta.texto], (err, resultPregunta) => {
@@ -45,7 +45,7 @@ exports.createQuiz = (req, res) => {
         const preguntaId = resultPregunta.insertId;
 
         (pregunta.opciones || []).forEach((op) => {
-          db.query(sqlOpcion, [preguntaId, op.texto, op.correcta ? 1 : 0], (err) => {
+          db.query(sqlOpcion, [preguntaId, op.texto, op.es_correcta ? 1 : 0], (err) => {
             if (err) console.error(err);
           });
         });
@@ -69,10 +69,10 @@ exports.getQuizById = (req, res) => {
     const quiz = quizResults[0];
 
     // Obtener preguntas
-    const sqlPreguntas = 'SELECT * FROM preguntas WHERE id_quiz = ?';
+    const sqlPreguntas = 'SELECT * FROM preguntas WHERE quiz_id = ?';
     db.query(sqlPreguntas, [quizId], (err, preguntasResults) => {
       if (err) {
-        return res.status(500).json({ error: 'Error al obtener preguntas' });
+        return res.status(500).json({ error: 'Error al obtener preguntas Q' });
       }
       if (preguntasResults.length === 0) {
         quiz.preguntas = [];
@@ -117,10 +117,10 @@ exports.updateQuiz = (req, res) => {
 
     // 2) Manejar las preguntas:
     //    Obtener las preguntas existentes en DB para "diferenciar" qué insertar, actualizar, eliminar
-    const sqlGetPreguntas = 'SELECT id FROM preguntas WHERE id_quiz = ?';
+    const sqlGetPreguntas = 'SELECT id FROM preguntas WHERE quiz_id = ?';
     db.query(sqlGetPreguntas, [quizId], (err, rowsPreg) => {
       if (err) {
-        return res.status(500).json({ error: 'Error al obtener preguntas' });
+        return res.status(500).json({ error: 'Error al obtener preguntas 33' });
       }
       const existentesIds = rowsPreg.map(r => r.id);
 
@@ -140,7 +140,7 @@ exports.updateQuiz = (req, res) => {
       preguntas.forEach((preg) => {
         if (!preg.id) {
           // Insertar pregunta
-          const sqlInsertPreg = 'INSERT INTO preguntas (id_quiz, texto) VALUES (?, ?)';
+          const sqlInsertPreg = 'INSERT INTO preguntas (quiz_id, texto) VALUES (?, ?)';
           db.query(sqlInsertPreg, [quizId, preg.texto], (err, resultPreg) => {
             if (err) console.error(err);
             const newPregId = resultPreg.insertId;
@@ -182,14 +182,14 @@ exports.updateQuiz = (req, res) => {
       opciones.forEach((op) => {
         if (!op.id) {
           // Insertar
-          const sqlInsOp = 'INSERT INTO opciones (id_pregunta, texto, correcta) VALUES (?, ?, ?)';
-          db.query(sqlInsOp, [preguntaId, op.texto, op.correcta ? 1 : 0], (err) => {
+          const sqlInsOp = 'INSERT INTO opciones (id_pregunta, texto, es_correcta) VALUES (?, ?, ?)';
+          db.query(sqlInsOp, [preguntaId, op.texto, op.es_correcta ? 1 : 0], (err) => {
             if (err) console.error(err);
           });
         } else if (opsExistentesIds.includes(op.id)) {
           // Update
-          const sqlUpdOp = 'UPDATE opciones SET texto = ?, correcta = ? WHERE id = ?';
-          db.query(sqlUpdOp, [op.texto, op.correcta ? 1 : 0, op.id], (err) => {
+          const sqlUpdOp = 'UPDATE opciones SET texto = ?, es_correcta = ? WHERE id = ?';
+          db.query(sqlUpdOp, [op.texto, op.es_correcta ? 1 : 0, op.id], (err) => {
             if (err) console.error(err);
           });
         }
@@ -209,5 +209,42 @@ exports.deleteQuiz = (req, res) => {
       return res.status(500).json({ error: 'Error al eliminar el quiz' });
     }
     res.json({ success: 'Quiz eliminado correctamente' });
+  });
+};
+// controllers/quizController.js
+exports.getPreguntasPorQuiz = (req, res) => {
+  const quizId = req.query.quizId;
+  const sqlPreg = `
+      SELECT id,
+             texto                       AS enunciado
+      FROM preguntas
+      WHERE quiz_id = ?
+      ORDER BY id
+  `;
+
+  db.query(sqlPreg, [quizId], (err, preguntas) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener preguntas' });
+    if (preguntas.length === 0) return res.json([]);
+
+    let hechas = 0;
+    preguntas.forEach((p, idx) => {
+      const sqlOps = `
+          SELECT texto,
+                 es_correcta
+          FROM opciones
+          WHERE id_pregunta = ?
+          ORDER BY id
+      `;
+      db.query(sqlOps, [p.id], (e, ops) => {
+        if (e) console.error(e);
+
+        // array de textos y letra correcta («A», «B», …)
+        p.opciones = ops.map(o => o.texto);
+        const indexCorrecta = ops.findIndex(o => o.es_correcta === 1);
+        p.respuesta_correcta = indexCorrecta >= 0 ? 'ABCDEFGHIJ'[indexCorrecta] : '';
+
+        if (++hechas === preguntas.length) res.json(preguntas);
+      });
+    });
   });
 };
