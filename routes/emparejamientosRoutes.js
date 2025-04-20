@@ -1,23 +1,50 @@
 const express = require('express');
-const router = express.Router();
+const router  = express.Router();
 const controller = require('../controllers/emparejamientosController');
+const upload = require('../utils/upload');   // Multer para gestionar archivos
 
-// Crear nueva actividad
-router.post('/profesor/emparejamientos', controller.crearActividad);
+// --------- Ruta de subida de imagen ---------
+router.post(
+  '/profesor/emparejamientos/:id/upload',
+  upload.single('imagen'),
+  controller.subirImagen
+);
 
-// Listar todas las del profesor
-router.get('/profesor/emparejamientos', controller.obtenerTodosDelProfesor);
+// --------- Rutas CRUD de emparejamientos ---------
+// Crear una nueva actividad con pares
+router.post(
+  '/profesor/emparejamientos',
+  controller.crearActividad
+);
 
-// Obtener una para edición
-router.get('/profesor/emparejamientos/:id', controller.obtenerEmparejamientoPorId);
+// Obtener todas las actividades del profesor
+router.get(
+  '/profesor/emparejamientos',
+  controller.obtenerTodosDelProfesor
+);
 
-// Editar
-router.put('/profesor/emparejamientos/:id', controller.actualizarEmparejamiento);
+// Obtener detalle de una actividad y sus pares
+router.get(
+  '/profesor/emparejamientos/:id',
+  controller.obtenerEmparejamientoPorId
+);
 
-// Eliminar
-router.delete('/profesor/emparejamientos/:id', controller.eliminarEmparejamiento);
+// Actualizar actividad y sus pares
+router.put(
+  '/profesor/emparejamientos/:id',
+  controller.actualizarEmparejamiento
+);
 
-// Ver como alumno
-router.get('/alumno/emparejamientos/:id', controller.obtenerEmparejamientoPorId);
+// Eliminar actividad y sus pares
+router.delete(
+  '/profesor/emparejamientos/:id',
+  controller.eliminarEmparejamiento
+);
+
+// --------- Ruta de solo lectura para alumnos ---------
+router.get(
+  '/alumno/emparejamientos/:id',
+  controller.obtenerEmparejamientoPorId
+);
 
 module.exports = router;

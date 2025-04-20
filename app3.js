@@ -15,6 +15,7 @@ const emparejamientosRoutes = require('./routes/emparejamientosRoutes');
 const app = express();
 
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // Middleware de sesión
