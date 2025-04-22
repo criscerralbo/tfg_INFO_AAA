@@ -89,24 +89,50 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error(err);
     }
   }
-  
-  async function eliminarQuiz(id) {
-    if (confirm('¿Eliminar este quiz?')) {
-      try {
-        const res = await fetch(`/api/quizzes/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-          mostrarMensaje('Quiz eliminado', 'success');
-          cargarQuizzes();
-        } else {
-          const data = await res.json();
-          mostrarMensaje(data.error, 'error');
-        }
-      } catch (err) {
-        console.error(err);
-        mostrarMensaje('Error al eliminar', 'error');
-      }
+  // Obtén referencias al modal
+const confirmModal    = document.getElementById('confirmModal');
+const confirmMsg      = document.getElementById('confirmMessage');
+const btnConfirmOk    = document.getElementById('confirmAccept');
+const btnConfirmNo    = document.getElementById('confirmDecline');
+const btnConfirmClose = document.getElementById('confirmClose');
+
+// Función que muestra el modal de confirmación y devuelve una Promise<boolean>
+function showConfirm(message) {
+  return new Promise(resolve => {
+    confirmMsg.textContent = message;
+    confirmModal.style.display = 'block';
+
+    // al hacer clic en Aceptar
+    btnConfirmOk.onclick = () => {
+      confirmModal.style.display = 'none';
+      resolve(true);
+    };
+    // en Cancelar o la X
+    btnConfirmNo.onclick = btnConfirmClose.onclick = () => {
+      confirmModal.style.display = 'none';
+      resolve(false);
+    };
+  });
+}
+
+async function eliminarQuiz(id) {
+  const ok = await showConfirm('¿Eliminar este quiz?');
+  if (!ok) return;
+
+  try {
+    const res = await fetch(`/api/quizzes/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      mostrarMensaje('Quiz eliminado', 'success');
+      cargarQuizzes();
+    } else {
+      const data = await res.json();
+      mostrarMensaje(data.error, 'error');
     }
+  } catch (err) {
+    console.error(err);
+    mostrarMensaje('Error al eliminar', 'error');
   }
+}
   // =====================
   // EMPAREJAMIENTOS
   // =====================
@@ -117,22 +143,22 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const nombre = document.getElementById('nombreEmp').value.trim();
     const descripcion = document.getElementById('descripcionEmp').value.trim();
-    const pares = Array.from(document.querySelectorAll('#pares-container div')).map(div => {
-      const inputs = div.querySelectorAll('input');
-      return { palabra: inputs[0].value, imagen: inputs[1].value };
-    });
-
+    // ya no usamos pares aquí...
+  
     try {
       const res = await fetch('/api/profesor/emparejamientos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, descripcion, pares })
+        body: JSON.stringify({ nombre, descripcion, pares: [] })
       });
-
+  
       if (res.ok) {
         mostrarMensaje('Actividad creada con éxito', 'success');
+  
+        // 1) reseteamos el formulario
         document.getElementById('form-nuevo-emparejamiento').reset();
-        document.getElementById('pares-container').innerHTML = '';
+  
+        // 2) recargamos la lista
         cargarEmparejamientos();
       } else {
         const data = await res.json();
@@ -143,9 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
       mostrarMensaje('Error al conectar con el servidor', 'error');
     }
   });
+  
 
   async function eliminarEmparejamiento(id) {
-    if (!confirm('¿Eliminar esta actividad?')) return;
+    const ok = await showConfirm('¿Eliminar esta actividad?');
+    if (!ok) return;
+  
     try {
       const res = await fetch(`/api/profesor/emparejamientos/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -153,11 +182,11 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarEmparejamientos();
       } else {
         const data = await res.json();
-        mostrarMensaje(data.error || 'Error al eliminar', 'error');
+        mostrarMensaje(data.error, 'error');
       }
     } catch (err) {
       console.error(err);
-      mostrarMensaje('Error al conectar con el servidor', 'error');
+      mostrarMensaje('Error al eliminar', 'error');
     }
   }
   

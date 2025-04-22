@@ -4,81 +4,89 @@
   <meta charset="UTF-8">
   <title>Editar Quiz</title>
   <link rel="stylesheet" href="css/edit_quizzes.css">
+  <style>
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 80px;
+      right: 40px;
+      padding: 10px 16px;
+      border-radius: 4px;
+      z-index: 2000;
+      display: none;
+    }
+    .mensaje-success { background: #d1f4d1; color: #155724; }
+    .mensaje-error   { background: #f8d7da; color: #721c24; }
+    .mensaje-info    { background: #d1ecf1; color: #0c5460; }
+  </style>
 </head>
 <body>
   <header>
     <h1>Editar Quiz</h1>
     <div class="user-section">
-      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button class="btn-back" onclick="history.back()">← Volver</button>
       <button id="logout-button" class="logout-button">Cerrar Sesión</button>
       <div class="user-icon">
-        <a href="/perfil.html">
-          <img src="images/usuario.png" alt="Usuario">
-        </a>
+        <a href="/perfil.html"><img src="images/usuario.png" alt="Usuario"></a>
       </div>
     </div>
   </header>
 
+  <!-- Modal Logout -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeModal">&times;</span>
-      <h2>¿Estás seguro de que deseas cerrar sesión?</h2>
+      <h2>¿Cerrar sesión?</h2>
       <div class="modal-buttons">
-        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
-        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+        <button id="confirmLogout" class="confirm-button">Sí, salir</button>
+        <button id="cancelLogout"  class="cancel-button">Cancelar</button>
       </div>
     </div>
   </div>
 
-  <div id="mensaje-estado" class="mensaje-oculto"></div>
+  <!-- Toast container -->
+  <div id="mensaje-estado" class="toast mensaje-info"></div>
 
   <main class="edit-quiz-layout">
-    <section class="datos-quiz">
+    <!-- Columna 1: Datos del Quiz -->
+    <section>
       <h2>Datos del Quiz</h2>
       <form id="form-edit-quiz">
         <label for="titulo-quiz">Título:</label>
         <input type="text" id="titulo-quiz" required>
-        <br>
+
         <label for="descripcion-quiz">Descripción:</label>
         <input type="text" id="descripcion-quiz">
-        <br><br><br><br><br><br><br><br><br>
+
         <button type="submit">Actualizar Quiz</button>
-        <button type="button" id="btn-eliminar-quiz">Eliminar Quiz</button>
+          <button type="button" id="btn-eliminar-quiz">Eliminar Quiz</button>
       </form>
     </section>
 
-    <section class="nueva-pregunta">
+    <!-- Columna 2: Crear / Editar Pregunta -->
+    <section>
       <h3 id="pregunta-titulo">Nueva Pregunta</h3>
-
       <form id="form-nueva-pregunta">
         <label for="enunciado">Enunciado:</label>
         <input type="text" id="enunciado" required>
 
-        <div id="opciones-container">
-          <div class="opcion-item">
-            <label>Opción A:</label>
-            <input type="text" name="opciones[]" required>
-          </div>
-          <div class="opcion-item">
-            <label>Opción B:</label>
-            <input type="text" name="opciones[]" required>
-          </div>
-        </div>
+        <div id="opciones-container"></div>
 
         <button type="button" id="agregar-opcion">+ Añadir opción</button>
         <button type="button" id="quitar-opcion">- Quitar opción</button>
 
         <label for="respuesta">Respuesta Correcta:</label>
-        <select id="respuesta" name="respuesta" required></select>
+        <select id="respuesta" required></select>
 
         <div class="acciones-pregunta">
           <button type="submit" id="btn-agregar-pregunta">Agregar Pregunta</button>
           <button type="button" id="btn-cancelar-edicion" style="display:none">Cancelar</button>
         </div>
-          </form>
+      </form>
     </section>
 
-    <section class="preguntas-quiz">
+    <!-- Columna 3: Lista de Preguntas -->
+    <section>
       <h2>Preguntas del Quiz</h2>
       <div id="contenedor-preguntas"></div>
     </section>

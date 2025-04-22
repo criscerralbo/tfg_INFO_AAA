@@ -1,196 +1,90 @@
+// controllers/preguntaController.js
 const db = require('../db');
 
-// Obtener todas las preguntas de un Quiz (con sus 4 opciones)
+// GET /api/preguntas?quizId=...
 exports.getPreguntasByQuiz = (req, res) => {
-  const quizId = req.query.quizId; 
-  if (!quizId) {
-    return res.status(400).json({ error: 'Falta quizId en la consulta' });
-  }
+  const quizId = req.query.quizId;
+  if (!quizId) return res.status(400).json({ error: 'Falta quizId' });
 
-  // 1) Obtener todas las filas de la tabla preguntas que pertenezcan a este quiz
-  const sqlPreguntas = 'SELECT * FROM preguntas WHERE quiz_id = ?';
-  db.query(sqlPreguntas, [quizId], (err, preguntas) => {
-    if (err) {
-      console.error('Error al obtener preguntas:', err);
-      return res.status(500).json({ error: 'Error interno al obtener preguntas' });
-    }
-    if (preguntas.length === 0) {
-      return res.json([]); // Sin preguntas
-    }
+  db.query('SELECT * FROM preguntas WHERE quiz_id = ?', [quizId], (err, preguntas) => {
+    if (err) return res.status(500).json({ error: 'Error al leer preguntas' });
+    if (preguntas.length === 0) return res.json([]);
 
-    // Iremos consultando opciones para cada pregunta y construyendo su objeto final
-    let contador = 0;
-    const resultadoFinal = [];
-
-    preguntas.forEach((preg) => {
-      const preguntaId = preg.id;
-      // Para la respuesta final al front, llamaremos "enunciado" a preg.texto
-      const objPregunta = {
-        id: preg.id,
-        enunciado: preg.texto
-      };
-
-      // 2) Obtener las opciones asociadas
-      const sqlOpciones = 'SELECT * FROM opciones WHERE id_pregunta = ?';
-      db.query(sqlOpciones, [preguntaId], (err, filasOpciones) => {
-        if (err) {
-          console.error('Error al obtener opciones:', err);
-          return res.status(500).json({ error: 'Error interno al obtener opciones' });
-        }
-
-        // Vamos a mapear hasta 4 opciones: A, B, C, D
-        // y si es_correcta=1, guardamos la letra en respuesta_correcta
-        // Asumimos que las opciones vienen en cierto orden (o que hay max 4).
-        // Ajusta si necesitas un orden específico.
-        let letraActual = ['A', 'B', 'C', 'D'];
-        let respuestaCorrecta = null;
-
-        filasOpciones.forEach((opcion, idx) => {
-          const letra = letraActual[idx] || '?';
-          // Por ejemplo: objPregunta.opcionA = textoOpcion
-          objPregunta[`opcion${letra}`] = opcion.texto;
-          // Si es_correcta = 1 => la respuesta correcta es esa letra
-          if (opcion.es_correcta === 1) {
-            respuestaCorrecta = letra;
-          }
+    let done = 0, out = [];
+    preguntas.forEach(p => {
+      db.query('SELECT * FROM opciones WHERE id_pregunta = ?', [p.id], (e, ops) => {
+        if (e) return res.status(500).json({ error: 'Error al leer opciones' });
+        // construyo la pregunta con array de opciones y respuesta_correcta
+        const opciones = ops.map(o => ({ id: o.id, texto: o.texto, es_correcta: o.es_correcta===1 }));
+        const respLetra = ['A','B','C','D'][ops.findIndex(o=>o.es_correcta===1)] || null;
+        out.push({
+          id:            p.id,
+          enunciado:     p.texto,
+          opciones,
+          respuesta_correcta: respLetra
         });
-
-        objPregunta.respuesta_correcta = respuestaCorrecta || 'A'; 
-        // (Por si acaso, si ninguna es_correcta=1, asumimos 'A')
-
-        resultadoFinal.push(objPregunta);
-        contador++;
-        if (contador === preguntas.length) {
-          return res.json(resultadoFinal);
-        }
+        if (++done === preguntas.length) res.json(out);
       });
     });
   });
 };
 
-// Crear una nueva pregunta
+// POST /api/preguntas
 exports.createPregunta = (req, res) => {
-  const { quiz_id, enunciado, opcionA, opcionB, opcionC, opcionD, respuesta_correcta } = req.body;
-
-  if (!quiz_id || !enunciado || !respuesta_correcta) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios' });
+  const { quiz_id, enunciado, opciones, respuesta_correcta } = req.body;
+  if (!quiz_id||!enunciado||!Array.isArray(opciones)||!respuesta_correcta) {
+    return res.status(400).json({ error:'Faltan campos' });
   }
-
-  // 1) Verificar cuántas preguntas hay ya (por si quieres máximo 10)
-  db.query('SELECT COUNT(*) AS total FROM preguntas WHERE quiz_id = ?', [quiz_id], (err, countResult) => {
-    if (err) {
-      console.error('Error al contar preguntas:', err);
-      return res.status(500).json({ error: 'Error interno al contar preguntas' });
-    }
-
-    const totalPreguntas = countResult[0].total;
-    if (totalPreguntas >= 10) {
-      return res.status(400).json({ error: 'Este quiz ya tiene el máximo de 10 preguntas' });
-    }
-
-    // 2) Insertar en 'preguntas' (usando "texto" para el enunciado)
-    const sqlPreg = 'INSERT INTO preguntas (quiz_id, texto) VALUES (?, ?)';
-    db.query(sqlPreg, [quiz_id, enunciado], (err, result) => {
-      if (err) {
-        console.error('Error al crear pregunta:', err);
-        return res.status(500).json({ error: 'Error interno al crear pregunta' });
-      }
-      const nuevaPreguntaId = result.insertId;
-
-      // 3) Insertar las 4 opciones en la tabla 'opciones'
-      //    (puedes usar un array para no repetir código)
-      const opciones = [
-        { texto: opcionA, letra: 'A' },
-        { texto: opcionB, letra: 'B' },
-        { texto: opcionC, letra: 'C' },
-        { texto: opcionD, letra: 'D' },
-      ];
-
-      opciones.forEach((op) => {
-        if (!op.texto) return; // Si viene vacía, podrías omitir la inserción
-
-        const esCorrecta = (op.letra === respuesta_correcta) ? 1 : 0;
-        const sqlOpc = 'INSERT INTO opciones (id_pregunta, texto, es_correcta) VALUES (?, ?, ?)';
-        db.query(sqlOpc, [nuevaPreguntaId, op.texto, esCorrecta], (err) => {
-          if (err) {
-            console.error('Error al insertar opción:', err);
-          }
-          // No devolvemos nada por cada opción
-        });
-      });
-
-      // Finalmente
-      return res.status(201).json({ success: 'Pregunta creada correctamente' });
+  // inserto pregunta
+  db.query('INSERT INTO preguntas (quiz_id,texto) VALUES (?,?)', [quiz_id,enunciado], (e,r) => {
+    if (e) return res.status(500).json({ error:'Error al crear pregunta' });
+    const pid = r.insertId;
+    // inserto opciones
+    const stm = 'INSERT INTO opciones (id_pregunta,texto,es_correcta) VALUES ?';
+    const vals = opciones.map((txt,i)=>[
+      pid,
+      txt,
+      ('ABCD'[i]===respuesta_correcta)?1:0
+    ]);
+    db.query(stm, [vals], err2 => {
+      if (err2) console.error(err2);
+      res.status(201).json({ success:'Pregunta creada' });
     });
   });
 };
 
-// Actualizar una pregunta existente (reinsertando sus 4 opciones)
+// PUT /api/preguntas/:id
 exports.updatePregunta = (req, res) => {
-  const preguntaId = req.params.id;
-  const { enunciado, opcionA, opcionB, opcionC, opcionD, respuesta_correcta } = req.body;
-
-  if (!preguntaId || !enunciado || !respuesta_correcta) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios' });
+  const pid = req.params.id;
+  const { enunciado, opciones, respuesta_correcta } = req.body;
+  if (!enunciado||!Array.isArray(opciones)||!respuesta_correcta) {
+    return res.status(400).json({ error:'Faltan campos' });
   }
-
-  // 1) Actualizar la pregunta (columna "texto")
-  const sqlUpdPreg = 'UPDATE preguntas SET texto = ? WHERE id = ?';
-  db.query(sqlUpdPreg, [enunciado, preguntaId], (err, result) => {
-    if (err) {
-      console.error('Error al actualizar pregunta:', err);
-      return res.status(500).json({ error: 'Error interno al actualizar la pregunta' });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'No se encontró la pregunta a actualizar' });
-    }
-
-    // 2) Borrar las opciones anteriores
-    const sqlDelOps = 'DELETE FROM opciones WHERE id_pregunta = ?';
-    db.query(sqlDelOps, [preguntaId], (err) => {
-      if (err) {
-        console.error('Error al eliminar opciones viejas:', err);
-      }
-
-      // 3) Insertar las nuevas 4 opciones
-      const opciones = [
-        { texto: opcionA, letra: 'A' },
-        { texto: opcionB, letra: 'B' },
-        { texto: opcionC, letra: 'C' },
-        { texto: opcionD, letra: 'D' },
-      ];
-
-      opciones.forEach((op) => {
-        if (!op.texto) return;
-        const esCorrecta = (op.letra === respuesta_correcta) ? 1 : 0;
-        const sqlInsOp = 'INSERT INTO opciones (id_pregunta, texto, es_correcta) VALUES (?, ?, ?)';
-        db.query(sqlInsOp, [preguntaId, op.texto, esCorrecta], (err2) => {
-          if (err2) {
-            console.error('Error al insertar opción:', err2);
-          }
-        });
+  db.query('UPDATE preguntas SET texto=? WHERE id=?', [enunciado,pid], (e) => {
+    if (e) return res.status(500).json({ error:'Error al actualizar pregunta' });
+    // borro viejas
+    db.query('DELETE FROM opciones WHERE id_pregunta=?', [pid], () => {
+      // inserto nuevas
+      const stm = 'INSERT INTO opciones (id_pregunta,texto,es_correcta) VALUES ?';
+      const vals = opciones.map((txt,i)=>[
+        pid,
+        txt,
+        ('ABCD'[i]===respuesta_correcta)?1:0
+      ]);
+      db.query(stm, [vals], err2 => {
+        if (err2) console.error(err2);
+        res.json({ success:'Pregunta actualizada' });
       });
-
-      return res.json({ success: 'Pregunta actualizada correctamente' });
     });
   });
 };
 
-// Eliminar una pregunta (las opciones se borran por ON DELETE CASCADE o manual)
+// DELETE /api/preguntas/:id
 exports.deletePregunta = (req, res) => {
-  const preguntaId = req.params.id;
-  if (!preguntaId) {
-    return res.status(400).json({ error: 'Falta el ID de la pregunta' });
-  }
-
-  db.query('DELETE FROM preguntas WHERE id = ?', [preguntaId], (err, result) => {
-    if (err) {
-      console.error('Error al eliminar la pregunta:', err);
-      return res.status(500).json({ error: 'Error interno al eliminar la pregunta' });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'No se encontró la pregunta a eliminar' });
-    }
-    res.json({ success: 'Pregunta eliminada correctamente' });
+  const pid = req.params.id;
+  db.query('DELETE FROM preguntas WHERE id=?', [pid], (e,r) => {
+    if (e) return res.status(500).json({ error:'Error al eliminar' });
+    if (r.affectedRows===0) return res.status(404).json({ error:'No encontrada' });
+    res.json({ success:'Pregunta eliminada' });
   });
 };

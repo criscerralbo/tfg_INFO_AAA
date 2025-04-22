@@ -1,33 +1,33 @@
-// edit_quiz.js
+// public/js/edit_quiz.js
 (() => {
   document.addEventListener('DOMContentLoaded', init);
+  let preguntas = [], editIdx = null, quizId;
 
-  let preguntas = [];    // { id, enunciado, opciones: [], respuesta_correcta }
-  let editIdx   = null;  // índice de la pregunta en edición
-  let quizId;
-
-  // ——— Helpers ———
   const id = s => document.getElementById(s);
-  async function fetchJSON(url, opts) {
-    const r = await fetch(url, opts);
-    if (!r.ok) throw new Error((await r.json()).error || r.statusText);
-    return r.json();
+  async function fetchJSON(url,opts){ 
+    const r = await fetch(url,opts);
+    const ct = r.headers.get('Content-Type')||'';
+    const data = ct.includes('json')?await r.json():await r.text();
+    if(!r.ok) throw new Error((data.error||r.statusText));
+    return data;
   }
-  function toast(msg, tipo = 'info') {
-    const d = id('mensaje-estado');
-    d.textContent = msg;
-    d.className = tipo === 'success' ? 'mensaje-success' : 'mensaje-error';
-    d.style.display = 'block';
+  function toast(msg, type='info'){
+    const d=id('mensaje-estado');
+    d.textContent=msg;
+    d.className=`toast ${
+      type==='success'?'mensaje-success':
+      type==='error'  ?'mensaje-error':
+                       'mensaje-info'}`;
+    d.style.display='block';
     clearTimeout(d._t);
-    d._t = setTimeout(() => d.style.display = 'none', 4000);
+    d._t=setTimeout(()=>d.style.display='none',3000);
   }
-  function confirmModal(msg, onOk) {
-    let m = id('confirmModalGen');
-    if (!m) {
-      m = document.createElement('div');
-      m.id = 'confirmModalGen'; 
-      m.className = 'modal';
-      m.innerHTML = `
+  function confirmModal(text, onOk){
+    let m=id('confirmModalGen');
+    if(!m){
+      m=document.createElement('div');
+      m.id='confirmModalGen'; m.className='modal';
+      m.innerHTML=`
         <div class="modal-content">
           <span class="close" id="cmClose">&times;</span>
           <p id="cmMsg"></p>
@@ -37,232 +37,194 @@
           </div>
         </div>`;
       document.body.appendChild(m);
+      id('cmClose').onclick = id('cmCanc').onclick = ()=>m.style.display='none';
+      id('cmOk').onclick = ()=>{ m.style.display='none'; onOk(); };
     }
-    id('cmMsg').textContent = msg;
-    m.style.display = 'block';
-    const cerrar = () => m.style.display = 'none';
-    id('cmClose').onclick = id('cmCanc').onclick = cerrar;
-    id('cmOk').onclick = () => { cerrar(); onOk && onOk(); };
+    id('cmMsg').textContent=text;
+    m.style.display='block';
   }
-  function prepararLogout() {
-    const l = id('logout-button'),
-          c = id('cancelLogout'),
-          x = id('closeModal'),
-          ok= id('confirmLogout');
-    if (!l) return;
-    l.onclick = () => id('logoutModal').style.display = 'block';
-    if (c) c.onclick = () => id('logoutModal').style.display = 'none';
-    if (x) x.onclick = () => id('logoutModal').style.display = 'none';
-    if (ok) ok.onclick = () => fetch('/usuarios/logout').then(()=>location.href='/');
+  function prepararLogout(){
+    const b=id('logout-button');
+    if(!b) return;
+    b.onclick=()=>id('logoutModal').style.display='block';
+    id('closeModal').onclick = id('cancelLogout').onclick = ()=>id('logoutModal').style.display='none';
+    id('confirmLogout').onclick = ()=>fetch('/usuarios/logout').then(_=>location.href='/');
   }
 
-  // ——— Inicialización ———
-  async function init() {
+  async function init(){
     prepararLogout();
+    quizId = new URLSearchParams(location.search).get('id');
+    if(!quizId){ toast('Falta ?id','error'); return; }
 
-    // 1) leer ID de la URL
-    const params = new URLSearchParams(location.search);
-    quizId = params.get('id');
-    if (!quizId) { toast('Falta parámetro ?id', 'error'); return; }
+    // refs
+    const inT = id('titulo-quiz'),
+          inD = id('descripcion-quiz'),
+          fQ  = id('form-edit-quiz'),
+          bDel= id('btn-eliminar-quiz'),
+          fP  = id('form-nueva-pregunta'),
+          inE = id('enunciado'),
+          contO = id('opciones-container'),
+          selR = id('respuesta'),
+          bAdd = id('agregar-opcion'),
+          bRem = id('quitar-opcion'),
+          bCan = id('btn-cancelar-edicion'),
+          contP= id('contenedor-preguntas');
 
-    // 2) refs DOM
-    const tituloIn   = id('titulo-quiz');
-    const descIn     = id('descripcion-quiz');
-    const formQuiz   = id('form-edit-quiz');
-    const btnDelQuiz = id('btn-eliminar-quiz');
-
-    const secciónTit    = id('pregunta-titulo');
-    const formPreg      = id('form-nueva-pregunta');
-    const inEnunciado   = id('enunciado');
-    const contOpciones  = id('opciones-container');
-    const selResp       = id('respuesta');
-    const btnAddOpt     = id('agregar-opcion');
-    const btnRemOpt     = id('quitar-opcion');
-    const btnSavePreg   = id('btn-agregar-pregunta');
-    const btnCancelPreg = id('btn-cancelar-edicion');
-
-    const contPreguntas = id('contenedor-preguntas');
-
-    // 3) carga inicial: quiz + preguntas
-    try {
+    try{
       const quiz = await fetchJSON(`/api/quizzes/${quizId}`);
-      tituloIn.value = quiz.titulo;
-      descIn.value   = quiz.descripcion || '';
-      // si tu GET /api/quizzes/:id devolvía .preguntas, úsalo; si no:
-      preguntas = (await fetchJSON(`/api/preguntas?quizId=${quizId}`)) || [];
-    } catch (e) {
-      console.error(e);
-      toast('Error al cargar datos','error');
-      return;
+      inT.value=quiz.titulo; inD.value=quiz.descripcion||'';
+      preguntas = await fetchJSON(`/api/preguntas?quizId=${quizId}`);
+    }catch(e){
+      console.error(e); toast('Error al cargar','error'); return;
     }
+    renderPreguntas(); resetForm();
 
-    renderPreguntas();
-    resetFormPregunta();
-
-    // 4) listeners
-    formQuiz.addEventListener('submit', e => {
+    // listeners quiz
+    fQ.onsubmit = e=>{
       e.preventDefault();
-      confirmModal('¿Actualizar Quiz?', async () => {
-        try {
+      confirmModal('¿Actualizar Quiz?', async ()=>{
+        try{
           await fetchJSON(`/api/quizzes/${quizId}`, {
-            method: 'PUT',
+            method:'PUT',
             headers:{'Content-Type':'application/json'},
             body: JSON.stringify({
-              titulo: tituloIn.value.trim(),
-              descripcion: descIn.value.trim()
+              titulo: inT.value.trim(),
+              descripcion: inD.value.trim(),
+              preguntas: [] // el controlador solo actualiza metadata aquí
             })
           });
           toast('Quiz actualizado','success');
-        } catch (err) {
-          console.error(err);
-          toast(err.message,'error');
+        }catch(err){
+          console.error(err); toast(err.message,'error');
         }
       });
-    });
-    btnDelQuiz.addEventListener('click', () => {
-      confirmModal('¿Eliminar Quiz completo?', async () => {
-        try {
-          await fetchJSON(`/api/quizzes/${quizId}`, { method:'DELETE' });
-          toast('Quiz eliminado','success');
-          setTimeout(()=>location.href='adm_quizzes.html',500);
-        } catch (err) {
-          console.error(err);
-          toast(err.message,'error');
-        }
-      });
-    });
+    };
+ // ** ELIMINAR QUIZ **
+ bDel.onclick = () => confirmModal('¿Eliminar Quiz completo?', async () => {
+  try {
+    await fetchJSON(`/api/quizzes/${quizId}`, { method: 'DELETE' });
+    toast('Quiz eliminado','success');
+    // redirijo de vuelta a la lista principal con ruta absoluta
+    setTimeout(() => {
+      window.location.href = '/adm_quizzes.html';
+    }, 500);
+  } catch (err) {
+    console.error(err); toast(err.message,'error');
+  }
+});
 
-    formPreg.addEventListener('submit', guardarPregunta);
-    btnCancelPreg.addEventListener('click', resetFormPregunta);
-    btnAddOpt.addEventListener('click', () => addOption(''));
-    btnRemOpt.addEventListener('click', removeOption);
-    contOpciones.addEventListener('input', updateSelect);
-
-    // delegación en preguntas existentes
-    contPreguntas.addEventListener('click', e => {
-      const btn = e.target.closest('button[data-idx]');
-      if (!btn) return;
-      const idx = +btn.dataset.idx;
-      if (btn.dataset.act === 'edit') startEdit(idx);
-      else deletePregunta(idx);
-    });
+    // listeners pregunta
+    fP.onsubmit = guardarPregunta;
+    bCan.onclick= resetForm;
+    bAdd.onclick=()=>addOption('');
+    bRem.onclick=()=>{
+      if(contO.children.length>2) contO.removeChild(contO.lastChild);
+      updateSelect();
+    };
+    contO.oninput = updateSelect;
+    contP.onclick = e=>{
+      const btn=e.target.closest('button[data-act]'); if(!btn)return;
+      const i=+btn.dataset.idx;
+      btn.dataset.act==='edit'?startEdit(i):deletePregunta(i);
+    };
   }
 
-  // ——— UI / lógica de preguntas ———
-  function renderPreguntas() {
-    const cont = id('contenedor-preguntas');
-    cont.innerHTML = '';
-    preguntas.forEach((p,i) => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'pregunta-item';
-      // texto + opciones + respuesta
-      const optsHtml = p.opciones.map((o,j)=>`<p>${String.fromCharCode(65+j)}) ${o}</p>`).join('');
-      wrapper.innerHTML = `
+  function renderPreguntas(){
+    const cont=id('contenedor-preguntas'); cont.innerHTML='';
+    preguntas.forEach((p,i)=>{
+      const opts = Array.isArray(p.opciones)?p.opciones:[],
+            htmlOpts = opts.map((o,j)=>`<p>${'ABCD'[j]}) ${o.texto}</p>`).join(''),
+            resp = p.respuesta_correcta||'';
+      const div=document.createElement('div');
+      div.className='pregunta-item';
+      div.innerHTML=`
         <p><strong>${p.enunciado}</strong></p>
-        ${optsHtml}
-        <p><em>Respuesta:</em> ${p.respuesta_correcta}</p>
+        ${htmlOpts}
+        <p><em>Respuesta:</em> ${resp}</p>
         <button data-act="edit" data-idx="${i}">✏️</button>
-        <button data-act="del"  data-idx="${i}">🗑️</button>
-      `;
-      cont.appendChild(wrapper);
+        <button data-act="del"  data-idx="${i}">🗑️</button>`;
+      cont.appendChild(div);
     });
   }
 
-  function startEdit(idx) {
-    editIdx = idx;
-    const p = preguntas[idx];
-    id('pregunta-titulo').textContent = 'Editar Pregunta';
-    id('btn-agregar-pregunta').textContent = 'Guardar Cambios';
-    id('btn-cancelar-edicion').style.display = 'inline-block';
-
-    id('enunciado').value = p.enunciado;
-    const cont = id('opciones-container');
-    cont.innerHTML = '';
-    p.opciones.forEach(o => addOption(o));
-    updateSelect(p.respuesta_correcta);
-  }
-
-  function resetFormPregunta() {
+  function resetForm(){
     editIdx = null;
-    id('pregunta-titulo').textContent = 'Nueva Pregunta';
-    id('btn-agregar-pregunta').textContent = 'Agregar Pregunta';
-    id('btn-cancelar-edicion').style.display = 'none';
-    id('enunciado').value = '';
-    const cont = id('opciones-container');
-    cont.innerHTML = '';
-    addOption(''); addOption('');
+    id('pregunta-titulo').textContent='Nueva Pregunta';
+    id('btn-agregar-pregunta').textContent='Agregar Pregunta';
+    id('btn-cancelar-edicion').style.display='none';
+    id('enunciado').value='';
+    id('opciones-container').innerHTML='';
+    addOption(); addOption();
     updateSelect();
   }
 
-  async function guardarPregunta(e) {
+  function startEdit(i){
+    editIdx = i;
+    const p = preguntas[i];
+    id('pregunta-titulo').textContent='Editar Pregunta';
+    id('btn-agregar-pregunta').textContent='Guardar Cambios';
+    id('btn-cancelar-edicion').style.display='inline-block';
+    id('enunciado').value=p.enunciado;
+    const cont=id('opciones-container'); cont.innerHTML='';
+    (p.opciones||[]).forEach(o=>addOption(o.texto));
+    updateSelect(p.respuesta_correcta);
+  }
+
+  async function guardarPregunta(e){
     e.preventDefault();
-    const enun = id('enunciado').value.trim();
-    const opts = [...id('opciones-container').querySelectorAll('input')]
-                  .map(i=>i.value.trim()).filter(v=>v);
-    const resp = id('respuesta').value;
-    if (!enun || opts.length < 2) { toast('Enunciado + ≥2 opciones','error'); return; }
+    const enun = id('enunciado').value.trim(),
+          opts = [...id('opciones-container').querySelectorAll('input')].map(i=>i.value.trim()).filter(v=>v),
+          resp = id('respuesta').value;
+    if(!enun||opts.length<2||!resp) { toast('Datos incompletos','error'); return; }
 
     const payload = { quiz_id: quizId, enunciado: enun, opciones: opts, respuesta_correcta: resp };
-    const url    = editIdx===null ? '/api/preguntas' : `/api/preguntas/${preguntas[editIdx].id}`;
-    const method = editIdx===null ? 'POST' : 'PUT';
+    const url = editIdx===null
+      ? '/api/preguntas'
+      : `/api/preguntas/${preguntas[editIdx].id}`;
+    const method = editIdx===null?'POST':'PUT';
 
-    try {
+    try{
       await fetchJSON(url, {
-        method,
-        headers:{'Content-Type':'application/json'},
+        method, headers:{'Content-Type':'application/json'},
         body: JSON.stringify(payload)
       });
-      toast(editIdx===null ? 'Pregunta creada' : 'Pregunta actualizada','success');
-
-      // recarga
+      toast(editIdx===null?'Pregunta creada':'Pregunta actualizada','success');
       preguntas = await fetchJSON(`/api/preguntas?quizId=${quizId}`);
-      renderPreguntas();
-      resetFormPregunta();
-    } catch (err) {
-      console.error(err);
-      toast('Error interno al crear/actualizar pregunta','error');
+      renderPreguntas(); resetForm();
+    }catch(err){
+      console.error(err); toast(err.message,'error');
     }
   }
 
-  function deletePregunta(idx) {
-    confirmModal('¿Eliminar esta pregunta?', async () => {
-      try {
-        await fetchJSON(`/api/preguntas/${preguntas[idx].id}`, { method:'DELETE' });
+  function deletePregunta(i){
+    confirmModal('¿Eliminar esta pregunta?', async ()=>{
+      try{
+        await fetchJSON(`/api/preguntas/${preguntas[i].id}`,{method:'DELETE'});
         toast('Pregunta eliminada','success');
-        preguntas.splice(idx,1);
-        renderPreguntas();
-        resetFormPregunta();
-      } catch (err) {
-        console.error(err);
-        toast('Error al eliminar pregunta','error');
+        preguntas.splice(i,1);
+        renderPreguntas(); resetForm();
+      }catch(err){
+        console.error(err); toast(err.message,'error');
       }
     });
   }
 
-  // — opciones dinámicas —
-  function addOption(val) {
-    const div = document.createElement('div');
-    div.className = 'opcion-item';
-    div.innerHTML = `<input type="text" value="${val}" required>`;
+  function addOption(val=''){
+    const div=document.createElement('div');
+    div.className='opcion-item';
+    div.innerHTML=`<input type="text" value="${val}" required>`;
     id('opciones-container').appendChild(div);
-    updateSelect();
   }
-  function removeOption() {
-    const cont = id('opciones-container');
-    if (cont.children.length > 2) {
-      cont.removeChild(cont.lastElementChild);
-      updateSelect();
-    }
-  }
-  function updateSelect(selected) {
-    const sel = id('respuesta');
-    sel.innerHTML = '';
-    [...id('opciones-container').querySelectorAll('input')].forEach((inp,i) => {
-      const opt = document.createElement('option');
-      opt.value = String.fromCharCode(65 + i);
-      opt.textContent = `${opt.value}) ${inp.value}`;
+
+  function updateSelect(selected){
+    const sel=id('respuesta'); sel.innerHTML='';
+    [...id('opciones-container').querySelectorAll('input')].forEach((inp,i)=>{
+      const opt=document.createElement('option');
+      opt.value='ABCD'[i];
+      opt.textContent=`${opt.value}) ${inp.value}`;
       sel.appendChild(opt);
     });
-    if (selected) sel.value = selected;
+    if(selected) sel.value=selected;
   }
+
 })();
