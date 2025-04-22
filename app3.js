@@ -11,7 +11,7 @@ const preguntaRoutes = require('./routes/preguntaRoutes');
 const pubQuizzesRoutes = require('./routes/pubQuizzesRoutes');
 const testRoutes = require('./routes/testRoutes');
 const emparejamientosRoutes = require('./routes/emparejamientosRoutes');
-
+const pubEmparejamientosRouter = require('./routes/pubEmparejamientosRouter');
 const app = express();
 
 
@@ -69,6 +69,7 @@ app.use('/api/preguntas', preguntaRoutes);
 app.use('/api/pubQuizzes', pubQuizzesRoutes);
 app.use('/api/tests', testRoutes);
 app.use('/api', emparejamientosRoutes);
+app.use('/api/emparejamientos', pubEmparejamientosRouter);
 // Ruta para la pantalla de inicio (luego de iniciar sesión)
 app.get('/inicio', (req, res) => {
     if (!req.session.nombreUsuario) {

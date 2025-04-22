@@ -173,34 +173,50 @@
       - Cada columna: 1fr (25% del ancho total menos gap)
       - Ajusta el gap y el padding para controlar márgenes
    */
-   .pub-quizzes-layout {
-     display: grid;
-     grid-template-columns: repeat(4, 1fr);
-     gap: 20px;
-     align-items: start;
-     
-     width: 100%;
-     box-sizing: border-box;
-     padding: 20px; /* un poco menos agresivo que 40px */
-     margin: 0;
-   
-     /* Para scroll interno en cada sección */
-     height: calc(100vh - 80px);
-     overflow: hidden;
-   }
-   
-   /* Cada sección: tarjeta con scroll propio */
-   .pub-quizzes-layout section {
-     background-color: #fff;
-     border-radius: 8px;
-     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-     padding: 20px;
-   
-     display: flex;
-     flex-direction: column;
-     overflow-y: auto;
-   }
-   
+  /* ================================
+   2 FILAS DE 4 COLUMNAS
+================================ */
+
+.pub-quizzes-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 20px;
+}
+
+/* Cada fila: 4 secciones lado a lado */
+.fila-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* Tarjetas de cada sección */
+.fila-grid section {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Scrollbar limpio */
+.fila-grid section::-webkit-scrollbar {
+  width: 8px;
+}
+.fila-grid section::-webkit-scrollbar-track {
+  background: transparent;
+}
+.fila-grid section::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+
+
    /* ==============================================
       TITULOS
       ============================================== */

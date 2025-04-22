@@ -31,12 +31,24 @@
       </div>
     </div>
   </div>
+  <!-- Modal genérico de confirmación de acción -->
+<div id="actionConfirmModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeActionModal">&times;</span>
+    <h2 id="actionConfirmText">¿Confirmar acción?</h2>
+    <div class="modal-buttons">
+      <button id="confirmActionButton" class="confirm-button">Confirmar</button>
+      <button id="cancelActionButton" class="cancel-button">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 
   <!-- Contenedor para mensajes de estado -->
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
   <main class="pub-quizzes-layout">
-    
+    <div class="fila-grid"> <!-- Fila para quizzes -->
     <!-- Sección para mostrar los quizzes propios del profesor -->
     <section id="mis-quizzes">
       <h2>Mis Quizzes</h2>
@@ -65,7 +77,7 @@
         <select id="quiz-select">
           <!-- Opciones se llenarán con los quizzes propios -->
         </select>
-        <br>
+     
         <!-- Usamos un input con datalist para un buscador/desplegable -->
         <label for="grupo-input">Seleccione el Grupo:</label>
         <input type="text" id="grupo-input" list="grupo-list" placeholder="Buscar grupo...">
@@ -81,10 +93,47 @@
       <div id="contenedor-asignaciones">
         <!-- Aquí se generará la lista de grupos y sus quizzes -->
       </div>
+
+    </section>
+
+  </div>
+  <div class="fila-grid"> <!-- Fila para emparejamientos -->
+    <section id="mis-emparejamientos">
+      <h2>Mis Emparejamientos</h2>
+      <ul id="lista-mis-emparejamientos">
+        <!-- Se cargarán dinámicamente los emparejamientos propios -->
+      </ul>
     </section>
     
+    <!-- NUEVA SECCION: Emparejamientos -->
+<section id="emparejamientos-publicos">
+  <h2>Emparejamientos Públicos</h2>
+  <ul id="lista-public-emparejamientos">
+    <!-- Se cargarán dinámicamente -->
+  </ul>
+</section>
+
+<section id="asignar-emparejamiento">
+  <h2>Asignar Emparejamiento a Grupo</h2>
+  <form id="form-asignar-emparejamiento">
+    <label for="emparejamiento-select">Selecciona un Emparejamiento:</label>
+    <select id="emparejamiento-select"></select>
+
+    <label for="grupo-emparejamiento-input">Seleccione el Grupo:</label>
+    <input type="text" id="grupo-emparejamiento-input" list="grupo-list" placeholder="Buscar grupo...">
+
+    <button type="submit">Asignar Emparejamiento</button>
+  </form>
+</section>
+
+<section id="asignaciones-emparejamientos">
+  <h2>Grupos y sus Emparejamientos Asignados</h2>
+  <div id="contenedor-asignaciones-emparejamientos"></div>
+</section>
+</div>
   </main>
 
   <script src="pub_quizzes.js"></script>
+  <script src="pub_emparejamientos.js"></script>
 </body>
 </html>
