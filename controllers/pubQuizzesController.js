@@ -92,8 +92,9 @@ exports.publicarQuiz = (req, res) => {
 
           let preguntasProcesadas = 0;
           preguntas.forEach(preg => {
-            const sqlInsertPreg = 'INSERT INTO preguntas (quiz_id, texto) VALUES (?, ?)';
-            db.query(sqlInsertPreg, [nuevoQuizId, preg.texto], (err, resultPreg) => {
+            const sqlInsertPreg = 'INSERT INTO preguntas (quiz_id, texto, imagen) VALUES (?, ?, ?)';
+;
+db.query(sqlInsertPreg, [nuevoQuizId, preg.texto, preg.imagen || null], (err, resultPreg) => {
               if (err) {
                 console.error(err);
               }
@@ -269,3 +270,24 @@ exports.desasignarQuiz = (req, res) => {
     res.json({ mensaje: 'Quiz desasignado correctamente' });
   });
 };
+// Marcar un quiz como privado (publico = 0)
+exports.hacerPrivado = (req, res) => {
+  const idProfesor = req.session.usuarioId;
+  const { quizId } = req.body;
+  if (!quizId) {
+    return res.status(400).json({ error: 'ID de quiz no especificado' });
+  }
+
+  const sql = 'UPDATE quizzes SET publico = 0 WHERE id = ? AND id_profesor = ?';
+  db.query(sql, [quizId, idProfesor], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Error al hacer privado el quiz' });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Quiz no encontrado o no te pertenece' });
+    }
+    res.json({ success: 'Quiz marcado como privado' });
+  });
+};
+

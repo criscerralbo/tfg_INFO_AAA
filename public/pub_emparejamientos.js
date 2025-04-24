@@ -64,40 +64,60 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!lista || !select) return;
   
     try {
-        const res = await fetch('/api/emparejamientos/mis');
-        const data = await res.json();
-        select.innerHTML = '';
-        lista.innerHTML = '';
-      
-        data.forEach(e => {
-          const opt = document.createElement('option');
-          opt.value = e.id;
-          opt.textContent = e.nombre;
-          select.appendChild(opt);
-      
-          const li = document.createElement('li');
-          li.className = "quiz-card";
-          li.innerHTML = `
-            <div class="quiz-card-title"><strong>${e.nombre}</strong></div>
-            <div class="quiz-card-description">
-              ${e.descripcion || ''}
-              ${e.publico ? ' <em>(Público)</em>' : ''}
-            </div>
-           <div class="quiz-card-actions">
+      const res = await fetch('/api/emparejamientos/mis');
+      const data = await res.json();
+      select.innerHTML = '';
+      lista.innerHTML = '';
+  
+      data.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.textContent = e.nombre;
+        select.appendChild(opt);
+  
+        const li = document.createElement('li');
+        li.className = "quiz-card";
+        li.innerHTML = `
+          <div class="quiz-card-title"><strong>${e.nombre}</strong></div>
+          <div class="quiz-card-description">
+            ${e.descripcion || ''} ${e.publico ? ' <em>(Público)</em>' : ''}
+          </div>
+          <div class="quiz-card-actions">
             <button type="button" class="edit-button" onclick="mostrarModalConfirmacion('Editar este par?', () => window.location.href='edit_emparejamiento.html?id=${e.id}')">Editar</button>
-            ${!e.publico ? 
-              `<button class="public-button" type="button" onclick="mostrarModalConfirmacion('Hacer público este par?', () => hacerPublico(${e.id}))">Hacer público</button>` : ''}
-              
-         
+            ${
+              e.publico
+                ? `<button class="public-button" type="button" onclick="mostrarModalConfirmacion('¿Hacer privado este emparejamiento?', () => hacerPrivadoEmparejamiento(${e.id}))">Hacer privado</button>`
+                : `<button class="public-button" type="button" onclick="mostrarModalConfirmacion('¿Hacer público este emparejamiento?', () => hacerEmparejamientoPublico(${e.id}))">Hacer público</button>`
+            }
           </div>
         `;
-          lista.appendChild(li);
-        });
-      } catch (err) {
-        console.error('Error al cargar emparejamientos del profesor');
-      }
-      
+        lista.appendChild(li);
+      });
+    } catch (err) {
+      console.error('Error al cargar emparejamientos del profesor');
+    }
   }
+  async function hacerPrivadoEmparejamiento(id) {
+    try {
+      const res = await fetch('/api/emparejamientos/hacerPrivado', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emparejamientoId: id })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        mostrarMensaje('Emparejamiento marcado como privado.', 'success');
+        cargarMisEmparejamientos();
+        cargarPublicEmparejamientos();
+      } else {
+        mostrarMensaje(data.error || 'Error al hacer privado.', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      mostrarMensaje('Error al conectar con el servidor.', 'error');
+    }
+  }
+  
   
   async function hacerEmparejamientoPublico(id) {
     try {

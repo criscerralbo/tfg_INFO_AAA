@@ -98,7 +98,7 @@
     }
     
    // === Quizzes ===
-  async function cargarMisQuizzes() {
+   async function cargarMisQuizzes() {
     try {
       const res = await fetch('/api/pubQuizzes/mis');
       const lista = document.getElementById('lista-mis-quizzes');
@@ -109,13 +109,16 @@
         li.className = 'quiz-card';
         li.innerHTML = `
           <div class="quiz-card-title"><strong>${q.titulo}</strong></div>
-          <div class="quiz-card-description">${q.descripcion || ''}${q.publico ? ' <em>(Público)</em>' : ''}</div>
+          <div class="quiz-card-description">
+            ${q.descripcion || ''} ${q.publico ? '<em>(Público)</em>' : ''}
+          </div>
           <div class="quiz-card-actions">
             <button type="button" class="edit-button" onclick="mostrarModalConfirmacion('Editar este quiz?', () => window.location.href='edit_quiz.html?id=${q.id}')">Editar</button>
-            ${!q.publico ? 
-              `<button class="public-button" type="button" onclick="mostrarModalConfirmacion('Hacer público este quiz?', () => hacerPublico(${q.id}))">Hacer público</button>` : ''}
-              
-         
+            ${
+              q.publico
+                ? `<button class="public-button" type="button" onclick="mostrarModalConfirmacion('¿Hacer privado este quiz?', () => hacerPrivado(${q.id}))">Hacer privado</button>`
+                : `<button class="public-button" type="button" onclick="mostrarModalConfirmacion('¿Hacer público este quiz?', () => hacerPublico(${q.id}))">Hacer público</button>`
+            }
           </div>
         `;
         lista.appendChild(li);
@@ -125,8 +128,29 @@
       mostrarMensaje('Error al conectar.', 'error');
     }
   }
+  
     
-    
+  async function hacerPrivado(quizId) {
+    try {
+      const res = await fetch('/api/pubQuizzes/hacerPrivado', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quizId })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        mostrarMensaje('Quiz marcado como privado.', 'success');
+        cargarMisQuizzes();
+        cargarQuizSelect();
+      } else {
+        mostrarMensaje(data.error || 'Error al actualizar visibilidad.', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      mostrarMensaje('Error al conectar con el servidor.', 'error');
+    }
+  }
+  
   async function cargarPublicQuizzes() {
     try {
       const res = await fetch('/api/pubQuizzes/publicos');

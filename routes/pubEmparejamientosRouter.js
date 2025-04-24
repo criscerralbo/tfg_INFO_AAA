@@ -19,5 +19,6 @@ router.get('/asignaciones', controller.getAsignaciones);
 router.post('/hacerPublico', controller.hacerPublico);
 router.delete('/desasignar', controller.desasignarEmparejamiento);
 
+router.post('/hacerPrivado', controller.hacerPrivado);
 
 module.exports = router;

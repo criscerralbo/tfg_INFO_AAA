@@ -20,6 +20,20 @@ exports.getPublicEmparejamientos = (req, res) => {
     res.json(results);
   });
 };
+// backend: marcar emparejamiento como privado
+exports.hacerPrivado = (req, res) => {
+  const idProfesor = req.session.usuarioId;
+  const { emparejamientoId } = req.body;
+
+  if (!emparejamientoId) return res.status(400).json({ error: 'ID de emparejamiento requerido' });
+
+  const sql = 'UPDATE emparejamientos SET publico = 0 WHERE id = ? AND profesor_id = ?';
+  db.query(sql, [emparejamientoId, idProfesor], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Error al hacer privado el emparejamiento' });
+    res.json({ success: 'Emparejamiento marcado como privado' });
+  });
+};
+
 
 // Publicar un emparejamiento (clonar en repertorio propio)
 exports.publicarEmparejamiento = (req, res) => {

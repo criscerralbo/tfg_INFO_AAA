@@ -17,4 +17,6 @@ router.post('/hacerPublico', pubQuizzesController.hacerPublico);
 
 router.get('/asignaciones', pubQuizzesController.getAsignaciones);
 router.delete('/desasignar', pubQuizzesController.desasignarQuiz);
+router.post('/hacerPrivado', pubQuizzesController.hacerPrivado);
+
 module.exports = router;

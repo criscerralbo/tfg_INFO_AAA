@@ -2,11 +2,10 @@
 const express = require('express');
 const router  = express.Router();
 const pc      = require('../controllers/preguntaController');
+const upload = require('../utils/upload'); // <- Asegúrate de que el path sea correcto
 
-// /api/preguntas?quizId=123
-router.get   ('/',      pc.getPreguntasByQuiz);
-router.post  ('/',      pc.createPregunta);
-router.put   ('/:id',   pc.updatePregunta);
-router.delete('/:id',   pc.deletePregunta);
-
+router.get   ('/',                    pc.getPreguntasByQuiz);
+router.delete('/:id',                pc.deletePregunta);
+router.post   ('/', upload.single('imagen'), pc.createPregunta);
+router.put('/:id', upload.single('imagen'), pc.updatePregunta);
 module.exports = router;

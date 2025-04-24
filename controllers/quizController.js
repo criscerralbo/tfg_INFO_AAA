@@ -98,69 +98,31 @@ exports.getQuizById = (req, res) => {
     });
   });
 };
-
-// Actualizar quiz y sus preguntas/opciones
+// Actualizar solo título y descripción del quiz
 exports.updateQuiz = (req, res) => {
   const quizId = req.params.id;
   const idProfesor = req.session.usuarioId;
-  const { titulo, descripcion, preguntas } = req.body;
+  const { titulo, descripcion } = req.body;
 
-  // 1) Actualizar título/descr
+  if (!titulo) {
+    return res.status(400).json({ error: 'El título es obligatorio' });
+  }
+
   const sqlUpdateQuiz = 'UPDATE quizzes SET titulo = ?, descripcion = ? WHERE id = ? AND id_profesor = ?';
-  db.query(sqlUpdateQuiz, [titulo, descripcion, quizId, idProfesor], (err, quizResult) => {
+  db.query(sqlUpdateQuiz, [titulo, descripcion, quizId, idProfesor], (err, result) => {
     if (err) {
+      console.error(err);
       return res.status(500).json({ error: 'Error al actualizar el quiz' });
     }
-    if (!preguntas || !Array.isArray(preguntas)) {
-      return res.json({ success: 'Quiz actualizado (sin cambios en preguntas)' });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Quiz no encontrado o sin permiso' });
     }
 
-    // 2) Manejar las preguntas:
-    //    Obtener las preguntas existentes en DB para "diferenciar" qué insertar, actualizar, eliminar
-    const sqlGetPreguntas = 'SELECT id FROM preguntas WHERE quiz_id = ?';
-    db.query(sqlGetPreguntas, [quizId], (err, rowsPreg) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error al obtener preguntas 33' });
-      }
-      const existentesIds = rowsPreg.map(r => r.id);
-
-      // IDs que llegan en el body (excluyendo null)
-      const idsEnviados = preguntas.map(p => p.id).filter(Boolean);
-
-      // Preguntas a eliminar
-      const preguntasAEliminar = existentesIds.filter(id => !idsEnviados.includes(id));
-      if (preguntasAEliminar.length > 0) {
-        const sqlDel = `DELETE FROM preguntas WHERE id IN (${preguntasAEliminar.join(',')})`;
-        db.query(sqlDel, (err) => {
-          if (err) console.error('Error al eliminar preguntas:', err);
-        });
-      }
-
-      // Para cada pregunta en el body => insertar o actualizar
-      preguntas.forEach((preg) => {
-        if (!preg.id) {
-          // Insertar pregunta
-          const sqlInsertPreg = 'INSERT INTO preguntas (quiz_id, texto) VALUES (?, ?)';
-          db.query(sqlInsertPreg, [quizId, preg.texto], (err, resultPreg) => {
-            if (err) console.error(err);
-            const newPregId = resultPreg.insertId;
-            // Insertar opciones
-            insertOrUpdateOpciones(newPregId, preg.opciones || []);
-          });
-        } else if (existentesIds.includes(preg.id)) {
-          // Actualizar texto
-          const sqlUpdPreg = 'UPDATE preguntas SET texto = ? WHERE id = ?';
-          db.query(sqlUpdPreg, [preg.texto, preg.id], (err) => {
-            if (err) console.error(err);
-          });
-          // Manejar opciones
-          insertOrUpdateOpciones(preg.id, preg.opciones || []);
-        }
-      });
-
-      return res.json({ success: 'Quiz actualizado con sus preguntas/opciones' });
-    });
+    res.json({ success: 'Quiz actualizado correctamente' });
   });
+
+
 
   // Función auxiliar para insertar/actualizar opciones
   function insertOrUpdateOpciones(preguntaId, opciones) {

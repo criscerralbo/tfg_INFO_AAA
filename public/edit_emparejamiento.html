@@ -25,7 +25,7 @@
     /* layout de 3 columnas */
     .edit-quiz-layout {
       display: grid;
-      grid-template-columns: 300px 1fr 300px;
+      grid-template-columns: repeat(3, 1fr); /* ← columnas iguales */
       gap: 24px;
       padding: 16px;
     }
@@ -34,11 +34,21 @@
       padding: 16px;
       border: 1px solid #ddd;
       border-radius: 8px;
+      max-height: 600px;
+     overflow-y: auto;
     }
     .edit-quiz-layout button {
       width: 100%;
       margin-top: 8px;
     }
+    #buscador-pares {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
 
     /* Toast */
     .toast {
@@ -119,6 +129,7 @@
     <!-- Columna 3: Lista de pares -->
     <section>
       <h3>Pares existentes</h3>
+      <input type="text" id="buscador-pares" placeholder="Buscar...">
       <ul id="lista-pares"></ul>
     </section>
   </main>

@@ -123,17 +123,29 @@
 
     function pintarLista() {
       listaUI.innerHTML = '';
-      pares.forEach((p,idx) => {
+      pares.forEach((p, idx) => {
         const li = document.createElement('li');
         li.innerHTML = `
-          <img src="${p.imagen}" width="45" style="vertical-align:middle;margin-right:8px">
-          ${p.palabra}
-          <button class="btn-list" data-idx="${idx}" data-act="edit">✏️</button>
-          <button class="btn-list" data-idx="${idx}" data-act="del">🗑️</button>
+          <img src="${p.imagen}" alt="imagen par ${idx}">
+          <span style="flex-grow: 1;">${p.palabra}</span>
+          <button class="btn-list" data-idx="${idx}" data-act="edit" title="Editar">✏️</button>
+          <button class="btn-list" data-idx="${idx}" data-act="del" title="Eliminar">🗑️</button>
         `;
         listaUI.appendChild(li);
       });
     }
+    document.getElementById('buscador-pares')?.addEventListener('input', filtrarLista);
+
+function filtrarLista(e) {
+  const texto = e.target.value.toLowerCase();
+  const items = document.querySelectorAll('#lista-pares li');
+  items.forEach(item => {
+    const textoItem = item.textContent.toLowerCase();
+    item.style.display = textoItem.includes(texto) ? '' : 'none';
+  });
+}
+
+    
 
     async function subirImg(file) {
       if (!file) return;

@@ -179,7 +179,7 @@
    /* Contenedor principal con 3 columnas */
    .edit-quiz-layout {
      display: grid;
-     grid-template-columns: 1fr 1fr 1fr; /* 3 columnas iguales */
+     grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
      gap: 20px;                          /* Espacio entre columnas */
      align-items: stretch;               /* Todas las columnas misma altura */
      width: 100%;
@@ -303,4 +303,62 @@
        grid-template-columns: 1fr;     /* 1 columna en pantallas pequeñas */
      }
    }
-   
+   /* Eliminar puntos de la lista y ajustar diseño */
+#lista-pares {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Contenedor de cada ítem */
+#lista-pares li {
+  display: flex;
+  align-items: center;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+/* Imagen más grande */
+#lista-pares img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  margin-right: 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+/* Botones más pequeños */
+#lista-pares .btn-list {
+  background: none;
+  border: none;
+  font-size: 16px;
+  margin-left: auto;
+  margin-right: 4px;
+  cursor: pointer;
+  padding: 2px 6px;
+  color: #555;
+}
+.edit-quiz-layout > section {
+  min-width: 0;
+  width: 100%;
+}
+.edit-quiz-layout section {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+/* Buscador preguntas */
+#buscador-preguntas {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
