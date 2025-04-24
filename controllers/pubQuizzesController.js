@@ -204,19 +204,34 @@ exports.getAsignaciones = (req, res) => {
 exports.asignarQuiz = (req, res) => {
   const idProfesor = req.session.usuarioId;
   const { quizId, grupo } = req.body;
+
   if (!quizId || !grupo) {
     return res.status(400).json({ error: 'Faltan datos para asignar el quiz' });
   }
-  // Se asume que existe una tabla "quiz_asignaciones" con las columnas: id, id_quiz, id_grupo, id_profesor
-  const sqlAsignar = 'INSERT INTO quiz_asignaciones (id_quiz, id_grupo, id_profesor) VALUES (?, ?, ?)';
-  db.query(sqlAsignar, [quizId, grupo, idProfesor], (err, result) => {
+
+  // 1. Verificar si ya está asignado
+  const checkSQL = 'SELECT 1 FROM quiz_asignaciones WHERE id_quiz = ? AND id_grupo = ?';
+  db.query(checkSQL, [quizId, grupo], (err, rows) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ error: 'Error al asignar el quiz' });
+      return res.status(500).json({ error: 'Error al verificar asignación' });
     }
-    res.status(201).json({ success: 'Quiz asignado correctamente' });
+    if (rows.length > 0) {
+      return res.status(400).json({ error: 'Este quiz ya está asignado a este grupo' });
+    }
+
+    // 2. Insertar si no existe
+    const insertSQL = 'INSERT INTO quiz_asignaciones (id_quiz, id_grupo, id_profesor) VALUES (?, ?, ?)';
+    db.query(insertSQL, [quizId, grupo, idProfesor], (err2) => {
+      if (err2) {
+        console.error(err2);
+        return res.status(500).json({ error: 'Error al asignar el quiz' });
+      }
+      res.status(201).json({ success: 'Quiz asignado correctamente' });
+    });
   });
 };
+
 
 // Hacer público un quiz propio para que sea visible para otros profesores
 exports.hacerPublico = (req, res) => {
@@ -238,4 +253,19 @@ exports.hacerPublico = (req, res) => {
       res.json({ success: 'Quiz publicado correctamente' });
     });
   };
-  
+  // Desasignar quiz de grupo
+exports.desasignarQuiz = (req, res) => {
+  const { quizId, grupoId } = req.body;
+  if (!quizId || !grupoId) {
+    return res.status(400).json({ error: 'Datos incompletos' });
+  }
+
+  const sql = 'DELETE FROM quiz_asignaciones WHERE id_quiz = ? AND id_grupo = ?';
+  db.query(sql, [quizId, grupoId], (err) => {
+    if (err) {
+      console.error('Error al desasignar quiz:', err);
+      return res.status(500).json({ error: 'Error al desasignar' });
+    }
+    res.json({ mensaje: 'Quiz desasignado correctamente' });
+  });
+};

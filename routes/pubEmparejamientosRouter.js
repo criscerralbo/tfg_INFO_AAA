@@ -17,6 +17,7 @@ router.post('/asignar', controller.asignarEmparejamiento);
 // Obtener asignaciones de emparejamientos
 router.get('/asignaciones', controller.getAsignaciones);
 router.post('/hacerPublico', controller.hacerPublico);
+router.delete('/desasignar', controller.desasignarEmparejamiento);
 
 
 module.exports = router;

@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const empId = document.getElementById('emparejamiento-select').value;
         const grupo = document.getElementById('grupo-emparejamiento-input').value.trim();
         if (!empId || !grupo) return mostrarMensaje('Campos requeridos.', 'error');
+       
+        mostrarModalConfirmacion('Asignar este emparejamiento al grupo seleccionado?', async () => {
+     
         try {
           const res = await fetch('/api/emparejamientos/asignar', {
             method: 'POST',
@@ -47,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
           mostrarMensaje('Error al conectar con el servidor.', 'error');
         }
       });
+    });
     }
   
     cargarMisEmparejamientos();
@@ -156,29 +160,77 @@ document.addEventListener('DOMContentLoaded', () => {
   async function cargarAsignacionesEmparejamientos() {
     const cont = document.getElementById('contenedor-asignaciones-emparejamientos');
     if (!cont) return;
+  
     try {
       const res = await fetch('/api/emparejamientos/asignaciones');
       const data = await res.json();
       cont.innerHTML = '';
+  
+      // Agrupamos por ID único
+      const gruposUnicos = {};
       data.forEach(g => {
+        if (!gruposUnicos[g.id]) {
+          gruposUnicos[g.id] = {
+            nombre: g.nombre,
+            emparejamientos: []
+          };
+        }
+        g.emparejamientos.forEach(e => {
+          // Evitar duplicados exactos
+          if (!gruposUnicos[g.id].emparejamientos.find(ex => ex.id === e.id)) {
+            gruposUnicos[g.id].emparejamientos.push(e);
+          }
+        });
+      });
+  
+      Object.entries(gruposUnicos).forEach(([grupoId, grupo]) => {
         const div = document.createElement('div');
         div.classList.add('grupo-asignado');
+  
         const h3 = document.createElement('h3');
-        h3.textContent = `Grupo: ${g.nombre}`;
+        h3.textContent = `Grupo: ${grupo.nombre}`;
         div.appendChild(h3);
+  
         const ul = document.createElement('ul');
-        g.emparejamientos.forEach(e => {
+        grupo.emparejamientos.forEach(e => {
           const li = document.createElement('li');
-          li.textContent = e.nombre;
+          li.innerHTML = `
+            ${e.nombre}
+            <button class="remove-button" onclick="mostrarModalConfirmacion('¿Desasignar este emparejamiento del grupo?', () => desasignarEmparejamiento(${e.id}, ${grupoId}))">
+              Desasignar
+            </button>
+          `;
           ul.appendChild(li);
         });
+  
         div.appendChild(ul);
         cont.appendChild(div);
       });
+  
     } catch (err) {
       console.error('Error al cargar asignaciones emparejamientos');
     }
   }
+  async function desasignarEmparejamiento(empId, grupoId) {
+    try {
+      const res = await fetch('/api/emparejamientos/desasignar', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emparejamientoId: empId, grupoId })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        mostrarMensaje('Emparejamiento desasignado.', 'success');
+        cargarAsignacionesEmparejamientos();
+      } else {
+        mostrarMensaje(data.error || 'Error al desasignar.', 'error');
+      }
+    } catch (err) {
+      console.error('Error al desasignar emparejamiento');
+      mostrarMensaje('Error al conectar con el servidor.', 'error');
+    }
+  }
+  
   
   function mostrarMensaje(mensaje, tipo) {
     const div = document.getElementById('mensaje-estado');

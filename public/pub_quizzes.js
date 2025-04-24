@@ -222,30 +222,30 @@
       const res = await fetch('/api/pubQuizzes/asignaciones');
       if (res.ok) {
         const grupos = await res.json(); 
-        // Estructura: [ { id, nombre, quizzes: [ { id, titulo }, ... ] }, ... ]
-  
         const contenedor = document.getElementById('contenedor-asignaciones');
         contenedor.innerHTML = '';
   
         grupos.forEach(grupo => {
-          // Creamos un div para cada grupo
           const grupoDiv = document.createElement('div');
           grupoDiv.classList.add('grupo-asignado');
   
-          // Título del grupo
           const tituloGrupo = document.createElement('h3');
           tituloGrupo.textContent = `Grupo: ${grupo.nombre}`;
           grupoDiv.appendChild(tituloGrupo);
   
-          // Lista de quizzes
           const ul = document.createElement('ul');
           grupo.quizzes.forEach(q => {
             const li = document.createElement('li');
-            li.textContent = q.titulo;
+            li.innerHTML = `
+              ${q.titulo}
+              <button onclick="mostrarModalConfirmacion('¿Desasignar este quiz?', () => desasignarQuiz(${q.id}, ${grupo.id}))">
+                Desasignar
+              </button>
+            `;
             ul.appendChild(li);
           });
-          grupoDiv.appendChild(ul);
   
+          grupoDiv.appendChild(ul);
           contenedor.appendChild(grupoDiv);
         });
       } else {
@@ -256,6 +256,26 @@
       mostrarMensaje('Error al conectar con el servidor.', 'error');
     }
   }
+  async function desasignarQuiz(quizId, grupoId) {
+    try {
+      const res = await fetch('/api/pubQuizzes/desasignar', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quizId, grupoId })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        mostrarMensaje('Quiz desasignado.', 'success');
+        cargarAsignaciones();
+      } else {
+        mostrarMensaje(data.error || 'Error al desasignar.', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      mostrarMensaje('Error al conectar.', 'error');
+    }
+  }
+  
     
     // Función para hacer público un quiz propio
     async function hacerPublico(quizId) {

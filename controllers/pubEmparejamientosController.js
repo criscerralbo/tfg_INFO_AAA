@@ -97,18 +97,39 @@ exports.getAsignaciones = (req, res) => {
   });
 };
 
-// Asignar emparejamiento a grupo
 exports.asignarEmparejamiento = (req, res) => {
   const idProfesor = req.session.usuarioId;
   const { emparejamientoId, grupo } = req.body;
-  if (!emparejamientoId || !grupo) return res.status(400).json({ error: 'Faltan datos' });
 
-  const sql = 'INSERT INTO emparejamientos_asignaciones (id_emparejamiento, id_grupo, id_profesor) VALUES (?, ?, ?)';
-  db.query(sql, [emparejamientoId, grupo, idProfesor], (err) => {
-    if (err) return res.status(500).json({ error: 'Error al asignar' });
-    res.status(201).json({ success: 'Emparejamiento asignado correctamente' });
+  if (!emparejamientoId || !grupo) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+
+  // Verificar si ya existe esa asignación
+  const checkSql = 'SELECT 1 FROM emparejamientos_asignaciones WHERE id_emparejamiento = ? AND id_grupo = ?';
+  db.query(checkSql, [emparejamientoId, grupo], (err, rows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Error al verificar asignación' });
+    }
+
+    if (rows.length > 0) {
+      return res.status(400).json({ error: 'Este emparejamiento ya está asignado a este grupo' });
+    }
+
+    // Si no existe, insertamos
+    const insertSql = 'INSERT INTO emparejamientos_asignaciones (id_emparejamiento, id_grupo, id_profesor) VALUES (?, ?, ?)';
+    db.query(insertSql, [emparejamientoId, grupo, idProfesor], (err2) => {
+      if (err2) {
+        console.error(err2);
+        return res.status(500).json({ error: 'Error al asignar emparejamiento' });
+      }
+
+      res.status(201).json({ success: 'Emparejamiento asignado correctamente' });
+    });
   });
 };
+
 // Marcar emparejamiento como público
 exports.hacerPublico = (req, res) => {
   const idProfesor = req.session.usuarioId;
@@ -120,5 +141,22 @@ exports.hacerPublico = (req, res) => {
   db.query(sql, [emparejamientoId, idProfesor], (err, result) => {
     if (err) return res.status(500).json({ error: 'Error al hacer público el emparejamiento' });
     res.json({ success: 'Emparejamiento marcado como público' });
+  });
+};
+// EmparejamientosController.js
+exports.desasignarEmparejamiento = (req, res) => {
+  const { emparejamientoId, grupoId } = req.body;
+  const idProfesor = req.session.usuarioId;
+  if (!emparejamientoId || !grupoId) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+
+  const sql = 'DELETE FROM emparejamientos_asignaciones WHERE id_emparejamiento = ? AND id_grupo = ?';
+  db.query(sql, [emparejamientoId, grupoId, idProfesor], err => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Error al desasignar' });
+    }
+    res.json({ success: 'Emparejamiento desasignado' });
   });
 };
