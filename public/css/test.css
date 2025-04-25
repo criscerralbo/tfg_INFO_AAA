@@ -11,6 +11,13 @@
      padding: 0;
      box-sizing: border-box;
    }
+   .pregunta-imagen {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }  
    
    html, body {
      font-family: 'Poppins', sans-serif;
@@ -429,8 +436,7 @@
    /* Contenedor principal en 2 columnas */
 .test-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 columnas de igual ancho */
-  gap: 20px;
+   gap: 20px;
   max-width: 1200px;    /* Ajusta ancho máximo */
   margin: 0 auto;       /* Centrado horizontal */
   padding: 20px;        /* Espacio interno */
@@ -509,4 +515,48 @@
   .preguntas-col {
     margin-top: 20px;
   }
+}
+#zona-preguntas {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.pregunta {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+}
+
+.pregunta-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+}
+
+.pregunta-texto {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.opciones label {
+  display: block;
+  margin: 0.3rem 0;
+}
+
+.test-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+#zona-preguntas {
+  width: 100%;
+  max-width: 960px;
+  background: white;
+  padding: 2rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }

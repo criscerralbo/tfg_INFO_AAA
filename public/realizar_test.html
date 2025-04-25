@@ -36,38 +36,55 @@
   <div id="mensaje-estado" class="mensaje-oculto"></div>
 
   <main class="test-layout">
-    <!-- Columna 1 (información del test e intentos) -->
+    <!-- Columna 1: Info e Intentos -->
     <section class="intentos-col">
-      <h2 id="test-titulo"></h2>
-      <p id="test-descripcion"></p>
-  
+      <h2 id="test-titulo">...</h2>
+      <p id="test-descripcion">...</p>
+  <!-- Botones de acción -->
+  <div class="botones-intentos">
+    <button id="btn-reanudar" style="display: none;">Reanudar intento</button>
+    <button id="btn-iniciar">Comenzar nuevo intento</button>
+    <button id="btn-falladas" style="display: none;">Repetir preguntas falladas</button>
+  </div>
       <h3>Mis intentos anteriores</h3>
       <table>
         <thead>
           <tr>
-            <th>ID</th>
+           
             <th>Inicio</th>
-            <th>Fin</th>
+          
             <th>Score</th>
-            <th>Estado</th>
+            <th>Duracion seg</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tabla-intentos"></tbody>
       </table>
-  
-      <div class="botones-intentos">
-        <button id="btn-reanudar" style="display:none;">Reanudar intento</button>
-        <button id="btn-iniciar">Comenzar nuevo intento</button>
-      </div>
+
+    
     </section>
-  
-    <!-- Columna 2 (preguntas con scroll + botón enviar) -->
-    <section class="preguntas-col">
-      <section id="zona-preguntas" style="display:none;">
+    
+    <!-- Columna 2: Preguntas -->
+    
+      <section id="zona-preguntas" style="display: none;">
+        <div id="cronometro">00:00</div>
         <div id="preguntas-container"></div>
-        <button id="btn-enviar">Enviar respuestas</button>
-      </section> </section>
+        <button id="btn-enviar">Finalizar y enviar</button>
+      </section>
+    
+  
   </main>
+
+  <!-- Modal de confirmación de envío -->
+  <div id="modal-confirmacion" class="modal">
+    <div class="modal-content">
+      <h3>¿Seguro que quieres finalizar el test?</h3>
+      <div class="modal-buttons">
+        <button id="confirmar-envio">Sí, enviar</button>
+        <button id="cancelar-envio">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="realizar_test.js"></script>
 </body>

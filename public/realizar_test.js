@@ -1,127 +1,102 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN DEL HEADER: LOGOUT, MODAL, ETC. ---
-    const logoutButton = document.getElementById('logout-button');
-    const cancelLogout = document.getElementById('cancelLogout');
-    const closeModal = document.getElementById('closeModal');
-    const confirmLogout = document.getElementById('confirmLogout');
-  
-    if (logoutButton) {
-      logoutButton.addEventListener('click', () => {
-        document.getElementById('logoutModal').style.display = 'block';
-      });
-    }
-    if (cancelLogout) {
-      cancelLogout.addEventListener('click', () => {
-        document.getElementById('logoutModal').style.display = 'none';
-      });
-    }
-    if (closeModal) {
-      closeModal.addEventListener('click', () => {
-        document.getElementById('logoutModal').style.display = 'none';
-      });
-    }
-    if (confirmLogout) {
-      confirmLogout.addEventListener('click', () => {
-        fetch('/usuarios/logout')
-          .then(() => window.location.href = '/');
-      });
-    }
-  // 1) Obtener el ID del test desde la URL (revisa que la URL sea ?testId=15)
-  const testId = getParam('testId');  // <--- OJO: 'testId'
+  const testId = getParam('testId');
   if (!testId) {
-    mostrarMensaje('No se recibió quizId', 'error');
+    mostrarMensaje('No se recibió testId', 'error');
     return;
   }
 
-  // 2) Cargar el detalle del test
+  const btnIniciar = document.getElementById('btn-iniciar');
+  const btnReanudar = document.getElementById('btn-reanudar');
+  const btnFalladas = document.getElementById('btn-falladas');
+  const btnEnviar = document.getElementById('btn-enviar');
+  const zonaPreguntas = document.getElementById('zona-preguntas');
+  const cronometro = document.getElementById('cronometro');
+
   fetch(`/api/tests/${testId}`)
     .then(res => res.json())
     .then(test => {
-      if (test.error) {
-        mostrarMensaje(test.error, 'error');
-        return;
-      }
+      if (test.error) return mostrarMensaje(test.error, 'error');
       document.getElementById('test-titulo').textContent = test.titulo;
       document.getElementById('test-descripcion').textContent = test.descripcion || '';
-    })
-    .catch(err => {
-      console.error(err);
-      mostrarMensaje('Error al cargar el test', 'error');
     });
 
-  // 3) Cargar intentos del usuario y determinar si hay un intento “in_progress”
   fetch(`/api/tests/${testId}/mis-intentos`)
     .then(res => res.json())
     .then(intentos => {
-      if (!Array.isArray(intentos)) {
-        return;
-      }
       pintarIntentos(intentos);
+      const hayIntentos = intentos.length > 0;
       const enCurso = intentos.find(i => i.state === 'in_progress');
-      if (enCurso) {
-        // Mostrar botón "Reanudar", ocultar "Iniciar"
-        document.getElementById('btn-reanudar').style.display = 'inline-block';
-        document.getElementById('btn-iniciar').style.display = 'none';
-      } else {
-        document.getElementById('btn-reanudar').style.display = 'none';
-        document.getElementById('btn-iniciar').style.display = 'inline-block';
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      mostrarMensaje('Error al cargar intentos', 'error');
+      toggleBotones(hayIntentos, enCurso);
     });
-
-  // 4) Listeners para los botones “Reanudar” e “Iniciar”
-  document.getElementById('btn-reanudar').addEventListener('click', () => {
-    mostrarMensaje('Reanudar test (pendiente de implementación)', 'success');
-    // Aquí podrías hacer fetch a un endpoint para cargar preguntas 
-    // del attempt en curso, etc.
-    document.getElementById('zona-preguntas').style.display = 'block';
-    cargarPreguntas(testId);
+  fetch(`/api/tests/${testId}/falladas`)
+    .then(res => res.json())
+    .then(falladas => {
+      const btnFalladas = document.getElementById('btn-falladas');
+      btnFalladas.style.display = falladas.length > 0 ? 'inline-block' : 'none';
   });
 
-  document.getElementById('btn-iniciar').addEventListener('click', () => {
-    mostrarMensaje('Iniciar un nuevo intento', 'success');
-    // Aquí podrías crear un nuevo attempt en la BD o simplemente mostrar preguntas
-    document.getElementById('zona-preguntas').style.display = 'block';
-    cargarPreguntas(testId);
-  });
 
-  // 5) Botón para enviar respuestas
-  document.getElementById('btn-enviar').addEventListener('click', () => {
-    enviarRespuestas(testId);
+  btnIniciar.addEventListener('click', () => iniciarTest(testId, false));
+  btnReanudar.addEventListener('click', () => iniciarTest(testId, false));
+  btnFalladas.addEventListener('click', () => iniciarTest(testId, true));
+
+  btnEnviar.addEventListener('click', () => {
+    document.getElementById('modal-confirmacion').style.display = 'block';
+  });
+  
+  document.getElementById('confirmar-envio').addEventListener('click', () => {
+    enviarRespuestas(testId, window._soloFalladas ?? false);
+    document.getElementById('modal-confirmacion').style.display = 'none';
+  });
+  
+  
+  document.getElementById('cancelar-envio').addEventListener('click', () => {
+    document.getElementById('modal-confirmacion').style.display = 'none';
+  });
+  
+
+  // --- Logout modal ---
+  const logoutButton = document.getElementById('logout-button');
+  const cancelLogout = document.getElementById('cancelLogout');
+  const closeModal = document.getElementById('closeModal');
+  const confirmLogout = document.getElementById('confirmLogout');
+
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      document.getElementById('logoutModal').style.display = 'block';
+    });
+  }
+  cancelLogout?.addEventListener('click', () => {
+    document.getElementById('logoutModal').style.display = 'none';
+  });
+  closeModal?.addEventListener('click', () => {
+    document.getElementById('logoutModal').style.display = 'none';
+  });
+  confirmLogout?.addEventListener('click', () => {
+    fetch('/usuarios/logout').then(() => window.location.href = '/');
   });
 });
 
-// FUNCIONES AUXILIARES
+let timerInterval;
 
-function pintarIntentos(intentos) {
-  const tbody = document.getElementById('tabla-intentos');
-  tbody.innerHTML = '';
-  intentos.forEach(i => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${i.id}</td>
-      <td>${formatearFecha(i.start_time)}</td>
-      <td>${i.end_time ? formatearFecha(i.end_time) : ''}</td>
-      <td>${i.score}</td>
-      <td>${i.state}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+function iniciarTest(testId, soloFalladas = false) {
+  window._soloFalladas = soloFalladas; // <- Guardamos para luego usar
+  document.getElementById('zona-preguntas').style.display = 'block';
+  document.querySelector('.intentos-col').style.display = 'none';
+  cargarPreguntas(testId, soloFalladas);
+  iniciarCronometro();
 }
 
-function cargarPreguntas(testId) {
-  fetch(`/api/tests/${testId}/preguntas`)
+
+
+function cargarPreguntas(testId, soloFalladas) {
+  const endpoint = soloFalladas ? `/api/tests/${testId}/falladas` : `/api/tests/${testId}/preguntas`;
+  fetch(endpoint)
     .then(res => res.json())
     .then(preguntas => {
-      if (!Array.isArray(preguntas)) {
-        mostrarMensaje('Error al cargar preguntas', 'error');
-        return;
-      }
       const contenedor = document.getElementById('preguntas-container');
       contenedor.innerHTML = '';
+      preguntas = preguntas.sort(() => Math.random() - 0.5);
       preguntas.forEach((p, idx) => {
         const div = document.createElement('div');
         div.classList.add('pregunta');
@@ -131,31 +106,33 @@ function cargarPreguntas(testId) {
             <label>
               <input type="radio" name="pregunta_${p.preguntaId}" value="${op.opcionId}">
               ${op.texto}
-            </label><br>
-          `;
+            </label><br>`;
         });
         div.innerHTML = `
-          <p><strong>${idx + 1}.</strong> ${p.texto}</p>
-          ${opcionesHTML}
-        `;
+        <p class="pregunta-texto"><strong>${idx + 1}.</strong> ${p.texto}</p>
+        ${p.imagen ? `<img src="${p.imagen.startsWith('/') ? p.imagen : '/' + p.imagen}" class="pregunta-img">` : ''}
+        <div class="opciones">${opcionesHTML}</div>`;      
         contenedor.appendChild(div);
       });
-    })
-    .catch(err => {
-      console.error(err);
-      mostrarMensaje('Error al cargar las preguntas', 'error');
     });
 }
+const tiempoTranscurrido = document.getElementById('cronometro').textContent;
+const [min, seg] = tiempoTranscurrido.split(':').map(Number);
+const duracionSegundos = min * 60 + seg;
 
-function enviarRespuestas(testId) {
+function enviarRespuestas(testId, soloFalladas = false) {
+  const tiempoTranscurrido = document.getElementById('cronometro').textContent;
+  const [min, seg] = tiempoTranscurrido.split(':').map(Number);
+  const duracionSegundos = min * 60 + seg;
+
   const contenedor = document.getElementById('preguntas-container');
   const preguntasDivs = contenedor.querySelectorAll('.pregunta');
-
   const answers = [];
+
   preguntasDivs.forEach(div => {
     const radioSel = div.querySelector('input[type="radio"]:checked');
     if (radioSel) {
-      const name = radioSel.name;  // por ej. "pregunta_5"
+      const name = radioSel.name;
       const preguntaId = parseInt(name.split('_')[1]);
       const opcionIdSeleccionada = parseInt(radioSel.value);
       answers.push({ preguntaId, opcionIdSeleccionada });
@@ -165,55 +142,88 @@ function enviarRespuestas(testId) {
   fetch(`/api/tests/${testId}/enviar-respuestas`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ answers })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.error) {
-        mostrarMensaje(data.error, 'error');
-        return;
-      }
-      // Mostramos mensaje con la nota
-      mostrarMensaje(`Test finalizado. Score: ${data.score}%`, 'success');
-
-      // 1) Ocultamos la zona de preguntas
-      document.getElementById('zona-preguntas').style.display = 'none';
-
-      // 2) Recargamos la tabla de intentos para ver el nuevo
-      fetch(`/api/tests/${testId}/mis-intentos`)
-        .then(res => res.json())
-        .then(intentos => {
-          if (!Array.isArray(intentos)) return;
-          pintarIntentos(intentos);
-        })
-        .catch(err => {
-          console.error(err);
-          mostrarMensaje('Error al recargar intentos', 'error');
-        });
+    body: JSON.stringify({
+      answers,
+      duracionSegundos,
+      esRepeticionFalladas: soloFalladas
     })
-    .catch(err => {
-      console.error(err);
-      mostrarMensaje('Error al enviar respuestas', 'error');
-    });
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!soloFalladas) {
+      mostrarMensaje(`Score: ${data.score}%`, 'success');
+    }    
+    detenerCronometro();
+
+    document.getElementById('zona-preguntas').style.display = 'none';
+    document.querySelector('.intentos-col').style.display = 'block';
+    recargarIntentos(testId);
+  });
 }
 
 
-function getParam(name) {
-  const search = new URLSearchParams(window.location.search);
-  return search.get(name);
+function pintarIntentos(intentos) {
+  const tbody = document.getElementById('tabla-intentos');
+  tbody.innerHTML = '';
+  intentos.forEach(i => {
+    const mins = Math.floor(i.duracion_segundos / 60);
+    const secs = i.duracion_segundos % 60;
+    const duracionFormateada = `${mins}m ${secs}s`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${formatearFecha(i.start_time)}</td>
+      <td>${i.score}</td>
+      <td>${duracionFormateada}</td>
+      <td><button onclick="revisarIntento(${i.id})">Revisar</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+
+function revisarIntento(idIntento) {
+  window.location.href = `/revisar.html?attemptId=${idIntento}`;
+}
+
+function recargarIntentos(testId) {
+  fetch(`/api/tests/${testId}/mis-intentos`)
+    .then(res => res.json())
+    .then(pintarIntentos);
+}
+
+function toggleBotones(hayIntentos, enCurso) {
+  document.getElementById('btn-iniciar').style.display = (!hayIntentos || !enCurso) ? 'inline-block' : 'none';
+  document.getElementById('btn-reanudar').style.display = enCurso ? 'inline-block' : 'none';
+  document.getElementById('btn-falladas').style.display = hayIntentos ? 'inline-block' : 'none';
+}
+
+function iniciarCronometro() {
+  const crono = document.getElementById('cronometro');
+  let segs = 0;
+  timerInterval = setInterval(() => {
+    segs++;
+    const min = String(Math.floor(segs / 60)).padStart(2, '0');
+    const sec = String(segs % 60).padStart(2, '0');
+    crono.textContent = `${min}:${sec}`;
+  }, 1000);
+}
+
+function detenerCronometro() {
+  clearInterval(timerInterval);
 }
 
 function formatearFecha(fechaStr) {
-  if (!fechaStr) return '';
   return new Date(fechaStr).toLocaleString();
+}
+
+function getParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
 }
 
 function mostrarMensaje(msg, tipo) {
   const div = document.getElementById('mensaje-estado');
   div.textContent = msg;
-  div.className = (tipo === 'success') ? 'mensaje-success' : 'mensaje-error';
+  div.className = tipo === 'success' ? 'mensaje-success' : 'mensaje-error';
   div.style.display = 'block';
-  setTimeout(() => {
-    div.style.display = 'none';
-  }, 4000);
+  setTimeout(() => div.style.display = 'none', 4000);
 }

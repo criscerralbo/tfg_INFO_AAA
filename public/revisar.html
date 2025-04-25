@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Revisar intento</title>
+  <link rel="stylesheet" href="/css/test.css">
+</head>
+<body>
+    <header>
+        <h1>Revision del intento</h1>
+        <div class="user-section">
+          <button class="btn-back" onclick="window.history.back()">← Volver</button>
+          <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+          <div class="user-icon">
+            <a href="/perfil.html">
+              <img src="images/usuario.png" alt="Usuario">
+            </a>
+          </div>
+        </div>
+      </header>
+
+  <div id="zona-revision">
+    <p id="info-intento"></p>
+    <div id="contenedor-revision"></div>
+  </div>
+
+  <!-- Modal logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal">&times;</span>
+      <p>¿Estás seguro que quieres cerrar sesión?</p>
+      <button id="confirmLogout">Sí, cerrar sesión</button>
+      <button id="cancelLogout">Cancelar</button>
+    </div>
+  </div>
+
+  <script src="revisar.js"></script>
+</body>
+</html>
