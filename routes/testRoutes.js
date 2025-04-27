@@ -21,9 +21,13 @@ router.post('/:testId/enviar-respuestas', testController.submitAnswers);
 router.get('/:testId/mis-intentos', testController.getUserAttempts);
 
 // 7. Revisar intento específico (modo resumen)
-router.get('/revisar/:attemptId', testController.getAttemptDetail);
+//router.get('/revisar/:attemptId', testController.getAttemptDetail);
 
 // 8. Revisar intento detallado con respuesta + correcto
-router.get('/attempts/:attemptId/revisar', testController.revisarIntento);
+//router.get('/attempts/:attemptId/revisar', testController.revisarIntento);
 
+router.get(
+    '/:testId/attempts/:attemptId/revisar',
+    testController.revisarIntento
+  );
 module.exports = router;

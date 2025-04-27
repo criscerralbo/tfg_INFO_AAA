@@ -4,36 +4,71 @@
   <meta charset="UTF-8">
   <title>Revisar intento</title>
   <link rel="stylesheet" href="/css/test.css">
+  <style>
+    :root {
+      --header-height: 70px; /* Ajusta según la altura real de tu header */
+    }
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-height);
+      z-index: 1000;
+    }
+    #zona-revision {
+      margin-top: var(--header-height);
+      padding: 20px;
+    }
+    .pregunta-revision {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 1rem;
+    }
+    .opcion {
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin: 4px 0;
+    }
+    .correcta   { background: #d4edda; }
+    .incorrecta { background: #f8d7da; }
+    .resaltada  { background: #e2e3e5; }
+    .pregunta-img {
+      max-width: 100%;
+      display: block;
+      margin: 10px 0;
+    }
+    /* Modal logout igual que tu CSS global */
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Revision del intento</h1>
-        <div class="user-section">
-          <button class="btn-back" onclick="window.history.back()">← Volver</button>
-          <button id="logout-button" class="logout-button">Cerrar Sesión</button>
-          <div class="user-icon">
-            <a href="/perfil.html">
-              <img src="images/usuario.png" alt="Usuario">
-            </a>
-          </div>
-        </div>
-      </header>
+  <header>
+    <h1>Revisión del intento</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+      </div>
+    </div>
+  </header>
 
-  <div id="zona-revision">
+  <main id="zona-revision">
     <p id="info-intento"></p>
     <div id="contenedor-revision"></div>
-  </div>
+  </main>
 
   <!-- Modal logout -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
-      <span id="closeModal">&times;</span>
+      <span id="closeModal" class="close">&times;</span>
       <p>¿Estás seguro que quieres cerrar sesión?</p>
-      <button id="confirmLogout">Sí, cerrar sesión</button>
-      <button id="cancelLogout">Cancelar</button>
+      <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+      <button id="cancelLogout" class="cancel-button">Cancelar</button>
     </div>
   </div>
 
-  <script src="revisar.js"></script>
+  <script src="/revisar.js"></script>
 </body>
+<footer>
+  © 2024 Tu Aplicación – TFG Cristina Cerralbo
+</footer>
 </html>

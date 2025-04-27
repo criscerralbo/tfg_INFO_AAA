@@ -18,6 +18,7 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }  
+  
    
    html, body {
      font-family: 'Poppins', sans-serif;
@@ -34,6 +35,10 @@
      flex-direction: column;
      justify-content: space-between;
    }
+   :root {
+    --header-height: 70px;   /* alto real de tu header */
+    --msg-height:   50px;    /* alto aproximado de tu zona de mensaje */
+  }
    
    /* ==============================================
       HEADER
@@ -47,6 +52,10 @@
      justify-content: space-between;
      align-items: center;
      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+     position: fixed;
+     top: 0; left: 0; right: 0;
+     height: var(--header-height);
+     z-index: 1000;
    }
    
    header h1 {
@@ -84,9 +93,18 @@
    /* ==============================================
       MENSAJES DE ESTADO (success, error, oculto)
       ============================================== */
-   .mensaje-oculto {
+      #mensaje-estado {
+        position: fixed;
+        top: var(--header-height);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+        width: auto;           /* o 100% si quieres que ocupe todo el ancho */
+      }
+
+      .mensaje-oculto {
      display: none;
-   }
+       }
    .mensaje-success {
      background-color: #d4edda;
      color: #155724;
@@ -179,10 +197,10 @@
       ============================================== */
    /* El <main> se extiende para ocupar la pantalla
       debajo del header */
-   main {
-     flex: 1;
-   }
-   
+      main {
+        flex: 1;
+        margin-top: calc(var(--header-height) + var(--msg-height));
+      }
    /* Contenedor principal con 3 columnas */
    .edit-quiz-layout {
      display: grid;

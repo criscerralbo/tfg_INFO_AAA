@@ -31,16 +31,25 @@ html, body {
 }
 
 /* Header */
+:root {
+    --header-height: 70px;   /* alto real de tu header */
+    --msg-height:   50px;    /* alto aproximado de tu zona de mensaje */
+  }
+/* Header */
 header {
-    background-color: #508bbd;
+    background-color: #508bbd; 
     color: white;
     padding: 20px;
-    text-align: left;
+    width: 100%;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-height);
+    z-index: 1000;
+  }
 
 header h1 {
     font-size: 1.8rem;
@@ -58,6 +67,18 @@ header button {
 header button:hover {
     background-color: #508bbd;
 }
+main {
+    flex: 1;
+    margin-top: calc(var(--header-height) + var(--msg-height));
+  }
+  #mensaje-estado {
+    position: fixed;
+    top: var(--header-height);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    width: auto;           /* o 100% si quieres que ocupe todo el ancho */
+  }
 
 /* Contenedor de la tabla */
 .table-container {

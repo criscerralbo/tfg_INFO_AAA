@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Modo de Juego Emparejamiento</title>
+  <link rel="stylesheet" href="/css/test.css">
+</head>
+<body>
+  <header>
+    <h1>Juego de Emparejamiento</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h2>Elige formato de juego</h2>
+    <button id="btn-multiple">Opción múltiple</button>
+    <button id="btn-fill">Rellenar palabra</button>
+  </main>
+
+  <script>
+    const actividadId = new URLSearchParams(window.location.search)
+                          .get('actividadId');
+    document.getElementById('btn-multiple').onclick = () => {
+      window.location.href = `/multiple.html?actividadId=${actividadId}`;
+    };
+    document.getElementById('btn-fill').onclick = () => {
+      window.location.href = `/fill.html?actividadId=${actividadId}`;
+    };
+  </script>
+</body>
+<footer>© 2025 Tu Aplicación</footer>
+</html>

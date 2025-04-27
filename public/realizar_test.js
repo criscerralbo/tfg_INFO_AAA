@@ -41,8 +41,21 @@ document.addEventListener('DOMContentLoaded', () => {
   btnFalladas.addEventListener('click', () => iniciarTest(testId, true));
 
   btnEnviar.addEventListener('click', () => {
+    // Contamos cuántas preguntas han respuesta marcada
+    const totalContestadas = document
+      .querySelectorAll('#preguntas-container input[type="radio"]:checked')
+      .length;
+  
+    if (totalContestadas === 0) {
+      // Si no ha contestado ninguna, mostramos mensaje y salimos
+      mostrarMensaje('Tu test está completamente en blanco, no has respondido nada.', 'error');
+      return;
+    }
+  
+    // Si hay al menos una respuesta, abrimos el modal
     document.getElementById('modal-confirmacion').style.display = 'block';
   });
+  
   
   document.getElementById('confirmar-envio').addEventListener('click', () => {
     enviarRespuestas(testId, window._soloFalladas ?? false);
@@ -130,14 +143,18 @@ function enviarRespuestas(testId, soloFalladas = false) {
   const answers = [];
 
   preguntasDivs.forEach(div => {
-    const radioSel = div.querySelector('input[type="radio"]:checked');
-    if (radioSel) {
-      const name = radioSel.name;
-      const preguntaId = parseInt(name.split('_')[1]);
-      const opcionIdSeleccionada = parseInt(radioSel.value);
-      answers.push({ preguntaId, opcionIdSeleccionada });
-    }
-  });
+       // Obtenemos el nombre de la pregunta a partir del primer radio
+       const primerRadio = div.querySelector('input[type="radio"]');
+       const name       = primerRadio.name;                 // ej. "pregunta_3"
+       const preguntaId = parseInt(name.split('_')[1], 10);
+      // Vemos si hay alguno marcado
+        const radioSel = div.querySelector('input[type="radio"]:checked');
+        const opcionIdSeleccionada = radioSel
+          ? parseInt(radioSel.value, 10)
+          : null;  // si es null, lo contamos luego como incorrecto
+    
+        answers.push({ preguntaId, opcionIdSeleccionada });
+      });
 
   fetch(`/api/tests/${testId}/enviar-respuestas`, {
     method: 'POST',
@@ -182,8 +199,10 @@ function pintarIntentos(intentos) {
 
 
 function revisarIntento(idIntento) {
-  window.location.href = `/revisar.html?attemptId=${idIntento}`;
+  const testId = getParam('testId');
+  window.location.href = `/revisar.html?testId=${testId}&attemptId=${idIntento}`;
 }
+
 
 function recargarIntentos(testId) {
   fetch(`/api/tests/${testId}/mis-intentos`)

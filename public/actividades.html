@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Actividades del Grupo</title>
+  <link rel="stylesheet" href="/css/test.css">
+</head>
+<body>
+  <header>
+    <h1>Actividades del Grupo</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>Tests</h2>
+      <div id="lista-tests"></div>
+    </section>
+    <section>
+      <h2>Emparejamientos</h2>
+      <div id="lista-emparejamientos"></div>
+    </section>
+  </main>
+
+  <script src="/actividades.js"></script>
+</body>
+<footer>© 2025 Tu Aplicación</footer>
+</html>
