@@ -207,16 +207,14 @@ main {
 
 /* Footer */
 footer {
-    background-color: #333;
-    color: white;
     text-align: center;
-    padding: 10px 0;
-    width: 100%;
+    padding: 1rem 0;
+    background: #eee;
+    color: #666;
     font-size: 0.9rem;
-    font-weight: 300;
-    position: relative;
-    bottom: 0;
-}
+    margin-top: 2rem;
+  }
+  
 
 /* Estilo responsivo */
 @media (max-width: 768px) {

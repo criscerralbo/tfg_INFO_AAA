@@ -1,0 +1,69 @@
+/* ==============================================
+   Estilos para Actividades por Grupo
+   ============================================== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f4f8fb;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+main {
+  padding: 1.5rem;
+}
+
+.intro h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+  color: #2c3e50;
+}
+
+.intro p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.grid-grupos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.grupo-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  padding: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.grupo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.grupo-card img {
+  width: 50px;
+  margin-bottom: 0.5rem;
+}
+
+.grupo-card h3 {
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0;
+  color: #2c3e50;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  background: #eee;
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 2rem;
+}

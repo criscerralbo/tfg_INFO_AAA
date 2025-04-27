@@ -412,17 +412,15 @@
    /* ==============================================
       Footer
       ============================================== */
-   footer {
-       background-color: #333;
-       color: white;
-       text-align: center;
-       padding: 10px 0;
-       width: 100%;
-       font-size: 0.9rem;
-       font-weight: 300;
-       position: relative;
-       bottom: 0;
-   }
+      footer {
+        text-align: center;
+        padding: 1rem 0;
+        background: #eee;
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 2rem;
+      }
+      
    
    /* ==============================================
       Estilos Responsivos

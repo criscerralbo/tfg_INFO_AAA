@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Emparejamiento — Opción múltiple</title>
+  <link rel="stylesheet" href="/css/test.css">
+</head>
+<body>
+  <header>
+     <h1>Emparejamiento 🦷</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="pregunta-container" class="pregunta-multiple">
+      <!-- La pregunta se inyecta aquí -->
+    </div>
+    <button id="btn-siguiente" class="btn-primary" disabled>Siguiente</button>
+  </main>
+
+  <!-- Modal de confirmación logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h2>¿Cerrar sesión?</h2>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, salir</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/multiple.js"></script>
+</body>
+<footer>© 2025 Tu Aplicación — Gamificación Odontológica</footer>
+</html>

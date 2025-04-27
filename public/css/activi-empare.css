@@ -1,0 +1,88 @@
+/* Centrar el main */
+.centered {
+    text-align: center;
+    padding: 2rem;
+  }
+  .intro {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: #34495e;
+  }
+  
+  /* Reutilizamos .grid-actividades y .actividad-card de la pantalla anterior */
+  .grid-actividades {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  header {
+    background: #508bbd;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  header .brand {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+  }
+  
+  header .logo {
+    width: 40px;
+    margin-right: 0.5rem;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+  header .btn-back {
+    background: #3a6f9a;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  header .logout-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .actividad-card {
+    background: #fefefe;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    width: 200px;
+    cursor: pointer;
+    transition: transform .2s;
+  }
+  .actividad-card:hover {
+    transform: translateY(-4px);
+  }
+  .actividad-card img {
+    width: 60px;
+    margin-bottom: .8rem;
+  }
+  .actividad-card h3 {
+    margin: .5rem 0;
+    color: #2c3e50;
+  }
+  .actividad-card p {
+    font-size: .9rem;
+    color: #555;
+  }

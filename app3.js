@@ -12,6 +12,9 @@ const pubQuizzesRoutes = require('./routes/pubQuizzesRoutes');
 const testRoutes = require('./routes/testRoutes');
 const emparejamientosRoutes = require('./routes/emparejamientosRoutes');
 const pubEmparejamientosRouter = require('./routes/pubEmparejamientosRouter');
+const actGroupRoutes    = require('./routes/actGroupRoutes');   // <-- tus rutas "actividades por grupo"
+const paresRoutes = require('./routes/paresRoutes');
+
 const app = express();
 
 
@@ -55,6 +58,7 @@ app.use((req, res, next) => {
 // ==============================
 // Rutas de usuarios (registro, login, etc.)
 app.use('/usuarios', userRoutes);
+app.use('/api/emparejamientos', paresRoutes);
 
 // Rutas de grupos (gestión de grupos)
 app.use('/api/groups', groupRoutes);
@@ -63,7 +67,7 @@ app.use('/api/games', gameRoutes);
 
 // Para las rutas de los grupos de los alumnos, mantén el prefijo '/api/alumno'
 app.use('/api/alumno', groupRoutes);
-
+app.use('/api/grupos', actGroupRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/preguntas', preguntaRoutes);
 app.use('/api/pubQuizzes', pubQuizzesRoutes);

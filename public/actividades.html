@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Actividades del Grupo</title>
   <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/actividades.css">
 </head>
 <body>
   <header>
@@ -19,16 +20,31 @@
 
   <main>
     <section>
-      <h2>Tests</h2>
-      <div id="lista-tests"></div>
+      <h2>📝 Tests</h2>
+      <div id="lista-tests" class="grid-actividades"></div>
+      <p id="no-tests" class="empty-msg">Cargando tests…</p>
     </section>
+
     <section>
-      <h2>Emparejamientos</h2>
-      <div id="lista-emparejamientos"></div>
+      <h2>🖼️ Emparejamientos</h2>
+      <div id="lista-emparejamientos" class="grid-actividades"></div>
+      <p id="no-emparejamientos" class="empty-msg">Cargando emparejamientos…</p>
     </section>
   </main>
-
+   <!-- Modal de confirmación de Logout -->
+   <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3>¿Estás seguro que deseas cerrar sesión?</h3>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
   <script src="/actividades.js"></script>
 </body>
+
 <footer>© 2025 Tu Aplicación</footer>
+
 </html>

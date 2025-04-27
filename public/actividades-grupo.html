@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Mis Actividades por Grupo</title>
   <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/actividades-grupo.css">
 </head>
 <body>
   <header>
@@ -17,8 +18,27 @@
     </div>
   </header>
 
-  <main id="lista-grupos"></main>
+  <main>
+    <section class="intro">
+      <h2>Bienvenido, elige tu grupo</h2>
+      <p>¡Vamos a repasar la patología oral de manera divertida! Selecciona uno de tus grupos para ver sus actividades.</p>
+    </section>
 
+    <section id="lista-grupos" class="grid-grupos">
+      <!-- Aquí inyecta tus tarjetas de grupo -->
+    </section>
+  </main>
+   <!-- Modal de confirmación de Logout -->
+   <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3>¿Estás seguro que deseas cerrar sesión?</h3>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
   <script src="/actividades-grupo.js"></script>
 </body>
 <footer>© 2025 Tu Aplicación</footer>

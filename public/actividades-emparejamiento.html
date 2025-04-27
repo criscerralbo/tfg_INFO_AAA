@@ -2,37 +2,56 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Modo de Juego Emparejamiento</title>
+  <title>Emparejamiento — GamOdonto</title>
   <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/activi-empare.css">
 </head>
 <body>
   <header>
-    <h1>Juego de Emparejamiento</h1>
+    <h1>Modo de juego</h1>
     <div class="user-section">
       <button class="btn-back" onclick="window.history.back()">← Volver</button>
       <button id="logout-button" class="logout-button">Cerrar Sesión</button>
       <div class="user-icon">
-        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+        <a href="/perfil.html">
+          <img src="images/usuario.png" alt="Usuario">
+        </a>
       </div>
     </div>
   </header>
 
-  <main>
-    <h2>Elige formato de juego</h2>
-    <button id="btn-multiple">Opción múltiple</button>
-    <button id="btn-fill">Rellenar palabra</button>
+  <main class="centered">
+    <p class="intro">
+      ¡Pon a prueba tu memoria visual 
+      Elige un modo:
+    </p>
+    <div class="grid-actividades">
+      <div class="actividad-card" id="card-multiple">
+        <img src="/images/tooth-match.png" alt="Emparejamiento múltiple">
+        <h3>Opción Múltiple</h3>
+        <p>Elige la palabra que coincide con la imagen.</p>
+      </div>
+      <div class="actividad-card" id="card-fill">
+        <img src="/images/tooth-match-fill.png" alt="Rellenar palabra">
+        <h3>Rellenar Palabra</h3>
+        <p>Escribe el nombre que corresponde con la imagen.</p>
+      </div>
+    </div>
   </main>
 
-  <script>
-    const actividadId = new URLSearchParams(window.location.search)
-                          .get('actividadId');
-    document.getElementById('btn-multiple').onclick = () => {
-      window.location.href = `/multiple.html?actividadId=${actividadId}`;
-    };
-    document.getElementById('btn-fill').onclick = () => {
-      window.location.href = `/fill.html?actividadId=${actividadId}`;
-    };
-  </script>
+  <!-- Modal de Logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3>¿Deseas cerrar sesión?</h3>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, salir</button>
+        <button id="cancelLogout"  class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2025 GamOdonto — Facultad de Odontología UCM</footer>
+  <script src="/actividades-emparejamiento.js"></script>
 </body>
-<footer>© 2025 Tu Aplicación</footer>
 </html>
