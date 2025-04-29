@@ -14,7 +14,7 @@
       <button id="logout-button" class="logout-button">Cerrar Sesión</button>
       <div class="user-icon">
         <a href="/perfil.html">
-          <img src="images/usuario.png" alt="Usuario">
+          <img src="/images/usuario.png" alt="Usuario">
         </a>
       </div>
     </div>
@@ -22,19 +22,46 @@
 
   <main class="centered">
     <p class="intro">
-      ¡Pon a prueba tu memoria visual 
+      ¡Pon a prueba tu memoria visual<br>
       Elige un modo:
     </p>
     <div class="grid-actividades">
+      <!-- tarjeta múltiple -->
       <div class="actividad-card" id="card-multiple">
         <img src="/images/tooth-match.png" alt="Emparejamiento múltiple">
         <h3>Opción Múltiple</h3>
         <p>Elige la palabra que coincide con la imagen.</p>
+
+        <!-- BOTONES CONDICIONALES MÚLTIPLE -->
+        <div id="review-container-multiple" class="botones-secundarios" style="display:none;">
+          <button id="btn-review-multiple" class="btn-secundario">
+            Revisar intentos
+          </button>
+        </div>
+        <div id="repeat-container-multiple" class="botones-secundarios" style="display:none;">
+          <button id="btn-repeat-multiple" class="btn-secundario">
+            Repetir falladas
+          </button>
+        </div>
       </div>
+
+      <!-- tarjeta rellenar -->
       <div class="actividad-card" id="card-fill">
         <img src="/images/tooth-match-fill.png" alt="Rellenar palabra">
         <h3>Rellenar Palabra</h3>
         <p>Escribe el nombre que corresponde con la imagen.</p>
+
+        <!-- BOTONES CONDICIONALES FILL -->
+        <div id="review-container-fill" class="botones-secundarios" style="display:none;">
+          <button id="btn-review-fill" class="btn-secundario">
+            Revisar intentos
+          </button>
+        </div>
+        <div id="repeat-container-fill" class="botones-secundarios" style="display:none;">
+          <button id="btn-repeat-fill" class="btn-secundario">
+            Repetir falladas
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -46,7 +73,7 @@
       <h3>¿Deseas cerrar sesión?</h3>
       <div class="modal-buttons">
         <button id="confirmLogout" class="confirm-button">Sí, salir</button>
-        <button id="cancelLogout"  class="cancel-button">Cancelar</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
       </div>
     </div>
   </div>

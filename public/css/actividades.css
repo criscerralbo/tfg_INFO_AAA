@@ -77,3 +77,77 @@ footer {
   color: #666;
   font-size: 0.9rem;
 }
+ /* Contenedor del quiz */
+ #quiz-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+#info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+#question-image {
+  max-width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+.options label {
+  display: block;
+  padding: 0.6rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.options label:hover {
+  background: #f0f8ff;
+}
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+.navigation button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  background: #508bbd;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.navigation button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+/* Estilos para la imagen de cada pregunta */
+#pair-image {
+  display: block;
+  margin: 0 auto 1rem;
+  width: 100%;
+  max-width: 400px;    /* ancho máximo */
+  height: 250px;       /* alto fijo */
+  object-fit: contain; /* mantiene la proporción, centrando la imagen */
+  border-radius: 8px;  /* opcional, para que tenga esquinas redondeadas */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.pregunta-img {
+  display: block;
+  margin: 0 auto 1rem;
+  width: 100%;
+  max-width: 400px;    /* ancho máximo */
+  height: 250px;       /* alto fijo */
+  object-fit: contain; /* mantiene la proporción, centrando la imagen */
+  border-radius: 8px;  /* opcional, para que tenga esquinas redondeadas */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+

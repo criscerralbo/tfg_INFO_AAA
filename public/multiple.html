@@ -4,36 +4,56 @@
   <meta charset="UTF-8">
   <title>Emparejamiento — Opción múltiple</title>
   <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/actividades.css">
 </head>
 <body>
   <header>
-     <h1>Emparejamiento 🦷</h1>
+    <h1>Emparejamiento – Opción Múltiple</h1>
     <div class="user-section">
-      <button class="btn-back" onclick="history.back()">← Volver</button>
+      <button class="btn-back" onclick="window.history.back()">← Volver</button>
       <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+      </div>
     </div>
   </header>
 
-  <main>
-    <div id="pregunta-container" class="pregunta-multiple">
-      <!-- La pregunta se inyecta aquí -->
-    </div>
-    <button id="btn-siguiente" class="btn-primary" disabled>Siguiente</button>
-  </main>
+  <!-- Toast mensajes -->
+  <div id="mensaje-estado" class="toast mensaje-info"></div>
 
-  <!-- Modal de confirmación logout -->
+  <!-- Modal logout -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <span id="closeModal" class="close">&times;</span>
-      <h2>¿Cerrar sesión?</h2>
+      <p>¿Estás seguro de que quieres cerrar sesión?</p>
       <div class="modal-buttons">
         <button id="confirmLogout" class="confirm-button">Sí, salir</button>
-        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+        <button id="cancelLogout"  class="cancel-button">Cancelar</button>
       </div>
     </div>
   </div>
 
-  <script src="/multiple.js"></script>
+  <main>
+    <div id="quiz-container">
+      <div id="info">
+        <span id="feedback">Pregunta 1 de N</span>
+        <span id="timer">00:00</span>
+      </div>
+      <div id="question-container">
+        <img id="pair-image" src="" alt="Imagen de la pregunta">
+      </div>
+      <div id="options-list" class="options">
+        <!-- Aquí se inyectan las opciones -->
+      </div>
+      <div class="navigation">
+        <button id="btn-prev" disabled>Anterior</button>
+        <button id="btn-next">Siguiente</button>
+        <button id="btn-submit" style="display:none;">Enviar</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>© 2025 Tu Aplicación — Gamificación Odontológica</footer>
+  <script src="multiple.js"></script>
 </body>
-<footer>© 2025 Tu Aplicación — Gamificación Odontológica</footer>
 </html>

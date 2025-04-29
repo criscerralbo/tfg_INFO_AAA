@@ -2,15 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Emparejamiento — Rellenar </title>
+  <title>Revisión — Rellenar</title>
   <link rel="stylesheet" href="/css/test.css">
   <link rel="stylesheet" href="/css/actividades.css">
 </head>
 <body>
   <header>
-    <h1>Emparejamiento – Rellenar</h1>
+    <h1>Revisión del Intento — Rellenar</h1>
     <div class="user-section">
-      <button class="btn-back" onclick="window.history.back()">← Volver</button>
+      <button id="btn-back" class="btn-back">← Volver</button>
       <button id="logout-button" class="logout-button">Cerrar Sesión</button>
       <div class="user-icon">
         <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
@@ -18,10 +18,7 @@
     </div>
   </header>
 
-  <!-- Toast mensajes -->
-  <div id="mensaje-estado" class="toast mensaje-info"></div>
-
-  <!-- Modal logout -->
+  <!-- Modal de confirmación de cierre de sesión -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <span id="closeModal" class="close">&times;</span>
@@ -34,27 +31,11 @@
   </div>
 
   <main>
-    <div id="quiz-container">
-      <div id="info">
-        <span id="feedback">Pregunta 1 de N</span>
-        <span id="timer">00:00</span>
-      </div>
-      <div id="question-container">
-        <img id="pair-image" src="" alt="…">
-      </div>
-      <div class="options">
-        <input id="text-answer" type="text" placeholder="Escribe aquí…">
-      </div>
-      
-      <div class="navigation">
-        <button id="btn-prev" disabled>Anterior</button>
-        <button id="btn-next">Siguiente</button>
-        <button id="btn-submit" style="display:none;">Enviar</button>
-      </div>
-    </div>
+    <div id="info-intento"></div>
+    <div id="contenedor-revision"></div>
   </main>
 
   <footer>© 2025 Tu Aplicación — Gamificación Odontológica</footer>
-  <script src="fill.js"></script>
+  <script src="fill-review.js"></script>
 </body>
 </html>

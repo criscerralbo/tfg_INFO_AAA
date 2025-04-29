@@ -1,39 +1,102 @@
-// public/js/emparejamiento.js
-
 function getParam(name) {
-    return new URLSearchParams(window.location.search).get(name);
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const actividadId = getParam('actividadId');
+  if (!actividadId) {
+    alert('Falta el parámetro actividadId');
+    return;
   }
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    // — LOGOUT MODAL —
-    const logoutButton = document.getElementById('logout-button');
-    const logoutModal  = document.getElementById('logoutModal');
-    const cancelBtn    = document.getElementById('cancelLogout');
-    const closeBtn     = document.getElementById('closeModal');
-    const confirmBtn   = document.getElementById('confirmLogout');
-  
-    logoutButton?.addEventListener('click', () => {
-      logoutModal.style.display = 'block';
-    });
-    cancelBtn?.addEventListener('click', () => {
-      logoutModal.style.display = 'none';
-    });
-    closeBtn?.addEventListener('click', () => {
-      logoutModal.style.display = 'none';
-    });
-    confirmBtn?.addEventListener('click', () => {
-      fetch('/usuarios/logout')
-        .then(() => window.location.href = '/')
-        .catch(() => window.location.href = '/');
-    });
-  
-    // — NAVEGACIÓN A MODO —
-    const actividadId = getParam('actividadId');
-    document.getElementById('card-multiple').onclick = () => {
-      window.location.href = `/multiple.html?actividadId=${actividadId}`;
-    };
-    document.getElementById('card-fill').onclick = () => {
-      window.location.href = `/fill.html?actividadId=${actividadId}`;
-    };
+
+  // — Logout Modal —
+  const logoutButton = document.getElementById('logout-button');
+  const logoutModal  = document.getElementById('logoutModal');
+  const cancelBtn    = document.getElementById('cancelLogout');
+  const closeBtn     = document.getElementById('closeModal');
+  const confirmBtn   = document.getElementById('confirmLogout');
+
+  logoutButton.addEventListener('click', () => logoutModal.style.display = 'block');
+  cancelBtn   .addEventListener('click', () => logoutModal.style.display = 'none');
+  closeBtn    .addEventListener('click', () => logoutModal.style.display = 'none');
+  confirmBtn  .addEventListener('click', () => {
+    fetch('/usuarios/logout').then(() => window.location.href = '/');
   });
-  
+
+  // — Navegación a los modos —
+  document.getElementById('card-multiple')
+    .addEventListener('click', () => {
+      window.location.href = `/multiple.html?actividadId=${actividadId}`;
+    });
+  document.getElementById('card-fill')
+    .addEventListener('click', () => {
+      window.location.href = `/fill.html?actividadId=${actividadId}`;
+    });
+
+  // — BOTONES MÚLTIPLE —  
+  // Revisar intentos
+  fetch(`/api/emparejamientos/${actividadId}/attempts`)
+    .then(r => r.json())
+    .then(attempts => {
+      if (attempts.length > 0) {
+        const rc = document.getElementById('review-container-multiple');
+        const btn = document.getElementById('btn-review-multiple');
+        rc.style.display = 'block';
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          window.location.href = `/multiple-attempts.html?actividadId=${actividadId}`;
+        });
+      }
+    })
+    .catch(() => {});
+
+  // Repetir falladas
+  fetch(`/api/emparejamientos/${actividadId}/falladas`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.questions && data.questions.length > 0) {
+        const rc = document.getElementById('repeat-container-multiple');
+        const btn = document.getElementById('btn-repeat-multiple');
+        rc.style.display = 'block';
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          window.location.href = `/multiple.html?actividadId=${actividadId}&repetirFalladas=1`;
+        });
+      }
+    })
+    .catch(() => {});
+
+  // — BOTONES FILL —  
+  // Revisar intentos de fill
+  fetch(`/api/emparejamientos/${actividadId}/fill/attempts`)
+    .then(r => r.json())
+    .then(attempts => {
+      if (attempts.length > 0) {
+        const rc = document.getElementById('review-container-fill');
+        const btn = document.getElementById('btn-review-fill');
+        rc.style.display = 'block';
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          window.location.href = `/fill-attempts.html?actividadId=${actividadId}`;
+        });
+      }
+    })
+    .catch(() => {});
+
+  // Repetir falladas de fill
+  fetch(`/api/emparejamientos/${actividadId}/fill/falladas`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.questions && data.questions.length > 0) {
+        const rc = document.getElementById('repeat-container-fill');
+        const btn = document.getElementById('btn-repeat-fill');
+        rc.style.display = 'block';
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          window.location.href = `/fill.html?actividadId=${actividadId}&repetirFalladas=1`;
+        });
+      }
+    })
+    .catch(() => {});
+
+});

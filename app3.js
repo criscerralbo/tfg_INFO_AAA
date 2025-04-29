@@ -14,6 +14,7 @@ const emparejamientosRoutes = require('./routes/emparejamientosRoutes');
 const pubEmparejamientosRouter = require('./routes/pubEmparejamientosRouter');
 const actGroupRoutes    = require('./routes/actGroupRoutes');   // <-- tus rutas "actividades por grupo"
 const paresRoutes = require('./routes/paresRoutes');
+const fillRoutes = require('./routes/fillRoutes');
 
 const app = express();
 
@@ -73,6 +74,8 @@ app.use('/api/preguntas', preguntaRoutes);
 app.use('/api/pubQuizzes', pubQuizzesRoutes);
 app.use('/api/tests', testRoutes);
 app.use('/api', emparejamientosRoutes);
+app.use('/api/emparejamientos', fillRoutes);
+//app.use('/api/emparejamientos', emparejamientosRoutes);
 app.use('/api/emparejamientos', pubEmparejamientosRouter);
 // Ruta para la pantalla de inicio (luego de iniciar sesión)
 app.get('/inicio', (req, res) => {

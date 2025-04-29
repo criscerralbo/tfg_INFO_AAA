@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Revisión de Intento — Emparejamiento</title>
+  <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/actividades.css">
+</head>
+<body>
+  <header>
+    <h1>Revisión de Emparejamiento</h1>
+    <div class="user-section">
+      <button class="btn-back" onclick="history.back()">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <p>¿Cerrar sesión?</p>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, salir</button>
+        <button id="cancelLogout"  class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section id="info-intento">
+      <!-- Fecha, duración y score -->
+    </section>
+
+    <section id="contenedor-revision">
+      <!-- Aquí se inyectan las preguntas revisadas -->
+    </section>
+  </main>
+
+  <footer>© 2025 Tu Aplicación — Gamificación Odontológica</footer>
+  <script src="multiple-review.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Historial de Intentos — Rellenar</title>
+  <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/actividades.css">
+</head>
+<body>
+  <header>
+    <h1>Historial de Intentos — Rellenar</h1>
+    <div class="user-section">
+    <button class="btn-back" onclick="history.go(-2)">← Volver</button>
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal de confirmación de logout -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <p>¿Estás seguro de que quieres cerrar sesión?</p>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, salir</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <h2>Intentos realizados</h2>
+    <table id="tabla-intentos" class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Duración</th>
+          <th>Puntuación</th>
+          <th>Revisar</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p id="no-intentos" class="empty-msg">Cargando intentos…</p>
+  </main>
+
+  <footer>© 2025 Tu Aplicación — Gamificación Odontológica</footer>
+  <script src="fill-attempts.js"></script>
+</body>
+</html>
