@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // 2) grupoId desde sessionStorage
+  const grupoId = sessionStorage.getItem('grupoIdActual');
+  if (!grupoId) {
+    alert('No se encontró el grupoId en sesión');
+    return;
+  }
   // — Logout Modal —
   const logoutButton = document.getElementById('logout-button');
   const logoutModal  = document.getElementById('logoutModal');
@@ -22,7 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
   confirmBtn  .addEventListener('click', () => {
     fetch('/usuarios/logout').then(() => window.location.href = '/');
   });
+// public/js/actividades-emparejamiento.js
 
+  // — Botón ← Volver: a actividades.html con grupoId
+  document.getElementById('btn-back').onclick = () => {
+    window.location.href = `/actividades.html?grupoId=${grupoId}`;
+  };
   // — Navegación a los modos —
   document.getElementById('card-multiple')
     .addEventListener('click', () => {

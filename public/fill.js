@@ -9,18 +9,21 @@ function normalizeText(str) {
     .toLowerCase();                   // pasa a minúsculas
 }
 
+// Extrae un parámetro de query string
 function getParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const actividadId = getParam('actividadId');
-  const repetir    = getParam('repetirFalladas') === '1';
+  // Aceptamos mayúsculas/minúsculas
+  const repetir    = getParam('repetirFalladas') === '1'
+                  || getParam('repetirfalladas') === '1';
 
   if (!actividadId) {
-    alert('Falta el parámetro actividadId');
-    return;
+    return alert('Falta el parámetro actividadId');
   }
+  console.log('🏷 actividadId=', actividadId, 'modo repetir?', repetir);
 
   // — Referencias al DOM —
   const imgEl       = document.getElementById('pair-image');
@@ -46,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // — Estado interno —
   let questions     = [];
-  let answers       = {};      // { pairId: respuestaUsuario }
+  let answers       = {};      // { pairId: textoIntroducido }
   let currentIndex  = 0;
   let timerSecs     = 0;
   let timerInterval = null;
@@ -55,8 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function startTimer() {
     timerInterval = setInterval(() => {
       timerSecs++;
-      const mm = String(Math.floor(timerSecs / 60)).padStart(2, '0');
-      const ss = String(timerSecs % 60).padStart(2, '0');
+      const mm = String(Math.floor(timerSecs/60)).padStart(2,'0');
+      const ss = String(timerSecs%60).padStart(2,'0');
       timerEl.textContent = `${mm}:${ss}`;
     }, 1000);
   }
@@ -65,47 +68,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // — Carga de preguntas —
-  const endpoint = repetir
-    ? `/api/emparejamientos/${actividadId}/fill/falladas`
-    : `/api/emparejamientos/${actividadId}/fill`;
+  function loadQuestions() {
+    const url = repetir
+      ? `/api/emparejamientos/${actividadId}/fill/falladas`
+      : `/api/emparejamientos/${actividadId}/fill`;
 
-  fetch(endpoint)
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      questions = data.questions.map(q => ({
-        id: q.id,
-        imagen: q.imagen,
-        respuestaCorrecta: q.respuestaCorrecta || q.palabra
-      }));
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        // ambos endpoints devuelven { questions: [ {id, imagen, respuestaCorrecta} ] }
+        questions = data.questions;
+        console.log('📋 Preguntas cargadas:', questions);
 
-      if (!questions.length) {
-        alert('No hay preguntas disponibles.');
-        return;
-      }
-      renderQuestion();
-      startTimer();
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Error cargando preguntas: ' + err.message);
-    });
-
-  // — Renderizado —
-  function renderQuestion() {
-    const q = questions[currentIndex];
-    feedbackEl.textContent    = `Pregunta ${currentIndex + 1} de ${questions.length}`;
-    imgEl.src                 = q.imagen;
-    imgEl.alt                 = q.respuestaCorrecta;
-    inputEl.value             = answers[q.id] || '';
-    prevBtn.disabled          = currentIndex === 0;
-    nextBtn.style.display     = currentIndex < questions.length - 1 ? 'inline-block' : 'none';
-    submitBtn.style.display   = currentIndex === questions.length - 1 ? 'inline-block' : 'none';
+        if (!questions.length) {
+          return alert('No hay preguntas disponibles.');
+        }
+        renderQuestion();
+        startTimer();
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error cargando preguntas: ' + err.message);
+      });
   }
 
-  // — Guardar localmente la respuesta actual —
+  // — Renderizado de la pregunta actual —
+  function renderQuestion() {
+    const q = questions[currentIndex];
+    feedbackEl.textContent  = `Pregunta ${currentIndex+1} de ${questions.length}`;
+    imgEl.src               = q.imagen;
+    imgEl.alt               = q.respuestaCorrecta;
+    inputEl.value           = answers[q.id] || '';
+    prevBtn.disabled        = currentIndex === 0;
+    nextBtn.style.display   = currentIndex < questions.length - 1 ? 'inline-block' : 'none';
+    submitBtn.style.display = currentIndex === questions.length - 1 ? 'inline-block' : 'none';
+  }
+
+  // — Guarda localmente la respuesta actual —
   function saveAnswer() {
     const val = inputEl.value;
     if (!val.trim()) {
@@ -128,62 +130,81 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // — Enviar respuestas —
-  submitBtn.onclick = () => {
+  submitBtn.onclick = async () => {
     if (!saveAnswer()) return;
     stopTimer();
 
-    const payload = {
-      answers: Object.entries(answers).map(([pairId, respuesta]) => ({
-        pairId: Number(pairId),
-        respuesta
-      })),
-      duracionSegundos: timerSecs
-    };
+    // En modo normal guardas intento (mismo código your submitFillAttempt)...
 
     if (!repetir) {
-      // Modo normal: guardamos intento
-      fetch(`/api/emparejamientos/${actividadId}/fill/attempts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then(() => {
-          window.location.href = `/fill-attempts.html?actividadId=${actividadId}`;
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error guardando intento: ' + err.message);
-        });
+      // POST /api/emparejamientos/:actividadId/fill/attempts
+      const payload = {
+        answers: Object.entries(answers).map(([pairId, respuesta]) => ({
+          pairId: Number(pairId),
+          respuesta
+        })),
+        duracionSegundos: timerSecs
+      };
+      try {
+        const r = await fetch(
+          `/api/emparejamientos/${actividadId}/fill/attempts`,
+          {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          }
+        );
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        window.location.href = `/fill-attempts.html?actividadId=${actividadId}`;
+      } catch (e) {
+        console.error(e);
+        alert('Error guardando intento: ' + e.message);
+      }
+      return;
+    }
 
-    } else {
-      // Modo repetir-falladas: borramos sólo las que ahora aciertes
-      const eliminarOps = questions.map(q => {
-        const userAnsNorm    = normalizeText(answers[q.id] || '');
-        const correctAnsNorm = normalizeText(q.respuestaCorrecta || '');
-        if (userAnsNorm === correctAnsNorm) {
+    // — Modo repetir falladas: borramos las acertadas de la tabla `fill_falladas` —
+    try {
+      // 1) dispara DELETE por cada pregunta acertada
+      const deletes = questions.map(q => {
+        const userNorm    = normalizeText(answers[q.id] || '');
+        const correctNorm = normalizeText(q.respuestaCorrecta || '');
+        if (userNorm === correctNorm) {
           return fetch(
             `/api/emparejamientos/${actividadId}/fill/falladas?pairId=${q.id}`,
             { method: 'DELETE' }
-          )
-          .then(res => {
-            if (!res.ok) throw new Error(`DELETE fallo para pairId ${q.id}`);
+          ).then(res => {
+            if (!res.ok) throw new Error(`DELETE fallada ${q.id} → HTTP ${res.status}`);
           });
         }
         return Promise.resolve();
       });
+      await Promise.all(deletes);
 
-      Promise.all(eliminarOps)
-        .then(() => {
-          window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId}`;
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error actualizando banco de falladas: ' + err.message);
-        });
+      // 2) recargo la lista de falladas
+      const rr = await fetch(`/api/emparejamientos/${actividadId}/fill/falladas`);
+      if (!rr.ok) throw new Error(`HTTP ${rr.status}`);
+      const nueva = await rr.json();
+      console.log('🔄 Después DELETE, falladas restantes:', nueva.questions);
+
+      if (nueva.questions.length === 0) {
+        // ya no quedan, vuelvo a modos
+        window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId}`;
+      } else {
+        // aún faltan, reinicio el juego con las preguntas restantes
+        questions    = nueva.questions;
+        answers      = {};
+        currentIndex = 0;
+        renderQuestion();
+        timerSecs = 0;
+        startTimer();
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error actualizando preguntas falladas: ' + err.message);
     }
   };
+
+  // Arrancamos
+  loadQuestions();
 });

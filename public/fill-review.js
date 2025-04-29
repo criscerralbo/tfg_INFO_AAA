@@ -1,13 +1,15 @@
 function normalizeText(str) {
-    return str
-      .normalize("NFD")                 // separa caracteres con tilde
-      .replace(/[\u0300-\u036f]/g, "")  // elimina marcas diacríticas
-      .trim()                           // quita espacios en los extremos
-      .toLowerCase();                   // pasa a minúsculas
-  }
+  return str
+    .trim()
+    .toLowerCase()
+    // descompone los caracteres acentuados en base+diacrítico
+    .normalize('NFD')
+    // elimina los diacríticos
+    .replace(/[\u0300-\u036f]/g, '');
+}
 function getParam(name) {
-    return new URLSearchParams(window.location.search).get(name);
-  }
+  return new URLSearchParams(window.location.search).get(name);
+}
   
   document.addEventListener('DOMContentLoaded', () => {
     const attemptId = getParam('attemptId');

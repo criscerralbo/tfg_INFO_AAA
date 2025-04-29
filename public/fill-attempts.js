@@ -28,7 +28,12 @@ function getParam(name) {
     confirmLogout.onclick= () => {
       fetch('/usuarios/logout').then(_ => window.location.href = '/');
     };
-  
+    const actividadId2 = new URLSearchParams(window.location.search)
+    .get('actividadId');
+    document.getElementById('btn-back').onclick = () => {
+    // de Multiple-Attempts volvemos a Emparejamiento
+    window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId2}`;
+    };
     // — Carga de intentos —
     fetch(`/api/emparejamientos/${actividadId}/fill/attempts`)
       .then(res => {

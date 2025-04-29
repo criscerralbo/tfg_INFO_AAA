@@ -2,7 +2,13 @@
 
 const db = require('../db');
 
-
+function normalize(text) {
+  return text
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
 // GET /api/emparejamientos/:actividadId/multiple
 // Devuelve todas las imágenes y las opciones (sin duplicados) + la respuesta correcta
 exports.getMultiple = (req, res) => {
@@ -59,11 +65,11 @@ exports.getFill = (req, res) => {
   });
 };
 
-// POST /api/emparejamientos/:actividadId/attempts
+//POST /api/emparejamientos/:actividadId/attempts
 // Guarda un intento normal, maneja emparejamientos_falladas
 exports.submitAttempt = (req, res) => {
-  const actividadId = req.params.actividadId;
-  const usuarioId   = req.session.usuarioId;
+  const actividadId      = req.params.actividadId;
+  const usuarioId        = req.session.usuarioId;
   const { answers, duracionSegundos } = req.body;
 
   if (!Array.isArray(answers)) {
@@ -92,11 +98,13 @@ exports.submitAttempt = (req, res) => {
       const correctMap = Object.fromEntries(rows.map(r => [r.id, r.palabra]));
       let aciertos = 0;
 
-      // 3) Guardar respuestas del intento
+      // 3) Guardar respuestas del intento (normalizando antes de comparar)
       const answersData = answers.map(a => {
-        const correct = correctMap[a.pairId] === a.palabra ? 1 : 0;
-        if (correct) aciertos++;
-        return [attemptId, a.pairId, a.palabra, correct];
+        const userNorm    = normalize(a.palabra);
+        const correctNorm = normalize(correctMap[a.pairId]);
+        const isCorrect   = userNorm === correctNorm ? 1 : 0;
+        if (isCorrect) aciertos++;
+        return [attemptId, a.pairId, a.palabra, isCorrect];
       });
       const sqlInsAns = `
         INSERT INTO emparejamiento_attempt_answers
@@ -116,16 +124,19 @@ exports.submitAttempt = (req, res) => {
         db.query(sqlUpdScore, [score, attemptId], err4 => {
           if (err4) return res.status(500).json({ error: 'Error al actualizar score' });
 
-          // 5) Banco de falladas
-          const falladas = [];
+          // 5) Banco de falladas: insertar las incorrectas, eliminar las ahora correctas
+          const falladas  = [];
           const acertadas = [];
           answers.forEach(a => {
-            if (correctMap[a.pairId] === a.palabra) {
+            const userNorm    = normalize(a.palabra);
+            const correctNorm = normalize(correctMap[a.pairId]);
+            if (userNorm === correctNorm) {
               acertadas.push(a.pairId);
             } else {
               falladas.push([usuarioId, actividadId, a.pairId]);
             }
           });
+
           if (falladas.length) {
             db.query(
               `INSERT IGNORE INTO emparejamientos_falladas
@@ -143,7 +154,7 @@ exports.submitAttempt = (req, res) => {
             );
           }
 
-          // 6) Responder al cliente
+          // 6) Devolver resultado al cliente
           res.json({ attemptId, score });
         });
       });

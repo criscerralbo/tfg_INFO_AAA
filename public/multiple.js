@@ -42,6 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex  = 0;
   let timerSecs     = 0;
   let timerInterval = null;
+  // public/js/multiple.js
+const actividadId2 = new URLSearchParams(window.location.search)
+.get('actividadId');
+document.getElementById('btn-back').onclick = () => {
+// de Multiple volvemos a Emparejamiento
+window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId2}`;
+};
+
 
   // — Cronómetro —
   function startTimer() {

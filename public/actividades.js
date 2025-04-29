@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const cancelBtn    = document.getElementById('cancelLogout');
   const closeBtn     = document.getElementById('closeModal');
   const confirmBtn   = document.getElementById('confirmLogout');
-
+  document.getElementById('btn-back').onclick = () => {
+    // de Actividades volvemos a Actividades-Grupo
+    window.location.href = '/actividades-grupo.html';
+  };
   logoutButton?.addEventListener('click', () => {
     logoutModal.style.display = 'block';
   });
@@ -75,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h3>${e.nombre}</h3>
           `;
           card.onclick = () => {
+            sessionStorage.setItem('grupoIdActual', grupoId);
             window.location.href = `/actividades-emparejamiento.html?actividadId=${e.id}`;
           };
           eDiv.appendChild(card);

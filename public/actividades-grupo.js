@@ -6,7 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
    const cancelBtn    = document.getElementById('cancelLogout');
    const closeBtn     = document.getElementById('closeModal');
    const confirmBtn   = document.getElementById('confirmLogout');
- 
+   const backBtn = document.getElementById('btn-back');
+  
+   document.getElementById('btn-back').onclick = () => {
+    // de Actividades-Grupo volvemos a Inicio
+    window.location.href = '/inicio';
+  };
    logoutButton?.addEventListener('click', () => {
      logoutModal.style.display = 'block';
    });

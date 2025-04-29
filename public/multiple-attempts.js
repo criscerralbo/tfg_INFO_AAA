@@ -24,7 +24,14 @@ function getParam(name) {
   
     const tbody        = document.querySelector('#tabla-intentos tbody');
     const noIntentosEl = document.getElementById('no-intentos');
-  
+  // public/js/multiple-attempts.js
+const actividadId2 = new URLSearchParams(window.location.search)
+.get('actividadId');
+document.getElementById('btn-back').onclick = () => {
+// de Multiple-Attempts volvemos a Emparejamiento
+window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId2}`;
+};
+
     fetch(`/api/emparejamientos/${actividadId}/attempts`)
       .then(res => res.json())
       .then(intentos => {
