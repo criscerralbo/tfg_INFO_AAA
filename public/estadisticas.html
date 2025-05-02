@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Estadisticas del Grupo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/css/test.css">
-  <link rel="stylesheet" href="/css/actividades.css">
+  <link rel="stylesheet" href="/css/estadisticas.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <header>
@@ -23,6 +25,17 @@
   </header>
 
   <main>
+    <!-- RESUMEN RÁPIDO -->
+    <section class="summary-cards" id="summary"></section>
+
+    <!-- GRÁFICOS -->
+    <h2>Actividad (últimos 30 días)</h2>
+    <canvas id="activityChart"></canvas>
+
+    <h2>Top 10 preguntas más falladas</h2>
+    <ul id="top-questions" class="top-list"></ul>
+
+    <!-- LISTAS DETALLADAS EXISTENTES -->
     <section>
       <h2>Quizzes</h2>
       <div id="quiz-stats" class="stats-grid"></div>
@@ -32,6 +45,9 @@
       <div id="match-stats" class="stats-grid"></div>
     </section>
   </main>
+  <footer>
+    © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
+  </footer>
 
   <script src="estadisticas.js"></script>
 </body>
