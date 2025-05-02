@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Estadisticas del Grupo</title>
+  <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/actividades.css">
+</head>
+<body>
+  <header>
+    <h1>Estadisticas del Grupo</h1>
+    <div class="user-section">
+        <button class="btn-back" onclick="window.history.back()">← Volver</button>
+            
+      <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+      <div class="user-icon">
+        <a href="/perfil.html"><img src="/images/usuario.png" alt="Usuario"></a>
+      </div>
+      <!-- dentro de tu <header> -->
+
+    </div>
+
+  </header>
+
+  <main>
+    <section>
+      <h2>Quizzes</h2>
+      <div id="quiz-stats" class="stats-grid"></div>
+    </section>
+    <section>
+      <h2>Emparejamientos</h2>
+      <div id="match-stats" class="stats-grid"></div>
+    </section>
+  </main>
+
+  <script src="estadisticas.js"></script>
+</body>
+</html>

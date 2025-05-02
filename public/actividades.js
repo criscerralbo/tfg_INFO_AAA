@@ -36,15 +36,26 @@ document.addEventListener('DOMContentLoaded', () => {
   let isProfesor = false;
 
   // 1) Averiguamos el role del usuario
-  fetch('/api/usuarios/me')
-    .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(user => {
-      isProfesor = (user.role === 'profesor');
-    })
-    .catch(_ => {
-      console.warn('No se pudo obtener perfil, asumimos usuario normal');
-    })
-    .finally(loadRecursos);
+ // 1) Averiguamos el rol
+// 1) Averiguamos el rol
+fetch('/usuarios/nombre')
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(user => { isProfesor = (user.rol === 'profesor'); })
+  .catch(() => console.warn('No pude obtener perfil, asumo alumno'))
+  .finally(() => {
+    // 2) Si es profe, mostramos el botón de estadísticas
+    if (isProfesor) {
+      const btnStats = document.getElementById('btn-stats');
+      btnStats.style.display = 'inline-block';
+      btnStats.addEventListener('click', () => {
+        const grupoId = getParam('grupoId');
+        window.location.href = `/estadisticas.html?grupoId=${grupoId}`;
+      });
+    }
+    // 3) Ya podemos cargar los recursos
+    loadRecursos();
+  });
+
 
   // 2) Cargamos tests y emparejamientos
   function loadRecursos() {
@@ -63,35 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <h3>${t.titulo}</h3>
             `;
 
-            // si es profesor, añadimos botones de editar y desasignar
-            if (isProfesor) {
-              const btnEdit = document.createElement('button');
-              btnEdit.textContent = 'Editar';
-              btnEdit.className = 'admin-btn edit';
-              btnEdit.onclick = e => {
-                e.stopPropagation();
-                window.location.href =
-                  `/editar_test.html?testId=${t.id}&grupoId=${grupoId}`;
-              };
-              card.appendChild(btnEdit);
-
-              const btnUnassign = document.createElement('button');
-              btnUnassign.textContent = 'Desasignar';
-              btnUnassign.className = 'admin-btn unassign';
-              btnUnassign.onclick = e => {
-                e.stopPropagation();
-                if (!confirm('¿Deseas desasignar este test del grupo?')) return;
-                fetch(`/api/grupos/${grupoId}/tests/${t.id}`, {
-                  method: 'DELETE'
-                })
-                .then(res => {
-                  if (!res.ok) throw new Error(res.status);
-                  card.remove();  // lo quitamos de la UI
-                })
-                .catch(err => alert('Error desasignando: ' + err));
-              };
-              card.appendChild(btnUnassign);
-            }
+ 
 
             // al hacer click en la tarjeta (no en los botones) lanzamos el test
             card.addEventListener('click', () => {

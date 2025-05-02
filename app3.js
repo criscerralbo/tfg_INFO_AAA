@@ -15,7 +15,7 @@ const pubEmparejamientosRouter = require('./routes/pubEmparejamientosRouter');
 const actGroupRoutes    = require('./routes/actGroupRoutes');   // <-- tus rutas "actividades por grupo"
 const paresRoutes = require('./routes/paresRoutes');
 const fillRoutes = require('./routes/fillRoutes');
-
+const estadisticasRoutes = require('./routes/estadisticasRoutes');
 const app = express();
 
 
@@ -59,6 +59,7 @@ app.use((req, res, next) => {
 // ==============================
 // Rutas de usuarios (registro, login, etc.)
 app.use('/usuarios', userRoutes);
+app.use(estadisticasRoutes);
 app.use('/api/emparejamientos', paresRoutes);
 
 // Rutas de grupos (gestión de grupos)
