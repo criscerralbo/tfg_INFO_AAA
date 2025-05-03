@@ -1,25 +1,15 @@
-/* ────────────────────────────────────────────────────────────────
-   estadísticas.js – 02 may 2025
-   – carga /api/grupos/:id/estadisticas
-   – pinta resumen, bar‑charts y grids
-   – muestra detalles de error en consola
-───────────────────────────────────────────────────────────────── */
-
-console.log('📊 estadísticas – inicializando…');
+console.log('📊 estadísticas – inicializando…');
 
 (() => {
-  /* helpers ─────────────────────────────────────────────── */
-  const $  = sel => document.querySelector(sel);
+  const $ = sel => document.querySelector(sel);
   const getParam = k => new URLSearchParams(location.search).get(k);
 
-  /* Chart.js handlers ------------------------------------- */
   let activityChart, scoreChart;
   function drawBar(canvasId, labels, data, datasetLabel) {
     const ctx = $(canvasId);
     if (!ctx) return;
     const prev = canvasId === '#activityChart' ? activityChart : scoreChart;
     prev?.destroy();
-
     const chart = new Chart(ctx, {
       type: 'bar',
       data: { labels, datasets: [{ label: datasetLabel, data }] },
@@ -33,31 +23,57 @@ console.log('📊 estadísticas – inicializando…');
     else scoreChart = chart;
   }
 
-  /* tarjetas grid ----------------------------------------- */
   function fillGrid(containerSel, arr) {
     const el = $(containerSel);
-    el.innerHTML = '';                             // limpia antes de pintar
+    el.innerHTML = '';
     arr.forEach(it =>
-      el.insertAdjacentHTML(
-        'beforeend',
-        `<div class="stat-card">
-           <h3>${it.titulo}</h3>
-           <p>Intentos: <strong>${it.totalIntentos}</strong></p>
-           <p>Puntuación media: <strong>${it.mediaScore}%</strong></p>
-           <p>Tiempo medio: <strong>${it.mediaTime}s</strong></p>
-         </div>`
+      el.insertAdjacentHTML('beforeend', `
+        <div class="stat-card">
+          <h3>${it.titulo}</h3>
+          <p>Intentos: <strong>${it.totalIntentos}</strong></p>
+          <p>Puntuación media: <strong>${it.mediaScore}%</strong></p>
+          <p>Tiempo medio: <strong>${it.mediaTime}s</strong></p>
+        </div>`
       )
     );
   }
 
-  /* flujo principal --------------------------------------- */
+  // <-- aquí movemos grupoId al scope superior -->
+  let grupoId;
+
+  async function descargarResumenExcel() {
+    const url = `/api/grupos/${grupoId}/estadisticas/excel`;
+    const resp = await fetch(url, { credentials:'include' });
+    if (!resp.ok) { alert('Error al descargar resumen'); return; }
+    const blob = await resp.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `estadisticas_grupo_${grupoId}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function descargarIntentosExcel() {
+    const url = `/api/grupos/${grupoId}/estadisticas/intentos/excel`;
+    const resp = await fetch(url, { credentials:'include' });
+    if (!resp.ok) { alert('Error al descargar intentos'); return; }
+    const blob = await resp.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `intentos_grupo_${grupoId}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
-    const grupoId = getParam('grupoId');
+    grupoId = getParam('grupoId');
     if (!grupoId) return alert('Falta el parámetro grupoId en la URL');
+    document.querySelector('#btnDescargarResumen').addEventListener('click', descargarResumenExcel);
+    document.querySelector('#btnDescargarIntentos').addEventListener('click', descargarIntentosExcel);
 
     try {
       const res = await fetch(`/api/grupos/${grupoId}/estadisticas`, {
-        credentials: 'include'           // lleva cookie de sesión
+        credentials: 'include'
       });
       if (!res.ok) {
         const text = await res.text();
@@ -65,7 +81,7 @@ console.log('📊 estadísticas – inicializando…');
       }
       const data = await res.json();
 
-      /* 1) RESUMEN */
+      // 1) RESUMEN
       const summary = $('#summary');
       summary.innerHTML = '';
       [
@@ -73,13 +89,12 @@ console.log('📊 estadísticas – inicializando…');
         { l: 'Intentos totales', v: data.intentosTotales },
         { l: 'Media global',     v: data.mediaGlobal + '%' }
       ].forEach(c =>
-        summary.insertAdjacentHTML(
-          'beforeend',
-          `<div class="card"><h3>${c.l}</h3><strong>${c.v}</strong></div>`
+        summary.insertAdjacentHTML('beforeend', `
+          <div class="card"><h3>${c.l}</h3><strong>${c.v}</strong></div>`
         )
       );
 
-      /* 2) GRÁFICO ACTIVIDAD 30 días */
+      // 2) ACTIVIDAD últimos 30 días
       drawBar(
         '#activityChart',
         data.actividad.map(r => r.dia),
@@ -87,7 +102,7 @@ console.log('📊 estadísticas – inicializando…');
         'Intentos'
       );
 
-      /* 3) HISTOGRAMA DE NOTAS */
+      // 3) HISTOGRAMA NOTAS
       drawBar(
         '#scoreChart',
         data.distribucionNotas.map(r => r.tramo),
@@ -95,21 +110,21 @@ console.log('📊 estadísticas – inicializando…');
         'Nº intentos'
       );
 
-      /* 4) TOP 10 PREGUNTAS FALLADAS */
+      // 4) TOP 10 PREGUNTAS
       const topUl = $('#top-questions');
       topUl.innerHTML = '';
       data.topPreguntas.forEach(p =>
-        topUl.insertAdjacentHTML(
-          'beforeend',
-          `<li><strong>${Math.round(p.ratio_error * 100)} % fallos</strong> – ${p.texto}</li>`
+        topUl.insertAdjacentHTML('beforeend', `
+          <li><strong>${Math.round(p.ratio_error * 100)} % fallos</strong> – ${p.texto}</li>`
         )
       );
 
-      /* 5) GRIDS QUIZ / EMPAREJAMIENTO */
+      // 5) GRIDS
       fillGrid('#quiz-stats',  data.quizzes);
       fillGrid('#match-stats', data.emparejamientos);
+
     } catch (err) {
-      console.error('❌ Fallo al cargar estadísticas:', err);
+      console.error('❌ Fallo al cargar estadísticas:', err);
       alert('No se pudieron cargar las estadísticas.\n' + err.message);
     }
   });

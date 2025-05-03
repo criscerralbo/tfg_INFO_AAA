@@ -1,8 +1,13 @@
 const express = require('express');
 const router  = express.Router();
-const stats   = require('../controllers/estadisticasController');
+const ec   = require('../controllers/estadisticasController');
 
-// Panel del profesor
-router.get('/api/grupos/:grupoId/estadisticas', stats.getGroupStats);
+// JSON:
+router.get('/api/grupos/:grupoId/estadisticas', ec.getGroupStats);
 
+// Excel resumen:
+router.get('/api/grupos/:grupoId/estadisticas/excel', ec.exportGroupStatsExcel);
+
+// Excel intentos:
+router.get('/api/grupos/:grupoId/estadisticas/intentos/excel', ec.exportGroupAttemptsExcel);
 module.exports = router;

@@ -47,6 +47,7 @@
     <div class="botones-section">
     <button id="btn-alumno-comenzar" class="btn-alumno-comenzar" style="display: block;">COMENZAR</button>
     <button id="btn-adm-juegos" class="btn-adm-juegos" style="display: none;">Administrar Juegos</button> <!-- Solo visible para administradores/profesores -->
+    <button id="qr-button" class="qr-button" style="display: block;">COMENZAR</button>
 </div>
 </main>
    
@@ -74,9 +75,7 @@
                     if (data.rol === 'alumno') { // Mostrar botón solo si el usuario es administrador
                         document.getElementById('btn-alumno-grupos').style.display = 'block';
                     }
-                    if (data.rol === 'administrador') { // Mostrar botón solo si el usuario es administrador
-                        document.getElementById('btn-adm-juegos').style.display = 'block';
-                    }
+
                     if (data.rol === 'profesor') { // Mostrar botón solo si el usuario es administrador
                         document.getElementById('btn-adm-juegos').style.display = 'block';
                     }
@@ -86,6 +85,10 @@
                     document.getElementById('user-greeting').textContent = 'Bienvenido, Usuario';
                 });
         });
+          // Redirigir al panel de administración
+          document.getElementById('qr-button').addEventListener('click', function() {
+                    window.location.href = '/qr.html';
+                })
                 // Redirigir al panel de administración
                 document.getElementById('admin-button').addEventListener('click', function() {
                     window.location.href = '/admin.html';

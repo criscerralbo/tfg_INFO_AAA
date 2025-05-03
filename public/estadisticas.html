@@ -25,15 +25,34 @@
   </header>
 
   <main>
-    <!-- RESUMEN RÁPIDO -->
-    <section class="summary-cards" id="summary"></section>
+ <!-- Botones de descarga -->
+ <section class="downloads">
+  <button id="btnDescargarResumen">📥 Descargar resumen (Excel)</button>
+  <button id="btnDescargarIntentos">📥 Descargar detalle de intentos (Excel)</button>
+</section>
 
-    <!-- GRÁFICOS -->
-    <h2>Actividad (últimos 30 días)</h2>
-    <canvas id="activityChart"></canvas>
+<section>
+  <h2>Resumen</h2>
+  <div id="summary" class="summary-cards">
+    <!-- Aquí el JS inyecta tres tarjetas con: alumnos activos, intentos totales y media global -->
+  </div>
+</section>
+    <section>
+      <h2>Actividad (últimos 30 días)</h2>
+      <canvas id="activityChart" width="400" height="200"></canvas>
+    </section>
 
-    <h2>Top 10 preguntas más falladas</h2>
-    <ul id="top-questions" class="top-list"></ul>
+    <section>
+      <h2>Histograma de notas</h2>
+      <canvas id="scoreChart" width="400" height="200"></canvas>
+    </section>
+
+  <section>
+    <h2>Top 10 Preguntas con más fallos</h2>
+    <ul id="top-questions">
+      <!-- Aquí el JS inyecta los <li> con porcentaje de fallos y texto de la pregunta -->
+    </ul>
+  </section>
 
     <!-- LISTAS DETALLADAS EXISTENTES -->
     <section>
