@@ -18,6 +18,8 @@ const fillRoutes = require('./routes/fillRoutes');
 const estadisticasRoutes = require('./routes/estadisticasRoutes');
 const app = express();
 
+const qrRouter = require('./routes/qrRouter');
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -53,7 +55,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(require('./routes/qr'));
+app.use(qrRouter);
 
 // ==============================
 // Rutas

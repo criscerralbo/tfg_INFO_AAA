@@ -1,0 +1,121 @@
+/* qr.css */
+/* ==============================================
+   Importar Poppins
+   ============================================== */
+   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+   /* ==============================================
+      Reset y globales
+      ============================================== */
+   * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+   }
+   html, body {
+     height: 100%;
+     font-family: 'Poppins', sans-serif;
+     background-color: #f7f9fa;
+     color: #2c3e50;
+   }
+   body {
+     display: flex;
+     flex-direction: column;
+   }
+   
+   /* ==============================================
+      HEADER
+      ============================================== */
+   header {
+     background-color: #508bbd;
+     color: #fff;
+     height: 70px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+   }
+   header h1 {
+     font-size: 1.6rem;
+     font-weight: 500;
+   }
+   
+   /* ==============================================
+      CONTENEDOR PRINCIPAL
+      ============================================== */
+   .main-container {
+     flex: 1;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     padding: 2rem;
+   }
+   .qr-box {
+     background: #ffffff;
+     padding: 2rem;
+     border-radius: 8px;
+     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+     text-align: center;
+     max-width: 320px;
+     width: 100%;
+   }
+   .qr-box h2 {
+     margin-bottom: 1rem;
+     font-size: 1.2rem;
+     color: #2980b9;
+   }
+
+   .qr-box p {
+     font-size: 0.95rem;
+     margin-top: 1rem;
+     word-break: break-all;
+   }
+   .qr-box a {
+     color: #508bbd;
+     text-decoration: none;
+     word-wrap: break-word;
+   }
+   .qr-box a:hover {
+     text-decoration: underline;
+   }
+   /* QR estándar 300×300 */
+.qr-box img {
+    width: 300px;
+    height: 300px;
+    display: block;
+    margin: 0 auto 1rem;
+  }
+  .qr-img {
+    width: 300px;
+    height: 300px;
+    display: block;
+    margin: 1rem auto;
+  }
+  
+   
+   /* ==============================================
+      FOOTER OPCIONAL
+      ============================================== */
+   footer {
+     text-align: center;
+     padding: 1rem 0;
+     font-size: 0.8rem;
+     color: #888;
+     background: #eee;
+   }
+   
+   /* ==============================================
+      RESPONSIVE
+      ============================================== */
+   @media (max-width: 480px) {
+     .qr-box {
+       padding: 1.5rem;
+     }
+     header h1 {
+       font-size: 1.4rem;
+     }
+     .qr-box h2 {
+       font-size: 1.1rem;
+     }
+   }
+   

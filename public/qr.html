@@ -1,31 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QR de Conexión</title>
+  <link rel="stylesheet" href="/css/qr.css" />
 </head>
 <body>
-  <h1>Escanea para conectar con el grupo</h1>
-  <!-- Aquí pintaremos el QR -->
-  <img id="qrImg" alt="QR para conectar" />
+  <h1>Escanea para entrar en la app</h1>
+  <div class="qr-container">
+    <img id="qrImg" alt="QR de acceso" />
+  </div>
+  <p>
+    O visita directamente:
+    <a id="directLink" href="#">cargando…</a>
+  </p>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(location.search);
-      const grupoId = params.get('grupoId');
-      if (!grupoId) return alert('Falta grupoId en la URL');
-
-      // Pedimos al backend el PNG del QR
-      fetch(`/api/grupos/${grupoId}/qr`)
-        .then(res => {
-          if (!res.ok) throw new Error(res.statusText);
-          return res.blob();
-        })
-        .then(blob => {
-          document.getElementById('qrImg').src = URL.createObjectURL(blob);
-        })
-        .catch(console.error);
-    });
-  </script>
+  <script src="qr.js"></script>
 </body>
 </html>
