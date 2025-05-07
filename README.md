@@ -18,7 +18,7 @@ debemos ejecutar
 
 node app.js
 
-cd C:\Users\Cris\ngrok> 
+cd C:\Users\Cris\ngrok
 .\ngrok.exe http 3000
 
 usuarios y contraseñas:

@@ -7,6 +7,10 @@ body {
   color: #333;
   margin: 0;
   padding: 0;
+  background-image: url('/images/FONDO_AZUL_2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 

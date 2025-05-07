@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Estadisticas del Grupo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/test_sin.css">
   <link rel="stylesheet" href="/css/estadisticas.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -64,8 +64,18 @@
       <div id="match-stats" class="stats-grid"></div>
     </section>
   </main>
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3>¿Estás seguro que deseas cerrar sesión?</h3>
+      <div class="modal-buttons">
+        <button id="confirmLogout" class="confirm-button">Sí, cerrar sesión</button>
+        <button id="cancelLogout" class="cancel-button">Cancelar</button>
+      </div>
+    </div>
+  </div>
   <footer>
-    © 2024 Tu Aplicación - Desarrollada para el TFG de Cristina Cerralbo sobre Gamificación en Educación Odontológica
+    © 2025 - TFG Cristina Cerralbo
   </footer>
 
   <script src="estadisticas.js"></script>

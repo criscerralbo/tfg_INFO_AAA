@@ -1,3 +1,4 @@
+//creo que lo tenemos que borrar
 document.addEventListener('DOMContentLoaded', () => {
   // --- Lógica para el modal de cierre de sesión ---
   const logoutButton = document.getElementById('logout-button');

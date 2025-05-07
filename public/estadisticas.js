@@ -66,6 +66,26 @@ console.log('📊 estadísticas – inicializando…');
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
+    // --- Logout modal ---
+  const logoutButton = document.getElementById('logout-button');
+  const cancelLogout = document.getElementById('cancelLogout');
+  const closeModal = document.getElementById('closeModal');
+  const confirmLogout = document.getElementById('confirmLogout');
+
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      document.getElementById('logoutModal').style.display = 'block';
+    });
+  }
+  cancelLogout?.addEventListener('click', () => {
+    document.getElementById('logoutModal').style.display = 'none';
+  });
+  closeModal?.addEventListener('click', () => {
+    document.getElementById('logoutModal').style.display = 'none';
+  });
+  confirmLogout?.addEventListener('click', () => {
+    fetch('/usuarios/logout').then(() => window.location.href = '/');
+  });
     grupoId = getParam('grupoId');
     if (!grupoId) return alert('Falta el parámetro grupoId en la URL');
     document.querySelector('#btnDescargarResumen').addEventListener('click', descargarResumenExcel);

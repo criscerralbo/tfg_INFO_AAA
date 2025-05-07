@@ -4,10 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QR de Conexión</title>
-  <link rel="stylesheet" href="/css/qr.css" />
+  <link rel="stylesheet" href="/css/pub_quizzes.css" />
 </head>
 <body>
+<header>
   <h1>Escanea para entrar en la app</h1>
+  <div class="user-section">
+    <button class="btn-back" onclick="window.history.back()">← Volver</button>
+    <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+    <div class="user-icon">
+      <a href="/perfil.html">
+        <img src="images/usuario.png" alt="Usuario">
+      </a>
+    </div>
+  </div>
+</header>
+
+  <main>
+    <section>
   <div class="qr-container">
     <img id="qrImg" alt="QR de acceso" />
   </div>
@@ -15,7 +29,21 @@
     O visita directamente:
     <a id="directLink" href="#">cargando…</a>
   </p>
-
+</section>
+ <!-- Modal de confirmación de logout -->
+ <div id="logoutModal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h2>¿Seguro que quieres cerrar sesión?</h2>
+    <div class="modal-buttons">
+      <button id="confirmLogout" class="confirm-button">Sí, cerrar</button>
+      <button id="cancelLogout"  class="cancel-button">Cancelar</button>
+    </div>
+  </div>
+</div>
   <script src="qr.js"></script>
 </body>
+<footer>
+  © 2025 - TFG Cristina Cerralbo
+</footer>
 </html>
