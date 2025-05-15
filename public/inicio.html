@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Usuarios - Gamificación en Odontología</title>
     <link rel="stylesheet" href="/css/inicio.css"> <!-- Estilos generales -->
+
+    <link rel="stylesheet" href="css/responsive-overrides.css"> 
 </head>
 <body>
 
@@ -45,8 +47,8 @@
         Aquí podrás participar en actividades, resolver casos clínicos y medir tu progreso de una manera divertida y educativa.
     </p>
     <div class="botones-section">
-    <button id="btn-alumno-comenzar" class="btn-alumno-comenzar" style="display: block;">COMENZAR</button>
-    <button id="btn-adm-juegos" class="btn-adm-juegos" style="display: none;">Administrar Juegos</button> <!-- Solo visible para administradores/profesores -->
+    <button id="btn-alumno-comenzar" class="btn-alumno-comenzar" style="display: none;">COMENZAR</button><!-- Solo visible para /profesores/alumnos -->
+    <button id="btn-adm-juegos" class="btn-adm-juegos" style="display: none;">Administrar Juegos</button> <!-- Solo visible para /profesores -->
     <button id="qr-button" class="qr-button" style="display: block;">GENERAR QR</button>
 </div>
 </main>
@@ -78,6 +80,12 @@
 
                     if (data.rol === 'profesor') { // Mostrar botón solo si el usuario es administrador
                         document.getElementById('btn-adm-juegos').style.display = 'block';
+                    }
+                    if (data.rol === 'profesor') { // Mostrar botón solo si el usuario es administrador
+                        document.getElementById('btn-alumno-comenzar').style.display = 'block';
+                    }
+                    if (data.rol === 'alumno') { // Mostrar botón solo si el usuario es administrador
+                        document.getElementById('btn-alumno-comenzar').style.display = 'block';
                     }
                 })
                 

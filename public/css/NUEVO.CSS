@@ -1,0 +1,138 @@
+/* ===================================================================
+   responsive-overrides.css   ·   16-05-2025
+   Se enlaza el ÚLTIMO en cada HTML — solo sobre-escribe.
+==================================================================== */
+
+/* ---------- 0 · Fuente corporativa ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* ---------- 1 · Variables globales ---------- */
+:root{
+  --bp-sm:576px;                     /* punto de corte móvil   */
+  --primary-500:#508bbd; --primary-300:#6aa4d0; --danger-500:#e74c3c;
+  --header-h-desk:70px;  --header-h-mob:56px;    --footer-h:56px;
+  --radius-md:12px;
+}
+
+/* ---------- 2 · Reset mínimo ---------- */
+*{box-sizing:border-box;}
+html,body{
+  font-family:'Poppins',sans-serif;
+  font-size:clamp(15px,1.2vw + .4rem,18px);
+  height:100%;
+}
+
+/* ---------- 3 · Fondo global repetitivo ---------- */
+body{
+  /* tu patrón dentales azul; cambia url si procede */
+  background:#f7f9fa url('/images/FOND_AZUL.png') repeat fixed top left;
+  display:flex;flex-direction:column;min-height:100vh;
+  padding-top:var(--header-h-desk);
+}
+@media(max-width:var(--bp-sm)){
+  body{padding-top:calc(var(--header-h-mob)+env(safe-area-inset-top));}
+}
+
+/* ---------- 4 · Header ---------- */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  height:var(--header-h-desk);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.25rem;background:var(--primary-500);color:#fff;
+  box-shadow:0 4px 6px rgba(0,0,0,.1);
+}
+header h1{
+  flex:1 1 auto;margin:0;font-weight:600;font-size:1.6rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.user-section{display:flex;align-items:center;gap:.35rem;}
+.user-icon img{width:40px;height:40px;border-radius:50%;object-fit:cover;}
+
+header button{
+  border:none;background:transparent;color:#fff;cursor:pointer;
+  min-width:44px;min-height:44px;padding:6px 16px;border-radius:var(--radius-md);
+  font-size:.9rem;display:inline-flex;align-items:center;justify-content:center;
+}
+header button:hover{background:rgba(255,255,255,.12);}
+.logout-button{background:var(--danger-500);}
+/* ----------------------------- */
+
+/* === 5 · BOTONES ESPECIALES (desktop = texto · móvil = icono) === */
+.btn-back,
+.btn-stats,
+.btn-profesor-grupos,
+.btn-alumno-grupos,
+.admin-button{padding:0 10px;}
+
+@media(max-width:576PX){
+  header{
+    padding-top:env(safe-area-inset-top);
+    height:calc(var(--header-h-mob)+env(safe-area-inset-top));
+    padding-left:.75rem;padding-right:.75rem;
+  }
+  header h1{font-size:1.2rem;}
+  .logout-button{padding:6px 12px;font-size:.8rem;}
+ 
+
+  .btn-back,
+  .admin-button,
+  .btn-profesor-grupos,
+  .btn-alumno-grupos,
+  .btn-stats{
+    font-size:0 !important;     /* texto invisible           */
+    color:transparent !important;
+  }
+  /* ---------- 16.1  Oculta cualquier texto de los botones, ESTO ES LO QUE FUNCIONA
+                      dejando visibles solo los pseudo-iconos ------ */
+
+  /* Flecha única para “Volver” */
+  .btn-back::before{
+    content:"←";
+    font-size:1.4rem;
+    line-height:1;
+    color:#fff;
+    text-indent:0;
+  }
+  /* Iconos para el resto */
+  .btn-stats::before{
+    content:"📊";
+    font-size:1.4rem;
+    line-height:1;
+    color:#fff;
+    text-indent:0;
+  }
+  .btn-profesor-grupos::before{
+    content:"👥";
+    font-size:1.4rem;
+    line-height:1;
+    color:#fff;
+    text-indent:0;
+  }
+  .admin-button::before{
+    content:"⚙";
+    font-size:1.4rem;
+    line-height:1;
+    color:#fff;
+    text-indent:0;
+  }
+
+
+  /* El saludo largo sobra en móvil */
+  #user-greeting{display:none;}
+}
+
+/* ---------- 6 · Footer fijo al fondo real ---------- */
+main{flex:1 0 auto;margin:0!important;}   /* empuja footer */
+footer{
+  height:var(--footer-h);margin-top:auto;
+  background:#eee;color:#666;font-size:.9rem;
+  display:flex;align-items:center;justify-content:center;padding:0 1rem;
+}
+
+/* ---------- 7 · Fondo visible dentro de secciones ---------- */
+main,section{background:transparent;}
+
+/* ---------- 8 · Pequeños comodines ---------- */
+img,svg{max-width:100%;height:auto;display:block;}
+table{width:100%;border-collapse:collapse;display:block;overflow-x:auto;}
+th,td{padding:.75rem 1rem;}

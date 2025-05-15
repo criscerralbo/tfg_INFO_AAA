@@ -229,3 +229,7 @@ async function eliminarQuiz(id) {
   }
   
 
+  console.log(
+    document.querySelector('main.main-grid').children.length
+  );
+  

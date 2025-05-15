@@ -43,7 +43,9 @@ async function collectStats (grupoId, profId) {
       actividad: EMPTY, topPreguntas: EMPTY,
       quizzes: EMPTY, emparejamientos: EMPTY,
       quizzesRaw: EMPTY, matchesRaw: EMPTY,
+      distribucionNotas: EMPTY ,
       inQuiz: '0', inMatch: '0', alumCond: '1=0'   // para re‑uso
+    
     };
   }
   const alumIds  = alumnos.map(a => a.usuario_id);

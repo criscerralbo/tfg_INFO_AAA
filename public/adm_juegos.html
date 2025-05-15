@@ -2,8 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  
   <title>Administrar Juegos</title>
   <link rel="stylesheet" href="css/adm_juegos.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/responsive-overrides.css"> 
+  
 </head>
 <body>
     <header>
@@ -30,30 +34,67 @@
         </div>
       </div>
     </div>
-  
+
+
     <!-- Contenedor para mensajes de éxito o error -->
     <div id="mensaje-estado" class="mensaje-oculto"></div>
-  
-    <main>
-      <section id="games-container">
-        <!-- Tarjeta para Quiz -->
-        <div class="game-card" data-game="quiz">
-          <h2>Gestionar Quiz</h2>
-          <p>Crear, editar y eliminar ejercicios para los alumnos.</p>
-          <!-- Botón para publicar quizzes -->
-          <button onclick="window.location.href='pub_quizzes.html'">
-            Publicar 
-          </button>
+    <section class="instructions">
+      <p>Gestiona aquí tus quizzes y actividades de emparejamiento de forma sencilla:</p>
+      <ul>
+        <li>
+          <strong>Mis Quizzes / Mis Emparejamientos:</strong>
+          Tus ítems guardados: edítalos o elimínalos cuando quieras.
+        </li>
+        <li>
+          <strong>Quizzes / Emparejamientos Públicos:</strong>
+          Aquí ves los recursos compartidos por otros profesores. Pulsa
+          <em>Guardar en mi repertorio</em> para copiarlos y poder personalizarlos.
+        </li>
+        <li>
+          <strong>Asignar a Grupo:</strong>
+          Selecciona un elemento de “Mis…” y elige el grupo al que asignarlo.
+          <em>Nota:</em> si no perteneces a ningún grupo, primero solicítate alta en uno.
+        </li>
+        <li>
+          <strong>Grupos y sus Quizzes / Emparejamientos Asignados:</strong>
+          Visualiza y, si hace falta, desasigna cualquier recurso asignado a cada grupo.
+        </li>
+      </ul>
+      <button class="action-btn" onclick="window.location.href='pub_quizzes.html'">
+        Ir a Publicar
+      </button>
+    </section>
+    <!-- Bloque de instrucciones para Lista de Quizzes -->
+<section class="instructions2">
+  <p>En esta pantalla puedes crear, editar y eliminar tanto quizzes como actividades de emparejamiento:</p>
+  <ul>
+    <li>
+      <strong>Crear Nuevo Quiz / Crear Nueva Actividad de Emparejamiento:</strong>
+      Define un <em>Título</em> (tema) y una <em>Descripción</em> para que el alumno sepa de qué trata la actividad.
+    </li>
+    <li>
+      <strong>Descripción de Emparejamientos:</strong>
+      Explica qué relación debe hacerse:  
+      por ejemplo, “Identifica el objeto/lesión que aparece en la imagen” o  
+      “Indica qué enfermedad pudo causar este agente externo”.
+    </li>
+    <li>
+      <strong>Opciones Avanzadas en Quizzes:</strong>
+      - Añade imágenes a las preguntas para ilustrar conceptos.  
+      - Ajusta el número de respuestas (más o menos alternativas).  
+      - Ten en cuenta que todos los ítems del quiz valen lo mismo: la puntuación final es un promedio global.
+    </li>
+    <li>
+      <strong>Quizzes / Actividades Existentes:</strong>
+      Aquí verás tus recursos guardados. Desde ahí puedes <em>editar</em> o <em>eliminar</em> cualquier elemento.
+    </li>
+  </ul>
+  <button onclick="window.location.href='adm_quizzes.html'">
+    Crear y editar
+  </button>  
+</section>
 
-          <!-- Botón para administrar quizzes -->
-          <button onclick="window.location.href='adm_quizzes.html'">
-            Crear y editar
-          </button>  
-        </div>
-  
-     
-      </section>
-    </main>
+   
   
   <!-- Modal de confirmación de Logout -->
   <div id="logoutModal" class="modal">

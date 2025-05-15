@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(() => window.location.href = '/');
   });
 
+
   // contenedores
   const tDiv = document.getElementById('lista-tests');
   const eDiv = document.getElementById('lista-emparejamientos');
@@ -45,6 +46,18 @@ fetch('/usuarios/nombre')
   .finally(() => {
     // 2) Si es profe, mostramos el botón de estadísticas
     if (isProfesor) {
+      const btnAdm = document.getElementById('btn-adm-juegos');
+      btnAdm.style.display = 'inline-block';
+      btnAdm.addEventListener('click', () => {
+      
+        window.location.href = `/pub_quizzes.html`;
+      });
+      const btnEdit = document.getElementById('btn-edit-juegos');
+      btnEdit.style.display = 'inline-block';
+      btnEdit.addEventListener('click', () => {
+       
+        window.location.href = `/adm_quizzes.html`;
+      });
       const btnStats = document.getElementById('btn-stats');
       btnStats.style.display = 'inline-block';
       btnStats.addEventListener('click', () => {
@@ -85,6 +98,10 @@ fetch('/usuarios/nombre')
           });
         } else {
           noT.textContent = 'De momento no hay tests asignados.';
+          if (isProfesor){
+            noT.textContent =
+          'De momento no hay test asignados. Si quieres puedes acceder a administrar actividades ';
+          }
         }
 
         // — Emparejamientos —
@@ -106,6 +123,10 @@ fetch('/usuarios/nombre')
           });
         } else {
           noE.textContent = 'De momento no hay emparejamientos asignados.';
+          if (isProfesor){
+            noE.textContent =
+          'De momento no hay emparejamientos asignados. Si quieres puedes acceder a administrar actividades ';
+          }
         }
       })
       .catch(err => {

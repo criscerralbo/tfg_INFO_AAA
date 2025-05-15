@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Actividades del Grupo</title>
-  <link rel="stylesheet" href="/css/test.css">
+  <link rel="stylesheet" href="/css/test_sin.css">
   <link rel="stylesheet" href="/css/actividades.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/responsive-overrides.css"> 
 </head>
 <body>
   <header>
@@ -26,12 +28,16 @@
 
   <main>
     <section>
+      <button id="btn-adm-juegos" class="btn-adm-juegos" style="display: none;">Asignar Actividades</button> <!-- Solo visible para /profesores -->
+      <button id="btn-edit-juegos" class="btn-edit-juegos" style="display: none;">Crear y editar Actividades</button> <!-- Solo visible para /profesores -->
+   
+    </section>
+    <section>
       <h2>📝 Tests</h2>
       <div id="lista-tests" class="grid-actividades"></div>
       <p id="no-tests" class="empty-msg">Cargando tests…</p>
     </section>
-
-    <section>
+      <section>
       <h2>🖼️ Emparejamientos</h2>
       <div id="lista-emparejamientos" class="grid-actividades"></div>
       <p id="no-emparejamientos" class="empty-msg">Cargando emparejamientos…</p>

@@ -325,4 +325,76 @@
         margin-top: 2rem;
       }
       
-   
+   /* ==========================================================
+   AJUSTES RESPONSIVE ESPECÍFICOS  ·  pub_quizzes.css
+   (no afectan a adm_quizzes ni a otras vistas)
+   ========================================================= */
+
+/* -------- 1 · Rejilla adaptable -------------------------- */
+/* portátil / tablet horizontal → 2 columnas */
+@media (max-width: 992px){
+  .fila-grid{ grid-template-columns:repeat(2,1fr); }
+}
+/* móvil / tablet vertical → 1 columna */
+@media (max-width: 576px){
+  .pub-quizzes-layout{ gap:24px; padding:16px; }
+
+  .fila-grid{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+
+  /* Tarjetas: alto libre y padding menor */
+  .fila-grid section{
+    max-height:none;
+    padding:16px;
+  }
+}
+
+/* -------- 2 · Tipografía y botones en pantallas pequeñas -- */
+@media (max-width: 576px){
+  h1{ font-size:1.4rem; }
+  h2{ font-size:1.2rem; margin-bottom:1rem; }
+
+  button{
+    padding:10px;
+    font-size:1rem;
+  }
+}
+
+/* -------- 3 · Scroll interno suave ----------------------- */
+/* Si el contenido crece, dejemos que toda la página scrollee
+   en lugar de un <section> con barra interna en pantallas
+   pequeñas. */
+@media (max-width: 576px){
+  .fila-grid section{ overflow-y:visible; }
+}
+/* BLOQUE DE INSTRUCCIONES */
+.instructions {
+  background-color: #fff;
+  border-left: 4px solid #2980b9;
+  padding: 1rem 1.5rem;
+  margin: calc(var(--header-height) + var(--msg-height) + 1rem) 20px 2rem 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  text-align: left;
+  line-height: 1.6;
+}
+
+.instructions p {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.instructions ul {
+  margin: 0.5rem 0 0.5rem 1.2rem;
+}
+
+.instructions li {
+  margin-bottom: 0.5rem;
+}
+
+.instructions strong {
+  color: #2980b9;
+}

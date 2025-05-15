@@ -100,52 +100,79 @@ console.log('📊 estadísticas – inicializando…');
         throw new Error(`${res.status} → ${text}`);
       }
       const data = await res.json();
-
-      // 1) RESUMEN
-      const summary = $('#summary');
-      summary.innerHTML = '';
-      [
-        { l: 'Alumnos activos',  v: data.activos },
-        { l: 'Intentos totales', v: data.intentosTotales },
-        { l: 'Media global',     v: data.mediaGlobal + '%' }
-      ].forEach(c =>
-        summary.insertAdjacentHTML('beforeend', `
-          <div class="card"><h3>${c.l}</h3><strong>${c.v}</strong></div>`
-        )
-      );
-
-      // 2) ACTIVIDAD últimos 30 días
-      drawBar(
-        '#activityChart',
-        data.actividad.map(r => r.dia),
-        data.actividad.map(r => r.intentos),
-        'Intentos'
-      );
-
-      // 3) HISTOGRAMA NOTAS
-      drawBar(
-        '#scoreChart',
-        data.distribucionNotas.map(r => r.tramo),
-        data.distribucionNotas.map(r => r.n),
-        'Nº intentos'
-      );
-
-      // 4) TOP 10 PREGUNTAS
-      const topUl = $('#top-questions');
-      topUl.innerHTML = '';
-      data.topPreguntas.forEach(p =>
-        topUl.insertAdjacentHTML('beforeend', `
-          <li><strong>${Math.round(p.ratio_error * 100)} % fallos</strong> – ${p.texto}</li>`
-        )
-      );
-
-      // 5) GRIDS
+    
+      /* ─────── sin datos ─────── */
+      const vacio =
+        data.intentosTotales === 0 &&
+        data.actividad.length === 0   &&
+        data.quizzes.length   === 0   &&
+        data.emparejamientos.length === 0;
+    
+      if (vacio) {
+        const wrapper = document.querySelector('#stats-wrapper');   // div que engloba todo
+        if (wrapper) {
+          wrapper.innerHTML =
+            '<p class="msg-empty">Aún no hay estadísticas para este grupo.</p>';
+        }
+        return;           // terminamos sin seguir pintando nada más
+      }
+    
+      /* ─────── RESUMEN ─────── */
+      const summary = document.querySelector('#summary');
+      if (summary) {
+        summary.innerHTML = '';
+        [
+          { l: 'Alumnos activos',  v: data.activos },
+          { l: 'Intentos totales', v: data.intentosTotales },
+          { l: 'Media global',     v: data.mediaGlobal + '%' }
+        ].forEach(c =>
+          summary.insertAdjacentHTML(
+            'beforeend',
+            `<div class="card"><h3>${c.l}</h3><strong>${c.v}</strong></div>`
+          )
+        );
+      }
+    
+      /* ─────── ACTIVIDAD 30 d ─────── */
+      if (data.actividad.length) {
+        drawBar(
+          '#activityChart',
+          data.actividad.map(r => r.dia),
+          data.actividad.map(r => r.intentos),
+          'Intentos'
+        );
+      }
+    
+      /* ─────── HISTOGRAMA NOTAS ─────── */
+      if (data.distribucionNotas.length) {
+        drawBar(
+          '#scoreChart',
+          data.distribucionNotas.map(r => r.tramo),
+          data.distribucionNotas.map(r => r.n),
+          'N.º intentos'
+        );
+      }
+    
+      /* ─────── TOP PREGUNTAS ─────── */
+      const topUl = document.querySelector('#top-questions');
+      if (topUl) {
+        topUl.innerHTML = '';
+        data.topPreguntas.forEach(p =>
+          topUl.insertAdjacentHTML(
+            'beforeend',
+            `<li><strong>${Math.round(p.ratio_error * 100)} % fallos</strong> – ${p.texto}</li>`
+          )
+        );
+      }
+    
+      /* ─────── GRIDS ─────── */
       fillGrid('#quiz-stats',  data.quizzes);
       fillGrid('#match-stats', data.emparejamientos);
-
+    
     } catch (err) {
       console.error('❌ Fallo al cargar estadísticas:', err);
       alert('No se pudieron cargar las estadísticas.\n' + err.message);
     }
+    
   });
 })();
