@@ -86,3 +86,32 @@
     font-size: .9rem;
     color: #555;
   }
+.actividad-info {
+  background: #fff;
+  border-left: 4px solid #2980b9;
+  padding: 1rem 1.5rem;
+  margin: calc(var(--header)) 20px 1rem 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  text-align: left;
+  line-height: 1.5;
+}
+
+#descripcion-actividad {
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.reglas-actividad {
+  margin-left: 1.2rem;
+  color: #555;
+}
+
+.reglas-actividad li {
+  margin-bottom: 0.5rem;
+}
+
+.reglas-actividad strong {
+  color: #2980b9;
+}

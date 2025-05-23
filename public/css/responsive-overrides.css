@@ -30,7 +30,7 @@ body{
   padding-top:var(--header-h-desk);
   
 }
-@media(max-width:var(--bp-sm)){
+@media(max-width:576PXw){
   body{padding-top:calc(var(--header-h-mob)+env(safe-area-inset-top));}
 }
 

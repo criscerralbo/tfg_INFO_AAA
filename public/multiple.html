@@ -36,25 +36,34 @@
   </div>
 
   <main>
-    <div id="quiz-container">
-      <div id="info">
-        <span id="feedback">Pregunta 1 de N</span>
-        <span id="timer">00:00</span>
-      </div>
+  <div id="quiz-container">
+    <div id="info">
+      <span id="feedback">Pregunta 1 de N -  </span>
+     
+    </div>
+        <div id="info">
+      <span id="timer">  00:00</span>
+     
+    </div>
+
+    <!-- contenedor flex para imagen + opciones -->
+    <div class="qa-flex">
       <div id="question-container">
         <img id="pair-image" src="" alt="Imagen de la pregunta">
       </div>
       <div id="options-list" class="options">
         <!-- Aquí se inyectan las opciones -->
       </div>
-      <div class="navigation">
-        <button id="btn-prev" disabled>Anterior</button>
-        <button id="btn-next">Siguiente</button>
-        <button id="btn-submit" style="display:none;">Enviar</button>
-      </div>
     </div>
-  </main>
 
+    <div class="navigation">
+      <button id="btn-prev" disabled>Anterior</button>
+      <button id="btn-next">Siguiente</button>
+      <button id="btn-finish">Terminar intento</button>
+      <button id="btn-submit" style="display:none;">Enviar</button>
+    </div>
+  </div>
+</main>
   <footer>
     © 2025 - TFG Cristina Cerralbo
   </footer>

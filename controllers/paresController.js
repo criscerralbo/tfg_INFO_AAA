@@ -161,6 +161,33 @@ exports.submitAttempt = (req, res) => {
     });
   });
 };
+// GET /api/emparejamientos/:actividadId
+// Devuelve los datos (nombre, descripción, ...) de la actividad
+// controllers/paresController.js
+
+// GET /api/emparejamientos/:actividadId
+exports.getActividad = (req, res) => {
+  const actividadId = req.params.actividadId;
+  const sql = `
+    SELECT nombre, descripcion
+    FROM emparejamientos       /* ← aquí usamos la tabla correcta */
+    WHERE id = ?
+  `;
+  db.query(sql, [actividadId], (err, rows) => {
+    if (err) {
+      console.error('getActividad error:', err);
+      return res.status(500).json({ error: 'Error al cargar la actividad' });
+    }
+    if (!rows.length) {
+      return res.status(404).json({ error: 'Actividad no encontrada' });
+    }
+    res.json({
+      nombre:      rows[0].nombre,
+      descripcion: rows[0].descripcion
+    });
+  });
+};
+
 
 // GET /api/emparejamientos/:actividadId/attempts
 // Lista los intentos del usuario para ese emparejamiento

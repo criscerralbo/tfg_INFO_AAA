@@ -43,6 +43,26 @@ document.addEventListener('DOMContentLoaded', () => {
     .addEventListener('click', () => {
       window.location.href = `/fill.html?actividadId=${actividadId}`;
     });
+// Dentro de DOMContentLoaded, tras validar actividadId y grupoId:
+
+// 1) Fetch de los datos de la actividad, para mostrar la descripción
+// justo tras obtener actividadId...
+fetch(`/api/emparejamientos/${actividadId}`)
+  .then(res => {
+    if (!res.ok) throw new Error('No se encontró la actividad');
+    return res.json();
+  })
+  .then(data => {
+    const descEl = document.getElementById('descripcion-actividad');
+    descEl.textContent = data.descripcion || 'Sin descripción.';
+  })
+  .catch(() => {
+    document.getElementById('descripcion-actividad')
+      .textContent = 'Error al cargar la descripción de la actividad.';
+  });
+
+
+// …resto de tu código (logout, back, navegación, intentos, etc.)…
 
   // — BOTONES MÚLTIPLE —  
   // Revisar intentos

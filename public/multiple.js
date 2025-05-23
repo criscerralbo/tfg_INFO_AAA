@@ -4,54 +4,58 @@ function getParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const actividadId = getParam('actividadId');
-  // Aceptamos mayúsculas/minúsculas por si acaso
   const repetir    = getParam('repetirFalladas') === '1' || getParam('repetirfalladas') === '1';
 
-  console.log('✨ Modo repetir falladas:', repetir, 'actividadId=', actividadId);
-
   if (!actividadId) {
-    return alert('Falta el parámetro actividadId');
+    alert('Falta el parámetro actividadId');
+    return;
   }
 
-  // — DOM elements —
+  // DOM elements
   const imgEl      = document.getElementById('pair-image');
   const optsEl     = document.getElementById('options-list');
   const prevBtn    = document.getElementById('btn-prev');
   const nextBtn    = document.getElementById('btn-next');
+  const finishBtn  = document.getElementById('btn-finish');
   const submitBtn  = document.getElementById('btn-submit');
   const feedbackEl = document.getElementById('feedback');
   const timerEl    = document.getElementById('timer');
+  const backBtn    = document.getElementById('btn-back');
 
-  // — Logout modal elements —
-  const logoutBtn    = document.getElementById('logout-button');
-  const logoutModal  = document.getElementById('logoutModal');
-  const cancelLogout = document.getElementById('cancelLogout');
-  const closeModal   = document.getElementById('closeModal');
-  const confirmLogout= document.getElementById('confirmLogout');
+  // Logout modal
+  const logoutBtn     = document.getElementById('logout-button');
+  const logoutModal   = document.getElementById('logoutModal');
+  const cancelLogout  = document.getElementById('cancelLogout');
+  const closeModal    = document.getElementById('closeModal');
+  const confirmLogout = document.getElementById('confirmLogout');
 
   logoutBtn.onclick    = () => logoutModal.style.display = 'block';
   cancelLogout.onclick = () => logoutModal.style.display = 'none';
   closeModal.onclick   = () => logoutModal.style.display = 'none';
-  confirmLogout.onclick= () => fetch('/usuarios/logout').then(_ => window.location = '/');
+  confirmLogout.onclick= () => fetch('/usuarios/logout').then(() => window.location = '/');
+
+  // Back button
+  backBtn.onclick = () => {
+    window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId}`;
+  };
 
   let questions     = [];
   let options       = [];
-  let answers       = {};    // { questionId: selectedOption }
+  let answers       = {};    // { questionId: selectedOptionOrNull }
   let currentIndex  = 0;
   let timerSecs     = 0;
   let timerInterval = null;
-  // public/js/multiple.js
-const actividadId2 = new URLSearchParams(window.location.search)
-.get('actividadId');
-document.getElementById('btn-back').onclick = () => {
-// de Multiple volvemos a Emparejamiento
-window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId2}`;
-};
 
-
-  // — Cronómetro —
+  // Timer
   function startTimer() {
     timerInterval = setInterval(() => {
       timerSecs++;
@@ -64,7 +68,7 @@ window.location.href = `/actividades-emparejamiento.html?actividadId=${actividad
     clearInterval(timerInterval);
   }
 
-  // — 1) Carga las opciones comunes —
+  // Load common options
   fetch(`/api/emparejamientos/${actividadId}/multiple`)
     .then(res => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -72,7 +76,6 @@ window.location.href = `/actividades-emparejamiento.html?actividadId=${actividad
     })
     .then(data => {
       options = data.questions[0]?.opciones || [];
-      console.log('Opciones cargadas:', options);
     })
     .then(loadQuestions)
     .catch(err => {
@@ -80,7 +83,7 @@ window.location.href = `/actividades-emparejamiento.html?actividadId=${actividad
       alert('Error cargando opciones: ' + err.message);
     });
 
-  // — 2) Carga las preguntas según si es modo normal o modo falladas —
+  // Load questions (normal or repeat)
   function loadQuestions() {
     const url = repetir
       ? `/api/emparejamientos/${actividadId}/falladas`
@@ -93,7 +96,6 @@ window.location.href = `/actividades-emparejamiento.html?actividadId=${actividad
       })
       .then(data => {
         if (repetir) {
-          // falladas devuelve { questions: [{ id, imagen, palabra }] }
           questions = data.questions.map(q => ({
             id: q.id,
             imagen: q.imagen,
@@ -101,14 +103,12 @@ window.location.href = `/actividades-emparejamiento.html?actividadId=${actividad
             respuestaCorrecta: q.palabra
           }));
         } else {
-          // multiple devuelve { questions: [{ id, imagen, opciones, respuestaCorrecta }] }
           questions = data.questions;
         }
 
-        console.log('Preguntas cargadas:', questions);
-
         if (!questions.length) {
-          return alert('No hay preguntas disponibles.');
+          alert('No hay preguntas disponibles.');
+          return;
         }
 
         render();
@@ -120,64 +120,76 @@ window.location.href = `/actividades-emparejamiento.html?actividadId=${actividad
       });
   }
 
-  // — Render de la pregunta actual —
+  // Render current question
   function render() {
     const q = questions[currentIndex];
-    feedbackEl.textContent = `Pregunta ${currentIndex+1} de ${questions.length}`;
+    feedbackEl.textContent = `Pregunta ${currentIndex + 1} de ${questions.length}`;
     imgEl.src = q.imagen;
     imgEl.alt = q.respuestaCorrecta;
+
+    const opts = [...q.opciones];
+    shuffle(opts);
+
     optsEl.innerHTML = '';
-    q.opciones.forEach(opt => {
+    opts.forEach(opt => {
       const lbl = document.createElement('label');
-      lbl.innerHTML = `<input type="radio" name="opt" value="${opt}"> ${opt}`;
+      lbl.innerHTML = `
+        <input type="radio" name="opt" value="${opt}">
+        <span>${opt}</span>
+      `;
       optsEl.appendChild(lbl);
     });
-    if (answers[q.id]) {
-      const sel = optsEl.querySelector(`input[value="${answers[q.id]}"]`);
+
+    const prevAnswer = answers[q.id];
+    if (prevAnswer != null) {
+      const sel = optsEl.querySelector(`input[value="${prevAnswer}"]`);
       if (sel) sel.checked = true;
     }
+
     prevBtn.disabled        = currentIndex === 0;
     nextBtn.style.display   = currentIndex < questions.length - 1 ? 'inline-block' : 'none';
     submitBtn.style.display = currentIndex === questions.length - 1 ? 'inline-block' : 'none';
   }
 
-  // — Guarda localmente la respuesta actual —
+  // Save current answer (allow blank)
   function saveAnswer() {
     const sel = optsEl.querySelector('input[name="opt"]:checked');
-    if (!sel) {
-      alert('Selecciona una opción antes de continuar');
-      return false;
-    }
-    answers[questions[currentIndex].id] = sel.value;
-    return true;
+    answers[questions[currentIndex].id] = sel ? sel.value : null;
   }
 
+  // Navigation handlers
   prevBtn.onclick = () => {
     saveAnswer();
     currentIndex--;
     render();
   };
   nextBtn.onclick = () => {
-    if (!saveAnswer()) return;
+    saveAnswer();
     currentIndex++;
     render();
   };
 
-  // — Manejador de envío —
-  submitBtn.onclick = () => {
-    if (!saveAnswer()) return;
+  // Finish / Submit handlers
+  finishBtn.onclick = doSubmit;
+  submitBtn.onclick = doSubmit;
+
+  function doSubmit() {
+    saveAnswer();
     stopTimer();
 
+
+        // Construimos el array con UNA entrada por cada pregunta,
+    // usando "" si no hay respuesta (se contará como incorrecta).
     const payload = {
-      answers: Object.entries(answers).map(([id, palabra]) => ({
-        pairId: Number(id),
-        palabra
+      answers: questions.map(q => ({
+        pairId:   q.id,
+        palabra:  answers[q.id] || ""
       })),
       duracionSegundos: timerSecs
     };
 
     if (!repetir) {
-      // Modo normal: guardamos intento y redirigimos al historial
+      // Normal mode: record attempt and go to history
       fetch(`/api/emparejamientos/${actividadId}/attempts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -194,32 +206,28 @@ window.location.href = `/actividades-emparejamiento.html?actividadId=${actividad
         console.error(err);
         alert('Error guardando intento: ' + err.message);
       });
-
     } else {
-      // Modo repetir falladas: eliminamos sólo las acertadas de la tabla de falladas
-      const promesas = questions.map(q => {
+      // Repeat-fail mode: delete correct from falladas, then back
+      const deletes = questions.map(q => {
         if (answers[q.id] === q.respuestaCorrecta) {
-          console.log('Borrando fallada:', q.id);
           return fetch(
             `/api/emparejamientos/${actividadId}/falladas?pairId=${q.id}`,
             { method: 'DELETE' }
-          )
-          .then(res => {
-            if (!res.ok) throw new Error(`DELETE fallada ${q.id} -> HTTP ${res.status}`);
+          ).then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
           });
         }
         return Promise.resolve();
       });
 
-      Promise.all(promesas)
+      Promise.all(deletes)
         .then(() => {
-          // tras limpiar, volvemos a la pantalla de modos
           window.location.href = `/actividades-emparejamiento.html?actividadId=${actividadId}`;
         })
         .catch(err => {
           console.error(err);
-          alert('Error al actualizar preguntas falladas: ' + err.message);
+          alert('Error actualizando preguntas falladas: ' + err.message);
         });
     }
-  };
+  }
 });
